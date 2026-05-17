@@ -3,7 +3,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { analysisSchema, type AnalysisSchema } from '../types/analysisSchema';
 import { analysisConfig } from '../features/analysis/analysisConfig';
 import { useScrollSpy } from '../hooks/useScrollSpy';
-import { FormHeader } from '../features/analysis/FormHeader';
 import { FormSidebar } from '../features/analysis/FormSidebar';
 import { FormSection } from '../features/analysis/FormSection';
 import { useFormPersist } from '../hooks/useFormPersist';
@@ -77,7 +76,6 @@ export const AnalysisPage = () => {
 
   return (
     <div className="flex-1 flex overflow-hidden flex-col bg-white">
-      <FormHeader title="Analysis" />
 
       <FormProvider {...methods}>
         <form 

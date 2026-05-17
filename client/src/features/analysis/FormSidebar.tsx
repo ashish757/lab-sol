@@ -12,7 +12,9 @@ interface FormSidebarProps {
 export const FormSidebar = ({ config, activeSection, onScrollTo, onReset, onSaveDraft }: FormSidebarProps) => {
   return (
     <nav className="w-full lg:w-64 bg-slate-50 border-r border-slate-200 overflow-y-auto z-0 flex-shrink-0 flex flex-col">
-      {/* Top Actions & Live Progress Panel */}
+      <div className="p-5 border-b border-slate-200 bg-white/60 flex flex-col gap-4 sticky top-0 z-10 backdrop-blur-md">
+        <h1 className="text-2xl font-bold text-slate-800">New Analysis</h1>
+      </div>
       <div className="p-5 border-b border-slate-200 bg-white/60 flex flex-col gap-4 sticky top-0 z-10 backdrop-blur-md">
         <FormProgress className="w-full select-none flex flex-col gap-2" />
         <div className="flex flex-col gap-2">
