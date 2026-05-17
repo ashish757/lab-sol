@@ -24,6 +24,32 @@ export const AnalysisPage = () => {
     console.log("Data: ", data);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      
+      const form = e.currentTarget;
+      const inputs = Array.from(
+        form.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
+          'input:not([type="hidden"]):not([disabled]), select:not([disabled])'
+        )
+      );
+      
+      const index = inputs.indexOf(e.target as any);
+      if (index > -1) {
+        if (e.shiftKey) {
+          if (index > 0) {
+            inputs[index - 1].focus();
+          }
+        } else {
+          if (index < inputs.length - 1) {
+            inputs[index + 1].focus();
+          }
+        }
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-100">
       <div className="bg-white overflow-hidden flex flex-col h-[calc(100vh-3rem)]">
@@ -33,7 +59,11 @@ export const AnalysisPage = () => {
         />
 
         <FormProvider {...methods}>
-          <form onSubmit={methods.handleSubmit(onSubmit)} className="flex flex-1 overflow-hidden flex-col lg:flex-row">
+          <form 
+            onSubmit={methods.handleSubmit(onSubmit)} 
+            onKeyDown={handleKeyDown}
+            className="flex flex-1 overflow-hidden flex-col lg:flex-row"
+          >
             <FormSidebar 
               config={analysisConfig} 
               activeSection={expanded} 
