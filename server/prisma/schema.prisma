@@ -7,3 +7,19 @@ datasource db {
   provider = "postgresql"
 }
 
+model DailyAnalysisLog {
+  id          String    @id @default(uuid()) @unique()
+  
+  logDate     DateTime   @map("log_date")
+  
+  metrics     Json
+
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  // Optional: If you have a User model, you can link who submitted it
+  // createdById String?   @map("created_by_id")
+  // createdBy   User?     @relation(fields: [createdById], references: [id])
+
+  @@map("daily_analysis_logs")
+}
