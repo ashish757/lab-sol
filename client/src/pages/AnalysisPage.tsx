@@ -6,7 +6,6 @@ import { useScrollSpy } from '../hooks/useScrollSpy';
 import { FormHeader } from '../features/analysis/FormHeader';
 import { FormSidebar } from '../features/analysis/FormSidebar';
 import { FormSection } from '../features/analysis/FormSection';
-
 import { useFormPersist } from '../hooks/useFormPersist';
 
 export const AnalysisPage = () => {
@@ -73,10 +72,7 @@ export const AnalysisPage = () => {
 
   return (
     <div className="h-screen bg-white overflow-hidden flex flex-col">
-      <FormHeader 
-        title="Analysis" 
-        onGenerateReport={methods.handleSubmit(onSubmit)} 
-      />
+      <FormHeader title="Analysis" />
 
       <FormProvider {...methods}>
         <form 

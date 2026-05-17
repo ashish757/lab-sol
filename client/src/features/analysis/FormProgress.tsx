@@ -8,7 +8,11 @@ const isFilled = (val: any): boolean => {
   return true;
 };
 
-export const FormProgress = React.memo(() => {
+export interface FormProgressProps {
+  className?: string;
+}
+
+export const FormProgress = React.memo(({ className }: FormProgressProps) => {
   const { control } = useFormContext();
   const values = useWatch({ control }) || {};
 
@@ -35,10 +39,10 @@ export const FormProgress = React.memo(() => {
   }, [filledCount, totalFields]);
 
   return (
-    <div className="w-full bg-slate-50 border-b border-slate-200 px-6 py-3 select-none flex flex-col gap-2 z-10 flex-shrink-0">
+    <div className={className || "w-full bg-slate-50 border-b border-slate-200 px-6 py-3 select-none flex flex-col gap-2 z-10 flex-shrink-0"}>
       <div className="flex items-center justify-between">
         <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-          Data Entry Progress
+        Progress
         </span>
         <span className="text-xs font-bold text-slate-700 bg-slate-200/60 px-2 py-0.5 rounded-full border border-slate-200/40">
           {filledCount} / {totalFields} ({percentage}%)
