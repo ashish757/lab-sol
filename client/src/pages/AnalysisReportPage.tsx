@@ -18,10 +18,10 @@ export const AnalysisReportPage = () => {
   const query = useGetLogById(id);
 
   const handleDownloadExcel = () => {
-    const url = getDownloadDailyReportUrl();
+    const url = getDownloadDailyReportUrl(id);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', 'Daily_Report.xlsx');
+    link.setAttribute('download', `Daily_Report_${id || 'new'}.xlsx`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
