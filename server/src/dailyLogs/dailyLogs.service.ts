@@ -39,4 +39,10 @@ export class DailyLogsService {
       orderBy: { createdAt: 'desc' },
     });
   }
+
+  async findOne(id: string) {
+    return this.prisma.dailyAnalysisLog.findUnique({
+      where: { id },
+    });
+  }
 }

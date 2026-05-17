@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { DailyLogsService } from './dailyLogs.service';
 import { UpsertDailyLogDto } from './dto/dailyLog.dto';
 
@@ -25,5 +25,14 @@ export class DailyLogsController {
       return this.dailyLogsService.findByDate(date);
     }
     return this.dailyLogsService.findAll();
+  }
+
+  /**
+   * GET /daily-logs/:id
+   * Fetch a single daily log by UUID.
+   */
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.dailyLogsService.findOne(id);
   }
 }
