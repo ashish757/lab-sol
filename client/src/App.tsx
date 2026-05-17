@@ -5,6 +5,7 @@ import { AnalysisPage } from './pages/AnalysisPage';
 import { AnalysisReportPage } from './pages/AnalysisReportPage';
 import { HomePage } from './pages/HomePage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { SettingsPage } from './pages/SettingsPage';
 import { LogsPage } from './pages/LogsPage';
 import { PAGES } from './config/routesConfig';
 
@@ -18,6 +19,7 @@ function App() {
           <Route path={PAGES.NEW_ANALYSIS} element={<AnalysisReportPage />} />
           <Route path={PAGES.ANALYSIS_REPORT} element={<AnalysisReportPage />} />
           <Route path={PAGES.LOGS_LIST} element={<LogsPage />} />
+          <Route path={PAGES.SETTINGS} element={<SettingsPage />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

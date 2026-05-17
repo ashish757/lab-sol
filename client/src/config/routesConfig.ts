@@ -4,6 +4,7 @@ export const PAGES = {
   NEW_LOG: '/log/new',
   NEW_ANALYSIS: '/analysis/new',
   ANALYSIS_REPORT: '/analysis/:id',
+  SETTINGS: '/settings',
 } as const;
 
 export const getPagePath = {

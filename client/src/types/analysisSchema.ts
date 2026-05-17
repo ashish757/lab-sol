@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { analysisConfig } from '../features/analysis/analysisConfig';
+import { analysisConfig } from '../config/analysisConfig';
 
 const schemaShape: Record<string, any> = {};
 

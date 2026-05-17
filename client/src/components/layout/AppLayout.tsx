@@ -7,7 +7,7 @@ const navItems = [
   { to: PAGES.HOME, icon: Home, label: 'Home', end: true },
   { to: PAGES.NEW_LOG, icon: FileText, label: 'New Analysis' },
   { to: PAGES.LOGS_LIST, icon: List, label: 'Logs' },
-  { to: '/settings', icon: Settings, label: 'Settings' },
+  { to: PAGES.SETTINGS, icon: Settings, label: 'Settings' },
 ];
 
 export const AppLayout = () => {
@@ -30,15 +30,14 @@ export const AppLayout = () => {
               end={end}
               title={label}
               className={({ isActive }) =>
-                `group relative w-11 h-11 rounded-lg rounded-r-none  flex items-center justify-center transition-all duration-200  w-full ${
-                  isActive
-                    ? 'bg-slate-100 scale-105'
-                    : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900 hover:scale-105'
+                `group relative w-11 h-11 rounded-lg rounded-r-none  flex items-center justify-center transition-all duration-200  w-full ${isActive
+                  ? 'bg-slate-100 scale-105'
+                  : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900 hover:scale-105'
                 }`
               }
             >
               <Icon size={20} strokeWidth={2} />
-              
+
               <span className="absolute left-full ml-3 px-3 py-1.5 text-xs font-semibold text-white bg-slate-900 border border-slate-800 rounded-lg whitespace-nowrap opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-x-0 -translate-x-2 transition-all duration-150 pointer-events-none shadow-xl z-50">
                 {label}
               </span>
@@ -46,8 +45,8 @@ export const AppLayout = () => {
           ))}
         </div>
 
-        <div className="w-9 h-9 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-200 text-xs font-bold cursor-pointer hover:bg-slate-800 hover:text-white hover:scale-105 transition-all shadow-md shadow-black/20">
-          A
+        <div className="w-10 h-10 rounded-full bg-slate-300 flex items-center justify-center text-slate-900 text-xs font-bold cursor-pointer hover:bg-slate-800 hover:text-white hover:scale-105 transition-all shadow-md shadow-black/20">
+          U
         </div>
       </nav>
 

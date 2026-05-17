@@ -2,10 +2,10 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
 import { analysisSchema, type AnalysisSchema } from '../types/analysisSchema';
-import { analysisConfig } from '../features/analysis/analysisConfig';
+import { analysisConfig } from '../config/analysisConfig';
 import { useScrollSpy } from '../hooks/useScrollSpy';
-import { FormSidebar } from '../features/analysis/FormSidebar';
-import { FormSection } from '../features/analysis/FormSection';
+import { FormSidebar } from '../components/analysis/FormSidebar';
+import { FormSection } from '../components/analysis/FormSection';
 import { useFormPersist } from '../hooks/useFormPersist';
 import { PAGES } from '../config/routesConfig';
 
@@ -56,23 +56,23 @@ export const AnalysisPage = () => {
       logDate: todayDate ?? new Date().toISOString().slice(0, 10),
       metrics: rest as Record<string, unknown>,
     };
-    
+
     clearStorage();
-    
+
     navigate(PAGES.NEW_ANALYSIS, { state: { payload } });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      
+
       const form = e.currentTarget;
       const inputs = Array.from(
         form.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
           'input:not([type="hidden"]):not([disabled]), select:not([disabled])'
         )
       );
-      
+
       const index = inputs.indexOf(e.target as any);
       if (index > -1) {
         if (e.shiftKey) {
@@ -92,15 +92,15 @@ export const AnalysisPage = () => {
     <div className="flex-1 flex overflow-hidden flex-col bg-white">
 
       <FormProvider {...methods}>
-        <form 
-          onSubmit={methods.handleSubmit(onSubmit)} 
+        <form
+          onSubmit={methods.handleSubmit(onSubmit)}
           onKeyDown={handleKeyDown}
           className="flex flex-1 overflow-hidden flex-col lg:flex-row"
         >
-          <FormSidebar 
-            config={analysisConfig} 
-            activeSection={expanded} 
-            onScrollTo={handleScrollTo} 
+          <FormSidebar
+            config={analysisConfig}
+            activeSection={expanded}
+            onScrollTo={handleScrollTo}
             onReset={handleReset}
             onSaveDraft={saveDraft}
             isSubmitting={false}

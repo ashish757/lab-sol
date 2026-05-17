@@ -1,6 +1,6 @@
 import React from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
-import type { FieldConfig } from './analysisConfig';
+import type { FieldConfig } from '../../config/analysisConfig';
 
 interface BaseInputProps {
   label: string;
@@ -52,14 +52,12 @@ const BasePrimitiveInputRow = React.memo(({ label, fields, children }: BaseInput
               const error = errors[field.id];
               const isDateTime = field.type === 'date' || field.type === 'time';
               const inputClassName = isDateTime
-                ? `p-0 border-none bg-transparent font-bold text-base shadow-none focus:ring-0 focus:outline-none appearance-none m-0 ${
-                    error ? 'text-red-650' : 'text-blue-600'
-                  }`
-                : `px-3 py-1.5 border rounded-md text-sm bg-slate-50/50 hover:bg-white transition-all duration-200 w-full ${
-                    error
-                      ? 'border-red-500 focus:bg-white focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 bg-red-50/20'
-                      : 'border-slate-200 hover:border-blue-400 focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100'
-                  }`;
+                ? `p-0 border-none bg-transparent font-bold text-base shadow-none focus:ring-0 focus:outline-none appearance-none m-0 ${error ? 'text-red-650' : 'text-blue-600'
+                }`
+                : `px-3 py-1.5 border rounded-md text-sm bg-slate-50/50 hover:bg-white transition-all duration-200 w-full ${error
+                  ? 'border-red-500 focus:bg-white focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 bg-red-50/20'
+                  : 'border-slate-200 hover:border-blue-400 focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100'
+                }`;
 
               const subLabel = fields.length > 1 ? field.subLabel : '';
 
@@ -107,7 +105,7 @@ const RatioCalculatedInput = React.memo(({ label, fields }: BaseInputProps) => {
 
   const brixIndex = fields.findIndex(f => f.id.toLowerCase().includes('brix'));
   const polIndex = fields.findIndex(f => f.id.toLowerCase().includes('pol'));
-  
+
   if (brixIndex === -1 || polIndex === -1) {
     return <BasePrimitiveInputRow label={label} fields={fields} />;
   }

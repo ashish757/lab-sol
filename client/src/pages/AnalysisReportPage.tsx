@@ -28,14 +28,13 @@ export const AnalysisReportPage = () => {
   };
 
   const [createdLogId, setCreatedLogId] = useState<string | null>(null);
-  const [loadingPhase, setLoadingPhase] = useState('Initializing laboratory payload...');
+  const [loadingPhase, setLoadingPhase] = useState('Initializing payload...');
 
   // 1. Trigger log generation on mount if this is /analysis/new
   useEffect(() => {
     if (isNew) {
       const payload = location.state?.payload;
       if (!payload) {
-        // No payload? Redirect back to the form
         navigate(PAGES.NEW_LOG, { replace: true });
         return;
       }

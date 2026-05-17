@@ -1,4 +1,4 @@
-import type { GroupConfig } from './analysisConfig';
+import type { GroupConfig } from '../../config/analysisConfig';
 import { FormProgress } from './FormProgress';
 
 interface FormSidebarProps {
@@ -20,7 +20,7 @@ export const FormSidebar = ({ config, activeSection, onScrollTo, onReset, onSave
 
       <div className="px-5 py-5 border-b border-slate-200 flex flex-col gap-4 shrink-0 bg-slate-50">
         <FormProgress className="w-full select-none flex flex-col gap-2" />
-        
+
         <div className="flex flex-col gap-2 mt-1">
           <button
             type="submit"
@@ -59,11 +59,10 @@ export const FormSidebar = ({ config, activeSection, onScrollTo, onReset, onSave
             key={group.groupId}
             type="button"
             onClick={() => onScrollTo(group.groupId)}
-            className={`text-left px-5 py-2.5 text-xs font-medium transition-colors relative ${
-              activeSection === group.groupId
+            className={`text-left px-5 py-2.5 text-xs font-medium transition-colors relative ${activeSection === group.groupId
                 ? 'bg-indigo-100 text-indigo-700 font-extrabold'
                 : 'text-slate-700 hover:bg-slate-50 hover:text-slate-950'
-            }`}
+              }`}
           >
             {group.title}
           </button>

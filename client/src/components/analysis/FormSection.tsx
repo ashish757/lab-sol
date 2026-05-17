@@ -1,5 +1,5 @@
 import React from 'react';
-import { type GroupConfig } from './analysisConfig';
+import { type GroupConfig } from '../../config/analysisConfig';
 import { PrimitiveInput } from './PrimitiveInputs';
 
 interface FormSectionProps {

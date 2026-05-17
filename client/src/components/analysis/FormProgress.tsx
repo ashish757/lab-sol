@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
-import { analysisConfig } from './analysisConfig';
+import { analysisConfig } from '../../config/analysisConfig';
 
 const isFilled = (val: any): boolean => {
   if (val === undefined || val === null || val === '') return false;
