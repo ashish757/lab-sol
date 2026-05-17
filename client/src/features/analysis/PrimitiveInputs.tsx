@@ -31,8 +31,8 @@ export const PrimitiveInput = ({ label, fields, groupId }: PrimitiveInputProps) 
     const pol = typeof polVal === 'number' ? polVal : parseFloat(polVal as string);
 
     let ratioText = '-';
-    if (!isNaN(brix) && !isNaN(pol) && pol !== 0) {
-      ratioText = (brix / pol).toFixed(2);
+    if (!isNaN(brix) && !isNaN(pol) && brix !== 0) {
+      ratioText = (pol / brix).toFixed(2);
     }
 
     return (
