@@ -1,7 +1,9 @@
+import { Link } from 'react-router-dom';
 import { useMemo } from 'react';
 import { useGetLogs } from '../hooks/useDailyLogs';
 import type { DailyLogResponse } from '../api/dailyLogs';
 import { FileText, AlertCircle, RefreshCw, Layers } from 'lucide-react';
+import { getPagePath } from '../config/routesConfig';
 
 function formatDate(dateStr: string): string {
   try {
@@ -38,7 +40,7 @@ function StatusBadge({ status }: { status: string }) {
 function SkeletonRow() {
   return (
     <tr className="border-b border-slate-200">
-      {[...Array(5)].map((_, i) => (
+      {[...Array(6)].map((_, i) => (
         <td key={i} className="px-4 py-4">
           <div className="h-4 bg-slate-100 rounded animate-pulse w-3/4" />
         </td>
@@ -142,7 +144,7 @@ export const LogsPage = () => {
               <table className="w-full text-left text-xs text-slate-900">
                 <thead className="bg-slate-700">
                   <tr>
-                    {['Date', 'Status', 'Cane Crushed (Qtls)', 'Total Sugar Bagged (Qtls)', 'Created'].map(
+                    {['Date', 'Status', 'Cane Crushed (Qtls)', 'Total Sugar Bagged (Qtls)', 'Created', 'Action'].map(
                       (col) => (
                         <th
                           key={col}
@@ -177,6 +179,15 @@ export const LogsPage = () => {
                           </td>
                           <td className="px-4 py-4 text-slate-600 font-semibold whitespace-nowrap">
                             {formatDate(log.createdAt)}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <Link
+                              to={getPagePath.analysisReport(log.id)}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 hover:text-indigo-800 text-[10px] font-bold rounded-lg border border-indigo-200 transition-colors uppercase tracking-wider"
+                            >
+                              <FileText size={11} />
+                              View Report
+                            </Link>
                           </td>
                         </tr>
                       ))}

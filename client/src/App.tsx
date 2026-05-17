@@ -2,9 +2,11 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
 import { AppLayout } from './components/layout/AppLayout';
 import { AnalysisPage } from './pages/AnalysisPage';
+import { AnalysisReportPage } from './pages/AnalysisReportPage';
 import { HomePage } from './pages/HomePage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { LogsPage } from './pages/LogsPage';
+import { PAGES } from './config/routesConfig';
 
 function App() {
   return (
@@ -12,8 +14,10 @@ function App() {
       <Routes>
         <Route element={<AppLayout />}>
           <Route index element={<HomePage />} />
-          <Route path="/analysis/new" element={<AnalysisPage />} />
-          <Route path="/logs" element={<LogsPage />} />
+          <Route path={PAGES.NEW_LOG} element={<AnalysisPage />} />
+          <Route path={PAGES.NEW_ANALYSIS} element={<AnalysisReportPage />} />
+          <Route path={PAGES.ANALYSIS_REPORT} element={<AnalysisReportPage />} />
+          <Route path={PAGES.LOGS_LIST} element={<LogsPage />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

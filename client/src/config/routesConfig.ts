@@ -1,0 +1,20 @@
+export const PAGES = {
+  HOME: '/',
+  LOGS_LIST: '/logs',
+  NEW_LOG: '/log/new',
+  NEW_ANALYSIS: '/analysis/new',
+  ANALYSIS_REPORT: '/analysis/:id',
+} as const;
+
+export const getPagePath = {
+  home: () => PAGES.HOME,
+  logsList: () => PAGES.LOGS_LIST,
+  newLog: () => PAGES.NEW_LOG,
+  newAnalysis: () => PAGES.NEW_ANALYSIS,
+  analysisReport: (id: string | number) => `/analysis/${id}`,
+};
+
+export const API_ENDPOINTS = {
+  DAILY_LOGS: '/api/daily-logs',
+  DAILY_LOG_BY_ID: (id: string | number) => `/api/daily-logs/${id}`,
+} as const;

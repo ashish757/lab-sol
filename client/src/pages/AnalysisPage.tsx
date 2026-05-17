@@ -1,12 +1,13 @@
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useNavigate } from 'react-router-dom';
 import { analysisSchema, type AnalysisSchema } from '../types/analysisSchema';
 import { analysisConfig } from '../features/analysis/analysisConfig';
 import { useScrollSpy } from '../hooks/useScrollSpy';
 import { FormSidebar } from '../features/analysis/FormSidebar';
 import { FormSection } from '../features/analysis/FormSection';
 import { useFormPersist } from '../hooks/useFormPersist';
-import { useUpsertLog } from '../hooks/useDailyLogs';
+import { PAGES } from '../config/routesConfig';
 
 const getInitialValues = () => {
   const today = new Date();
@@ -29,6 +30,7 @@ const getInitialValues = () => {
 };
 
 export const AnalysisPage = () => {
+  const navigate = useNavigate();
   const methods = useForm<AnalysisSchema>({
     resolver: zodResolver(analysisSchema),
     mode: 'onBlur',
@@ -36,7 +38,6 @@ export const AnalysisPage = () => {
   });
 
   const { saveDraft, clearStorage } = useFormPersist(methods, { key: 'analysis-form' });
-  const mutation = useUpsertLog();
 
   const sectionIds = analysisConfig.map((group) => group.groupId);
   const { activeSection: expanded, scrollTo: handleScrollTo } = useScrollSpy(
@@ -51,17 +52,14 @@ export const AnalysisPage = () => {
 
   const onSubmit = (data: AnalysisSchema) => {
     const { todayDate, ...rest } = data;
-    mutation.mutate(
-      {
-        logDate: todayDate ?? new Date().toISOString().slice(0, 10),
-        metrics: rest as Record<string, unknown>,
-      },
-      {
-        onSuccess: () => {
-          // clearStorage();
-        },
-      },
-    );
+    const payload = {
+      logDate: todayDate ?? new Date().toISOString().slice(0, 10),
+      metrics: rest as Record<string, unknown>,
+    };
+    
+    clearStorage();
+    
+    navigate(PAGES.NEW_ANALYSIS, { state: { payload } });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
@@ -105,7 +103,7 @@ export const AnalysisPage = () => {
             onScrollTo={handleScrollTo} 
             onReset={handleReset}
             onSaveDraft={saveDraft}
-            isSubmitting={mutation.isPending}
+            isSubmitting={false}
           />
 
           <div className="flex-1 overflow-y-auto p-6 lg:p-8 bg-slate-50 relative scroll-smooth">

@@ -1,10 +1,12 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { Home, FileText, List, Settings } from 'lucide-react';
 
+import { PAGES } from '../../config/routesConfig';
+
 const navItems = [
-  { to: '/', icon: Home, label: 'Home', end: true },
-  { to: '/analysis/new', icon: FileText, label: 'New Analysis' },
-  { to: '/logs', icon: List, label: 'Logs' },
+  { to: PAGES.HOME, icon: Home, label: 'Home', end: true },
+  { to: PAGES.NEW_LOG, icon: FileText, label: 'New Analysis' },
+  { to: PAGES.LOGS_LIST, icon: List, label: 'Logs' },
   { to: '/settings', icon: Settings, label: 'Settings' },
 ];
 

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { FileText, ArrowRight, Database, Activity } from 'lucide-react';
+import { PAGES } from '../config/routesConfig';
 
 export const HomePage = () => {
   return (
@@ -25,14 +26,14 @@ export const HomePage = () => {
             
             <div className="flex flex-wrap gap-4">
               <Link
-                to="/analysis/new"
+                to={PAGES.NEW_LOG}
                 className="inline-flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] text-white text-xs font-semibold rounded-xl transition-all shadow-lg shadow-indigo-600/30 cursor-pointer"
               >
                 Start Analysing
                 <ArrowRight size={14} strokeWidth={2.5} />
               </Link>
               <Link
-                to="/logs"
+                to={PAGES.LOGS_LIST}
                 className="inline-flex items-center gap-2 px-5 py-3 bg-slate-900 hover:bg-slate-800 text-slate-200 text-xs font-semibold rounded-xl border border-slate-800 transition-all cursor-pointer"
               >
                 View Historical Logs
@@ -51,7 +52,7 @@ export const HomePage = () => {
             <p className="text-xs text-slate-600 leading-relaxed mb-4">
               Enter over 30+ precision parameters with tab-focus acceleration, auto-saving drafts, and client-side schemas.
             </p>
-            <Link to="/analysis/new" className="text-xs font-bold text-indigo-600 hover:text-indigo-700 inline-flex items-center gap-1">
+            <Link to={PAGES.NEW_LOG} className="text-xs font-bold text-indigo-600 hover:text-indigo-700 inline-flex items-center gap-1">
               Start Log <ArrowRight size={12} />
             </Link>
           </div>
@@ -64,7 +65,7 @@ export const HomePage = () => {
             <p className="text-xs text-slate-600 leading-relaxed mb-4">
               Access structured historical records instantly. Compare production results, filter metrics, and sync state securely.
             </p>
-            <Link to="/logs" className="text-xs font-bold text-emerald-600 hover:text-emerald-700 inline-flex items-center gap-1">
+            <Link to={PAGES.LOGS_LIST} className="text-xs font-bold text-emerald-600 hover:text-emerald-700 inline-flex items-center gap-1">
               Browse Logs <ArrowRight size={12} />
             </Link>
           </div>
