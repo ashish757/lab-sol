@@ -11,59 +11,66 @@ interface PrimitiveInputProps extends BaseInputProps {
   groupId?: string;
 }
 
+const getFieldUnit = (field: FieldConfig): string => {
+  if (field.type === 'date') return 'Date';
+  if (field.type === 'time') return 'Time';
+  return field.unit || '-';
+};
+
+const getInputType = (type: string): string => {
+  if (type === 'number') return 'number';
+  if (type === 'date') return 'date';
+  if (type === 'time') return 'time';
+  return 'text';
+};
+
+const getRegisterOptions = (type: string) => {
+  if (type === 'number') return { valueAsNumber: true };
+  return {};
+};
+
 const BasePrimitiveInputRow = React.memo(({ label, fields, children }: BaseInputProps & { children?: React.ReactNode }) => {
   const { register, formState: { errors } } = useFormContext();
 
   return (
-    <tr className="border-b border-slate-100 hover:bg-slate-50 transition-colors relative group">
-      <td className="py-3 pl-4 text-xs font-semibold text-slate-600 tracking-wide uppercase select-none align-middle w-1/3 md:w-1/4 lg:w-1/3">
+    <tr className="border-b border-slate-100 hover:bg-slate-50/70 transition-colors relative group">
+      <td className="py-3.5 pl-4 text-xs font-semibold text-slate-600 tracking-wide uppercase select-none align-middle w-1/3 md:w-1/4 lg:w-1/3">
         <label className="cursor-pointer block">
           {label}
         </label>
       </td>
-      <td className="py-3 px-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider align-middle w-1/4 md:w-1/6">
-        {Array.from(new Set(fields.map(f => {
-          const isDateTime = f.type === 'date' || f.type === 'time';
-          return isDateTime ? (f.type === 'date' ? 'Date' : 'Time') : (f.unit || '-');
-        }))).join(' / ')}
+      <td className="py-3.5 px-4 text-[10px] font-bold text-slate-400/90 uppercase tracking-widest align-middle w-1/4 md:w-1/6 select-none">
+        {Array.from(new Set(fields.map(getFieldUnit))).join(' / ')}
       </td>
-      <td className="py-3 pr-4 align-middle relative w-auto">
+      <td className="py-3.5 pr-4 align-middle relative w-auto">
         <div className="flex items-center w-full">
           <div className={`grid gap-4 ${fields.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} flex-1 w-full`}>
             {fields.map(field => {
               const isDateTime = field.type === 'date' || field.type === 'time';
               const inputClassName = isDateTime
-                ? "p-0 border-none bg-transparent text-blue-700 font-bold text-base shadow-none focus:ring-0 focus:outline-none w-full appearance-none m-0"
-                : "px-3 py-1.5 border border-slate-300 rounded shadow-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm bg-white transition-colors hover:border-slate-400 w-full";
+                ? "p-0 border-none bg-transparent text-blue-600 font-bold text-base shadow-none focus:ring-0 focus:outline-none w-full appearance-none m-0"
+                : "px-3 py-1.5 border border-slate-200 rounded-md text-sm bg-slate-50/50 hover:bg-white hover:border-blue-400 focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-200 w-full";
 
               const subLabel = fields.length > 1 ? (field.id.match(/[A-Z][a-z]*$/)?.[0] || field.id) : '';
 
-              const getRegisterOptions = () => {
-                if (field.type === 'number') return { valueAsNumber: true };
-                return {};
-              };
-
-              const getInputType = () => {
-                if (field.type === 'number') return 'number';
-                if (field.type === 'date') return 'date';
-                if (field.type === 'time') return 'time';
-                return 'text';
-              };
-
               return (
                 <div key={field.id} className="relative w-full flex items-center">
-                  {subLabel && <span className="text-[10px] font-bold text-slate-400 mr-3 uppercase tracking-wider w-16 text-right select-none">{subLabel}</span>}
+                  {subLabel && (
+                    <span className="text-[10px] font-bold text-slate-400/90 mr-3 uppercase tracking-wider w-14 text-right select-none">
+                      {subLabel}
+                    </span>
+                  )}
                   <div className="relative w-full">
                     <input
                       id={field.id}
-                      type={getInputType()}
+                      type={getInputType(field.type)}
                       step={field.type === 'number' ? 'any' : undefined}
                       placeholder={field.type === 'time' ? 'HH:MM' : ''}
-                      {...register(field.id, getRegisterOptions())}
+                      {...register(field.id, getRegisterOptions(field.type))}
                       className={inputClassName}
                     />
                     {errors[field.id] && (
-                      <span className="absolute -bottom-4 left-0 text-[10px] text-red-500 font-medium">
+                      <span className="absolute -bottom-4 left-0 text-[10px] text-red-500 font-semibold tracking-wide">
                         {errors[field.id]?.message as string}
                       </span>
                     )}
@@ -108,9 +115,9 @@ const RatioCalculatedInput = React.memo(({ label, fields }: BaseInputProps) => {
 
   return (
     <BasePrimitiveInputRow label={label} fields={fields}>
-      <div className="w-16 flex-shrink-0 flex flex-col items-center justify-center ml-4 pl-4 border-l border-slate-200">
-        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Purity</span>
-        <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">
+      <div className="w-20 flex-shrink-0 flex flex-col items-center justify-center ml-6 pl-6 border-l border-slate-100 select-none">
+        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Purity</span>
+        <span className="text-xs font-extrabold text-blue-600 bg-blue-50/80 px-2.5 py-1 rounded-full border border-blue-100 shadow-sm shadow-blue-500/5 min-w-[3rem] text-center">
           {ratioText}
         </span>
       </div>

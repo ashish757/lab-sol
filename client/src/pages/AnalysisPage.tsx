@@ -72,35 +72,33 @@ export const AnalysisPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100">
-      <div className="bg-white overflow-hidden flex flex-col h-[calc(100vh-3rem)]">
-        <FormHeader 
-          title="Analysis" 
-          onGenerateReport={methods.handleSubmit(onSubmit)} 
-        />
+    <div className="h-screen bg-white overflow-hidden flex flex-col">
+      <FormHeader 
+        title="Analysis" 
+        onGenerateReport={methods.handleSubmit(onSubmit)} 
+      />
 
-        <FormProvider {...methods}>
-          <form 
-            onSubmit={methods.handleSubmit(onSubmit)} 
-            onKeyDown={handleKeyDown}
-            className="flex flex-1 overflow-hidden flex-col lg:flex-row"
-          >
-            <FormSidebar 
-              config={analysisConfig} 
-              activeSection={expanded} 
-              onScrollTo={handleScrollTo} 
-            />
+      <FormProvider {...methods}>
+        <form 
+          onSubmit={methods.handleSubmit(onSubmit)} 
+          onKeyDown={handleKeyDown}
+          className="flex flex-1 overflow-hidden flex-col lg:flex-row"
+        >
+          <FormSidebar 
+            config={analysisConfig} 
+            activeSection={expanded} 
+            onScrollTo={handleScrollTo} 
+          />
 
-            <div className="flex-1 overflow-y-auto p-6 lg:p-8 bg-white relative scroll-smooth">
-              <div className="max-w-5xl mx-auto pb-24">
-                {analysisConfig.map((group) => (
-                  <FormSection key={group.groupId} group={group} />
-                ))}
-              </div>
+          <div className="flex-1 overflow-y-auto p-6 lg:p-8 bg-white relative scroll-smooth">
+            <div className="max-w-5xl mx-auto pb-24">
+              {analysisConfig.map((group) => (
+                <FormSection key={group.groupId} group={group} />
+              ))}
             </div>
-          </form>
-        </FormProvider>
-      </div>
+          </div>
+        </form>
+      </FormProvider>
     </div>
   );
 };
