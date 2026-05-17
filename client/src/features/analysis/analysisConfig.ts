@@ -7,6 +7,7 @@ export interface FieldConfig {
   placeholder?: string;
   unit?: string;
   subLabel?: string;
+  required?: boolean;
 }
 
 export interface GroupConfig {
@@ -25,7 +26,7 @@ export const analysisConfig: GroupConfig[] = [
       { id: "plantStartTime", label: "Plant Start Time", type: "time" },
       { id: "plantShutdownDate", label: "Plant Shutdown Date", type: "date" },
       { id: "plantShutdownTime", label: "Plant Shutdown Time", type: "time" },
-      { id: "todayDate", label: "Today Date", type: "date" },
+      { id: "todayDate", label: "Today Date", type: "date", required: true },
       { id: "cropDay", label: "Cropday", type: "number", unit: "Nos" },
       { id: "rain", label: "Rain (Inch)", type: "number", unit: "Inch" },
       { id: "tempMax", label: "Temperature Max (Deg C)", type: "number", unit: "Deg C" },

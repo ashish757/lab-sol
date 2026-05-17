@@ -1,169 +1,46 @@
 import { z } from 'zod';
+import { analysisConfig } from '../features/analysis/analysisConfig';
 
-export const analysisSchema = z.object({
-  // CRUSHING DATA
-  plantStartDate: z.string().optional(),
-  plantStartTime: z.string().optional(),
-  plantShutdownDate: z.string().optional(),
-  plantShutdownTime: z.string().optional(),
-  todayDate: z.string().optional(),
-  cropDay: z.number().optional(),
-  rain: z.number().optional(),
-  tempMax: z.number().optional(),
-  tempMin: z.number().optional(),
-  humidity: z.number().optional(),
+const schemaShape: Record<string, any> = {};
 
-  // CONTROL PARAMETERS
-  caneCrushed: z.number().optional(),
-  gate: z.number().optional(),
-  road: z.number().optional(),
-  closingBal: z.number().optional(),
-  earlyVariety: z.number().optional(),
-  totalCaneCrushed: z.number().optional(),
-  divertedSyrup: z.number().optional(),
-  molassesSentOut: z.number().optional(),
-  imbibition: z.number().optional(),
-  dirtPercent: z.number().optional(),
-  filterCakeProduction: z.number().optional(),
-  grossMixedJuice: z.number().optional(),
-  l31S: z.number().optional(),
-  m31S: z.number().optional(),
-  s31S: z.number().optional(),
-  l31: z.number().optional(),
-  m31: z.number().optional(),
-  s31: z.number().optional(),
-  sSs31Export: z.number().optional(),
-  rawSugar: z.number().optional(),
-  llBold: z.number().optional(),
-  brownSugar: z.number().optional(),
-  totalSugarBagged: z.number().optional(),
-
-  // REPROCESS
-  reprocessBrownSugar: z.number().optional(),
-  reprocessRawSugar: z.number().optional(),
-
-  // STORES CONSUMPTION
-  lime: z.number().optional(),
-  sulphur: z.number().optional(),
-  ppBags: z.number().optional(),
-  millSanitationChemicals: z.number().optional(),
-  lubricants: z.number().optional(),
-  grease: z.number().optional(),
-  phosphoricAcid: z.number().optional(),
-  colourPrecipitant: z.number().optional(),
-
-  // MASSECUITES Production
-  aMassecuite: z.number().optional(),
-  a1Massecuite: z.number().optional(),
-  bMassecuite: z.number().optional(),
-  b1Massecuite: z.number().optional(),
-  cMassecuite: z.number().optional(),
-  r1Massecuite: z.number().optional(),
-  r3Massecuite: z.number().optional(),
-  totalMassecuite: z.number().optional(),
-
-  // STOPPAGES (Hrs:Min)
-  stopNoCane: z.string().optional(),
-  stopMechanical: z.string().optional(),
-  stopElectrical: z.string().optional(),
-  stopInstrumentation: z.string().optional(),
-  stopProcess: z.string().optional(),
-  stopGenCleaning: z.string().optional(),
-  stopMiscellaneous: z.string().optional(),
-  totalHoursLost: z.string().optional(),
-
-  // SUGAR ANALYSIS (M Grade)
-  sugarColourGs10: z.number().optional(),
-  sugarColourGs8: z.number().optional(),
-  sugarReflectance: z.number().optional(),
-  moisture: z.number().optional(),
-  particleSizeMa: z.number().optional(),
-  particleSizeCv: z.number().optional(),
-
-  // POWER DATA
-  powerGeneration: z.number().optional(),
-  powerExport: z.number().optional(),
-  powerImport: z.number().optional(),
-  powerConsumption: z.number().optional(),
-
-  // WATER USAGE & DISCHARGE
-  rawWaterConsumption: z.number().optional(),
-  treatedWaterDischarge: z.number().optional(),
-  treatedWaterRecycled: z.number().optional(),
-  dmWaterConsumption: z.number().optional(),
-  steamGeneration: z.number().optional(),
-  steamFuelRatio: z.number().optional(),
-  boilingHouseSteamConsumption: z.number().optional(),
-
-  // ANALYSIS RESULTS
-  primaryJuiceBrix: z.number().optional(),
-  primaryJuicePol: z.number().optional(),
-  mixedJuiceBrix: z.number().optional(),
-  mixedJuicePol: z.number().optional(),
-  lastMillJuiceBrix: z.number().optional(),
-  lastMillJuicePol: z.number().optional(),
-  clearJuiceBrix: z.number().optional(),
-  clearJuicePol: z.number().optional(),
-  divertedSyrupBrix: z.number().optional(),
-  divertedSyrupPol: z.number().optional(),
-  unsulphuredSyrupBrix: z.number().optional(),
-  unsulphuredSyrupPol: z.number().optional(),
-  sulphuredSyrupBrix: z.number().optional(),
-  sulphuredSyrupPol: z.number().optional(),
-  filterJuiceBrix: z.number().optional(),
-  filterJuicePol: z.number().optional(),
-  bagassePol: z.number().optional(),
-  bagasseBrix: z.number().optional(),
-  filterCakePol: z.number().optional(),
-  filterCakeBrix: z.number().optional(),
-  aMassecuiteBrix: z.number().optional(),
-  aMassecuitePol: z.number().optional(),
-  a1MassecuiteBrix: z.number().optional(),
-  a1MassecuitePol: z.number().optional(),
-  bMassecuiteBrix: z.number().optional(),
-  bMassecuitePol: z.number().optional(),
-  b1MassecuiteBrix: z.number().optional(),
-  b1MassecuitePol: z.number().optional(),
-  cMassecuiteBrix: z.number().optional(),
-  cMassecuitePol: z.number().optional(),
-  aHeavyMolassesBrix: z.number().optional(),
-  aHeavyMolassesPol: z.number().optional(),
-  aLightMolassesBrix: z.number().optional(),
-  aLightMolassesPol: z.number().optional(),
-  a1HeavyMolassesBrix: z.number().optional(),
-  a1HeavyMolassesPol: z.number().optional(),
-  bHeavyMolassesBrix: z.number().optional(),
-  bHeavyMolassesPol: z.number().optional(),
-  b1HeavyMolassesBrix: z.number().optional(),
-  b1HeavyMolassesPol: z.number().optional(),
-  cLightMolassesBrix: z.number().optional(),
-  cLightMolassesPol: z.number().optional(),
-  finalMolassesBrix: z.number().optional(),
-  finalMolassesPol: z.number().optional(),
-  bCuredSugarBrix: z.number().optional(),
-  bCuredSugarPol: z.number().optional(),
-  cSingleCuredBrix: z.number().optional(),
-  cSingleCuredPol: z.number().optional(),
-  cDoubleCuredBrix: z.number().optional(),
-  cDoubleCuredPol: z.number().optional(),
-  magmaBrix: z.number().optional(),
-  magmaPol: z.number().optional(),
-  meltBrix: z.number().optional(),
-  meltPol: z.number().optional(),
-  rawMeltBrix: z.number().optional(),
-  rawMeltPol: z.number().optional(),
-  refinedSyrupBrix: z.number().optional(),
-  refinedSyrupPol: z.number().optional(),
-  r1MassecuiteBrix: z.number().optional(),
-  r1MassecuitePol: z.number().optional(),
-  r1MolassesBrix: z.number().optional(),
-  r1MolassesPol: z.number().optional(),
-  r3MassecuiteBrix: z.number().optional(),
-  r3MassecuitePol: z.number().optional(),
-  r3MolassesBrix: z.number().optional(),
-  r3MolassesPol: z.number().optional(),
-  sentOutMolassesTrs: z.number().optional(),
-  divertedSyrupTrs: z.number().optional()
+analysisConfig.forEach((group) => {
+  group.fields.forEach((field) => {
+    if (field.type === 'number') {
+      if (field.required) {
+        schemaShape[field.id] = z.preprocess(
+          (val) => {
+            if (val === '' || val === null || val === undefined) return undefined;
+            const num = Number(val);
+            return isNaN(num) ? undefined : num;
+          },
+          z.number({ error: `${field.label} is required` })
+        );
+      } else {
+        schemaShape[field.id] = z.preprocess(
+          (val) => {
+            if (val === '' || val === null || val === undefined) return undefined;
+            const num = Number(val);
+            return isNaN(num) ? undefined : num;
+          },
+          z.number().optional()
+        );
+      }
+    } else {
+      // Date / Time / Text strings
+      if (field.required) {
+        schemaShape[field.id] = z.preprocess(
+          (val) => (val === '' || val === null || val === undefined ? undefined : String(val)),
+          z.string({ error: `${field.label} is required` }).min(1, `${field.label} is required`)
+        );
+      } else {
+        schemaShape[field.id] = z.preprocess(
+          (val) => (val === '' || val === null || val === undefined ? undefined : String(val)),
+          z.string().optional()
+        );
+      }
+    }
+  });
 });
 
+export const analysisSchema = z.object(schemaShape);
 export type AnalysisSchema = z.infer<typeof analysisSchema>;

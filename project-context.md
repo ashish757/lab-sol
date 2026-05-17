@@ -21,3 +21,9 @@ trigger: always_on
 - When working on the **Server**, ensure the math logic is robust and follows the enterprise reporting requirements.
 - Use no to ver minimal comments in code.
 - Keep the code clean and modular.
+
+## Validation & Form Architecture
+- **Dynamic Form Schema:** The client-side validation schema ([analysisSchema.ts](file:///Users/ashish/Developer/project/client/src/types/analysisSchema.ts)) is generated dynamically from the primary UI configuration ([analysisConfig.ts](file:///Users/ashish/Developer/project/client/src/features/analysis/analysisConfig.ts)). This avoids duplicate mapping definitions and ensures synchronization.
+- **Optional Form Inputs:** By default, fields are optional. Zod preprocessors dynamically convert empty string inputs and `NaN` (returned by native HTML empty number fields) to `undefined`, allowing analysts to submit partially filled reports.
+- **Required Validation:** Fields can be set as strictly required by adding `required: true` inside their field configuration within [analysisConfig.ts](file:///Users/ashish/Developer/project/client/src/features/analysis/analysisConfig.ts). Asterisks are automatically rendered next to their labels, and inline validation warnings are displayed under erroneous inputs.
+

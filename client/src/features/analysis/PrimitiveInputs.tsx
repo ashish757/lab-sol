@@ -30,13 +30,16 @@ const getRegisterOptions = (type: string) => {
 };
 
 const BasePrimitiveInputRow = React.memo(({ label, fields, children }: BaseInputProps & { children?: React.ReactNode }) => {
-  const { register } = useFormContext();
+  const { register, formState: { errors } } = useFormContext();
+
+  const hasRequiredField = fields.some(field => field.required);
 
   return (
     <tr className="border-b border-slate-200 hover:bg-slate-50/40 transition-colors relative group">
       <td className="py-3 pl-4 text-xs font-semibold text-slate-800 tracking-wide uppercase select-none align-middle w-1/3 md:w-1/4 lg:w-1/3">
         <label className="cursor-pointer block">
           {label}
+          {hasRequiredField && <span className="text-red-500 ml-1 font-extrabold select-none">*</span>}
         </label>
       </td>
       <td className="py-3 px-4 text-[10px] font-bold text-slate-600 uppercase tracking-widest align-middle w-1/4 md:w-1/6 select-none">
@@ -46,20 +49,28 @@ const BasePrimitiveInputRow = React.memo(({ label, fields, children }: BaseInput
         <div className="flex items-center w-full">
           <div className={`grid gap-4 ${fields.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} flex-1 w-full`}>
             {fields.map(field => {
+              const error = errors[field.id];
               const isDateTime = field.type === 'date' || field.type === 'time';
               const inputClassName = isDateTime
-                ? "p-0 border-none bg-transparent text-blue-600 font-bold text-base shadow-none focus:ring-0 focus:outline-none appearance-none m-0"
-                : "px-3 py-1.5 border border-slate-200 rounded-md text-sm bg-slate-50/50 hover:bg-white hover:border-blue-400 focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-200 w-full";
+                ? `p-0 border-none bg-transparent font-bold text-base shadow-none focus:ring-0 focus:outline-none appearance-none m-0 ${
+                    error ? 'text-red-650' : 'text-blue-600'
+                  }`
+                : `px-3 py-1.5 border rounded-md text-sm bg-slate-50/50 hover:bg-white transition-all duration-200 w-full ${
+                    error
+                      ? 'border-red-500 focus:bg-white focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 bg-red-50/20'
+                      : 'border-slate-200 hover:border-blue-400 focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100'
+                  }`;
 
               const subLabel = fields.length > 1 ? field.subLabel : '';
 
               return (
-                <div key={field.id} className="relative w-full flex items-center">
-                  {subLabel && (
-                    <span className="text-[10px] font-black text-slate-500 mr-3 uppercase tracking-wider w-14 text-right select-none">
-                      {subLabel}
-                    </span>
-                  )}
+                <div key={field.id} className="relative w-full flex flex-col gap-1">
+                  <div className="flex items-center w-full">
+                    {subLabel && (
+                      <span className="text-[10px] font-black text-slate-500 mr-3 uppercase tracking-wider w-14 text-right select-none">
+                        {subLabel}
+                      </span>
+                    )}
                     <input
                       id={field.id}
                       type={getInputType(field.type)}
@@ -68,6 +79,12 @@ const BasePrimitiveInputRow = React.memo(({ label, fields, children }: BaseInput
                       {...register(field.id, getRegisterOptions(field.type))}
                       className={inputClassName}
                     />
+                  </div>
+                  {error && (
+                    <span className="text-[10px] font-bold text-red-500 select-none block">
+                      {String(error.message || 'Required')}
+                    </span>
+                  )}
                 </div>
               );
             })}
