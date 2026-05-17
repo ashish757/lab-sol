@@ -34,12 +34,12 @@ const BasePrimitiveInputRow = React.memo(({ label, fields, children }: BaseInput
 
   return (
     <tr className="border-b border-slate-100 hover:bg-slate-50/70 transition-colors relative group">
-      <td className="py-3.5 pl-4 text-xs font-semibold text-slate-600 tracking-wide uppercase select-none align-middle w-1/3 md:w-1/4 lg:w-1/3">
+      <td className="py-3.5 pl-4 text-xs font-semibold text-slate-800 tracking-wide uppercase select-none align-middle w-1/3 md:w-1/4 lg:w-1/3">
         <label className="cursor-pointer block">
           {label}
         </label>
       </td>
-      <td className="py-3.5 px-4 text-[10px] font-bold text-slate-400/90 uppercase tracking-widest align-middle w-1/4 md:w-1/6 select-none">
+      <td className="py-3.5 px-4 text-[10px] font-bold text-slate-600 uppercase tracking-widest align-middle w-1/4 md:w-1/6 select-none">
         {Array.from(new Set(fields.map(getFieldUnit))).join(' / ')}
       </td>
       <td className="py-3.5 pr-4 align-middle relative w-auto">
@@ -51,7 +51,7 @@ const BasePrimitiveInputRow = React.memo(({ label, fields, children }: BaseInput
                 ? "p-0 border-none bg-transparent text-blue-600 font-bold text-base shadow-none focus:ring-0 focus:outline-none w-full appearance-none m-0"
                 : "px-3 py-1.5 border border-slate-200 rounded-md text-sm bg-slate-50/50 hover:bg-white hover:border-blue-400 focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-200 w-full";
 
-              const subLabel = fields.length > 1 ? (field.id.match(/[A-Z][a-z]*$/)?.[0] || field.id) : '';
+              const subLabel = fields.length > 1 ? field.subLabel : '';
 
               return (
                 <div key={field.id} className="relative w-full flex items-center">
