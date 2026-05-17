@@ -19,34 +19,19 @@ export function useFormPersist<T extends Record<string, any>>(
         const parsed = JSON.parse(saved);
         reset(parsed as any);
       } catch (err) {
-        // Silent error handling
+        console.error("Failed to parse saved draft", err);
       }
     }
   }, [key, reset]);
 
-  useEffect(() => {
-    const handleBlur = (event: FocusEvent) => {
-      const target = event.target as HTMLElement;
-      if (
-        target &&
-        (target.tagName === 'INPUT' ||
-          target.tagName === 'SELECT' ||
-          target.tagName === 'TEXTAREA')
-      ) {
-        const values = getValues();
-        localStorage.setItem(key, JSON.stringify(values));
-      }
-    };
-
-    window.addEventListener('focusout', handleBlur);
-    return () => {
-      window.removeEventListener('focusout', handleBlur);
-    };
-  }, [key, getValues]);
+  const saveDraft = () => {
+    const values = getValues();
+    localStorage.setItem(key, JSON.stringify(values));
+  };
 
   const clearStorage = () => {
     localStorage.removeItem(key);
   };
 
-  return { clearStorage };
+  return { saveDraft, clearStorage };
 }

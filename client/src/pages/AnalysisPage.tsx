@@ -15,13 +15,18 @@ export const AnalysisPage = () => {
     defaultValues: {},
   });
 
-  const { clearStorage } = useFormPersist(methods, { key: 'analysis-form' });
+  const { saveDraft, clearStorage } = useFormPersist(methods, { key: 'analysis-form' });
 
   const sectionIds = analysisConfig.map((group) => group.groupId);
   const { activeSection: expanded, scrollTo: handleScrollTo } = useScrollSpy(
     sectionIds,
     analysisConfig[0].groupId
   );
+
+  const handleReset = () => {
+    methods.reset({});
+    clearStorage();
+  };
 
   const onSubmit = async (data: AnalysisSchema) => {
     try {
@@ -84,6 +89,8 @@ export const AnalysisPage = () => {
             config={analysisConfig} 
             activeSection={expanded} 
             onScrollTo={handleScrollTo} 
+            onReset={handleReset}
+            onSaveDraft={saveDraft}
           />
 
           <div className="flex-1 overflow-y-auto p-6 lg:p-8 bg-white relative scroll-smooth">
