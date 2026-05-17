@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { DailyLogsService } from './dailyLogs.service';
 import { UpsertDailyLogDto } from './dto/dailyLog.dto';
 
-@Controller('daily-logs')
+@Controller('api/daily-logs')
 export class DailyLogsController {
   constructor(private readonly dailyLogsService: DailyLogsService) { }
 
