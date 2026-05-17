@@ -43,3 +43,7 @@ export async function getDailyLogById(id: string): Promise<DailyLogResponse> {
   );
   return response;
 }
+
+export function getDownloadDailyReportUrl(): string {
+  return `${apiClient.defaults.baseURL || 'http://localhost:3000'}${API_ENDPOINTS.DOWNLOAD_DAILY_REPORT}`;
+}

@@ -17,4 +17,5 @@ export const getPagePath = {
 export const API_ENDPOINTS = {
   DAILY_LOGS: '/api/daily-logs',
   DAILY_LOG_BY_ID: (id: string | number) => `/api/daily-logs/${id}`,
+  DOWNLOAD_DAILY_REPORT: '/api/reports/daily/download',
 } as const;

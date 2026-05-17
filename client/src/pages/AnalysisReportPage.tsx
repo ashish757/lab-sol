@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams, useLocation, useNavigate, Link } from 'react-router-dom';
 import { 
-  CheckCircle2, Calendar, Clipboard, ArrowLeft, 
-  Printer, Plus, ShieldAlert,  Database, Activity
+  CheckCircle2, Calendar, ArrowLeft, 
+  Plus, ShieldAlert, Database, Download
 } from 'lucide-react';
 import { useUpsertLog, useGetLogById } from '../hooks/useDailyLogs';
 import { PAGES, getPagePath } from '../config/routesConfig';
+import { getDownloadDailyReportUrl } from '../api/dailyLogs';
 
 export const AnalysisReportPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,6 +16,16 @@ export const AnalysisReportPage = () => {
   const isNew = !id || id === 'new';
   const mutation = useUpsertLog();
   const query = useGetLogById(id);
+
+  const handleDownloadExcel = () => {
+    const url = getDownloadDailyReportUrl();
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'Daily_Report.xlsx');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const [createdLogId, setCreatedLogId] = useState<string | null>(null);
   const [loadingPhase, setLoadingPhase] = useState('Initializing laboratory payload...');
@@ -158,13 +169,6 @@ export const AnalysisReportPage = () => {
         </div>
         
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => window.print()}
-            className="inline-flex items-center gap-2 px-3.5 py-2 border border-slate-350 bg-white hover:bg-slate-50 text-slate-850 text-xs font-bold rounded-lg cursor-pointer uppercase tracking-wider shadow-sm"
-          >
-            <Printer size={14} />
-            Print Report
-          </button>
           <Link
             to={PAGES.NEW_LOG}
             className="inline-flex items-center gap-2 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg cursor-pointer uppercase tracking-wider shadow-md shadow-indigo-600/10"
@@ -204,11 +208,16 @@ export const AnalysisReportPage = () => {
                   <span className="font-semibold text-slate-300 print:text-black">Log Date:</span>
                   <span className="font-bold text-white print:text-black">{formatDate(logData.logDate)}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Clipboard size={14} className="text-slate-500 print:text-black" />
-                  <span className="font-semibold text-slate-300 print:text-black">UUID ID:</span>
-                  <span className="font-bold text-indigo-400 font-mono print:text-black">{logData.id}</span>
-                </div>
+              </div>
+
+              <div className="flex justify-end mt-5 pt-4 border-t border-slate-900 print:hidden">
+                <button
+                  onClick={handleDownloadExcel}
+                  className="inline-flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] text-white text-xs font-extrabold rounded-lg border border-indigo-700 hover:border-indigo-600 transition-all shadow-lg shadow-indigo-650/45 cursor-pointer uppercase tracking-widest"
+                >
+                  <Download size={14} />
+                  Download Excel Report
+                </button>
               </div>
             </div>
           </div>
@@ -242,43 +251,6 @@ export const AnalysisReportPage = () => {
           </div>
         </div>
 
-        {/* Highlighted Parameter Groups */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
-          <div className="bg-slate-700 text-white px-5 py-3 select-none flex items-center gap-2">
-            <Activity size={16} />
-            <h3 className="text-xs font-black uppercase tracking-wider">Key Parameter Readings</h3>
-          </div>
-          
-          <div className="divide-y divide-slate-150 text-xs">
-            <div className="px-5 py-3.5 flex justify-between gap-4">
-              <span className="font-semibold text-slate-750 uppercase tracking-wide">Plant Operational Time</span>
-              <span className="font-bold text-slate-900">
-                Start: {getMetric(logData.metrics, 'plantStartTime', '—')} · End: {getMetric(logData.metrics, 'plantShutdownTime', '—')}
-              </span>
-            </div>
-            <div className="px-5 py-3.5 flex justify-between gap-4">
-              <span className="font-semibold text-slate-750 uppercase tracking-wide">Imbibition Water Ratio</span>
-              <span className="font-bold text-slate-900">{getMetric(logData.metrics, 'imbibition', '0')}%</span>
-            </div>
-            <div className="px-5 py-3.5 flex justify-between gap-4">
-              <span className="font-semibold text-slate-750 uppercase tracking-wide">Filter Cake Production</span>
-              <span className="font-bold text-slate-900">{getMetric(logData.metrics, 'filterCakeProduction', '0')} Qtls</span>
-            </div>
-            <div className="px-5 py-3.5 flex justify-between gap-4">
-              <span className="font-semibold text-slate-750 uppercase tracking-wide">Power Generation YTD</span>
-              <span className="font-bold text-slate-900">{Number(getMetric(logData.metrics, 'powerGeneration', '0')).toLocaleString()} KWH</span>
-            </div>
-            <div className="px-5 py-3.5 flex justify-between gap-4">
-              <span className="font-semibold text-slate-750 uppercase tracking-wide">Steam Fuel Ratio</span>
-              <span className="font-bold text-slate-900">{getMetric(logData.metrics, 'steamFuelRatio', '0')}%</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Print Footer */}
-        <div className="hidden print:block text-center mt-12 pt-6 border-t border-slate-300 text-[10px] text-slate-500 font-semibold uppercase tracking-wider">
-          Enterprise Analytics System Summary · Secure Database Ledger
-        </div>
       </main>
     </div>
   );
