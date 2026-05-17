@@ -41,16 +41,16 @@ export const FormProgress = React.memo(({ className }: FormProgressProps) => {
   return (
     <div className={className || "w-full px-6 py-3 select-none flex flex-col gap-2"}>
       <div className="flex items-center justify-between">
-        <span className="text-xs text-slate-500">
+        <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">
           Progress
         </span>
-        <span className="text-xs text-slate-600 tabular-nums">
+        <span className="text-xs font-black text-slate-700 tabular-nums">
           {filledCount} / {totalFields}
         </span>
       </div>
-      <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+      <div className="w-full h-2 bg-slate-100 border border-slate-250/60 rounded-full overflow-hidden">
         <div
-          className="h-full bg-slate-500 rounded-full transition-all duration-300 ease-out"
+          className="h-full bg-indigo-600 rounded-full transition-all duration-300 ease-out shadow-sm"
           style={{ width: `${percentage}%` }}
         />
       </div>

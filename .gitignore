@@ -1,1 +1,4 @@
 .DS_Store
+.env
+prompt.md
+node_modules

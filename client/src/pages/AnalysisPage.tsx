@@ -8,11 +8,31 @@ import { FormSection } from '../features/analysis/FormSection';
 import { useFormPersist } from '../hooks/useFormPersist';
 import { useUpsertLog } from '../hooks/useDailyLogs';
 
+const getInitialValues = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  const hours = String(today.getHours()).padStart(2, '0');
+  const minutes = String(today.getMinutes()).padStart(2, '0');
+
+  const currentDate = `${year}-${month}-${day}`;
+  const currentTime = `${hours}:${minutes}`;
+
+  return {
+    plantStartDate: currentDate,
+    plantStartTime: currentTime,
+    plantShutdownDate: currentDate,
+    plantShutdownTime: currentTime,
+    todayDate: currentDate,
+  };
+};
+
 export const AnalysisPage = () => {
   const methods = useForm<AnalysisSchema>({
     resolver: zodResolver(analysisSchema),
     mode: 'onBlur',
-    defaultValues: {},
+    defaultValues: getInitialValues(),
   });
 
   const { saveDraft, clearStorage } = useFormPersist(methods, { key: 'analysis-form' });
@@ -25,7 +45,7 @@ export const AnalysisPage = () => {
   );
 
   const handleReset = () => {
-    methods.reset({});
+    methods.reset(getInitialValues());
     clearStorage();
   };
 
@@ -38,7 +58,7 @@ export const AnalysisPage = () => {
       },
       {
         onSuccess: () => {
-          clearStorage();
+          // clearStorage();
         },
       },
     );
@@ -88,7 +108,7 @@ export const AnalysisPage = () => {
             isSubmitting={mutation.isPending}
           />
 
-          <div className="flex-1 overflow-y-auto p-6 lg:p-8 bg-white relative scroll-smooth">
+          <div className="flex-1 overflow-y-auto p-6 lg:p-8 bg-slate-50 relative scroll-smooth">
             <div className="max-w-5xl mx-auto pb-24">
               {analysisConfig.map((group) => (
                 <FormSection key={group.groupId} group={group} />

@@ -33,16 +33,16 @@ const BasePrimitiveInputRow = React.memo(({ label, fields, children }: BaseInput
   const { register } = useFormContext();
 
   return (
-    <tr className="border-b border-slate-100 hover:bg-slate-50/70 transition-colors relative group">
-      <td className="py-3.5 pl-4 text-xs font-semibold text-slate-800 tracking-wide uppercase select-none align-middle w-1/3 md:w-1/4 lg:w-1/3">
+    <tr className="border-b border-slate-200 hover:bg-slate-50/40 transition-colors relative group">
+      <td className="py-3 pl-4 text-xs font-semibold text-slate-800 tracking-wide uppercase select-none align-middle w-1/3 md:w-1/4 lg:w-1/3">
         <label className="cursor-pointer block">
           {label}
         </label>
       </td>
-      <td className="py-3.5 px-4 text-[10px] font-bold text-slate-600 uppercase tracking-widest align-middle w-1/4 md:w-1/6 select-none">
+      <td className="py-3 px-4 text-[10px] font-bold text-slate-600 uppercase tracking-widest align-middle w-1/4 md:w-1/6 select-none">
         {Array.from(new Set(fields.map(getFieldUnit))).join(' / ')}
       </td>
-      <td className="py-3.5 pr-4 align-middle relative w-auto">
+      <td className="py-3 pr-4 align-middle relative w-auto">
         <div className="flex items-center w-full">
           <div className={`grid gap-4 ${fields.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} flex-1 w-full`}>
             {fields.map(field => {
@@ -56,7 +56,7 @@ const BasePrimitiveInputRow = React.memo(({ label, fields, children }: BaseInput
               return (
                 <div key={field.id} className="relative w-full flex items-center">
                   {subLabel && (
-                    <span className="text-[10px] font-bold text-slate-400/90 mr-3 uppercase tracking-wider w-14 text-right select-none">
+                    <span className="text-[10px] font-black text-slate-500 mr-3 uppercase tracking-wider w-14 text-right select-none">
                       {subLabel}
                     </span>
                   )}
@@ -101,16 +101,16 @@ const RatioCalculatedInput = React.memo(({ label, fields }: BaseInputProps) => {
   const brix = typeof brixVal === 'number' ? brixVal : parseFloat(brixVal as string);
   const pol = typeof polVal === 'number' ? polVal : parseFloat(polVal as string);
 
-  let ratioText = '-';
+  let ratioText = '—';
   if (!isNaN(brix) && !isNaN(pol) && brix !== 0) {
     ratioText = (pol / brix).toFixed(2);
   }
 
   return (
     <BasePrimitiveInputRow label={label} fields={fields}>
-      <div className="w-20 flex-shrink-0 flex flex-col items-center justify-center ml-6 pl-6 border-l border-slate-100 select-none">
-        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Purity</span>
-        <span className="text-xs font-extrabold text-blue-600 bg-blue-50/80 px-2.5 py-1 rounded-full border border-blue-100 shadow-sm shadow-blue-500/5 min-w-[3rem] text-center">
+      <div className="w-24 flex-shrink-0 flex flex-col items-center justify-center ml-6 pl-6 border-l border-slate-200 select-none">
+        <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Purity</span>
+        <span className="text-xs font-black text-emerald-800 bg-emerald-55  px-3 py-1.5 rounded-lg border-1 border-emerald-200 min-w-[3.5rem] text-center select-all">
           {ratioText}
         </span>
       </div>
