@@ -30,7 +30,7 @@ const getRegisterOptions = (type: string) => {
 };
 
 const BasePrimitiveInputRow = React.memo(({ label, fields, children }: BaseInputProps & { children?: React.ReactNode }) => {
-  const { register, formState: { errors } } = useFormContext();
+  const { register } = useFormContext();
 
   return (
     <tr className="border-b border-slate-100 hover:bg-slate-50/70 transition-colors relative group">
@@ -48,7 +48,7 @@ const BasePrimitiveInputRow = React.memo(({ label, fields, children }: BaseInput
             {fields.map(field => {
               const isDateTime = field.type === 'date' || field.type === 'time';
               const inputClassName = isDateTime
-                ? "p-0 border-none bg-transparent text-blue-600 font-bold text-base shadow-none focus:ring-0 focus:outline-none w-full appearance-none m-0"
+                ? "p-0 border-none bg-transparent text-blue-600 font-bold text-base shadow-none focus:ring-0 focus:outline-none appearance-none m-0"
                 : "px-3 py-1.5 border border-slate-200 rounded-md text-sm bg-slate-50/50 hover:bg-white hover:border-blue-400 focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-200 w-full";
 
               const subLabel = fields.length > 1 ? field.subLabel : '';
@@ -60,7 +60,6 @@ const BasePrimitiveInputRow = React.memo(({ label, fields, children }: BaseInput
                       {subLabel}
                     </span>
                   )}
-                  <div className="relative w-full">
                     <input
                       id={field.id}
                       type={getInputType(field.type)}
@@ -69,12 +68,6 @@ const BasePrimitiveInputRow = React.memo(({ label, fields, children }: BaseInput
                       {...register(field.id, getRegisterOptions(field.type))}
                       className={inputClassName}
                     />
-                    {errors[field.id] && (
-                      <span className="absolute -bottom-4 left-0 text-[10px] text-red-500 font-semibold tracking-wide">
-                        {errors[field.id]?.message as string}
-                      </span>
-                    )}
-                  </div>
                 </div>
               );
             })}
