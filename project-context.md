@@ -15,9 +15,6 @@ trigger: always_on
 - **Server:** NestJS + Prisma (Backend). Focus on "Secret Math" logic and document generation.
 - **Shared:** (If applicable) Shared Zod schemas and TypeScript interfaces.
 
-## Strategic Constraints
-- **Performance:** Typing in the 30-input form must be instantaneous (zero lag).
-- **Security:** Business logic for calculations must stay on the server; the client only displays results.
 
 ## Instruction to Agent
 - When working on the **Client**, always reference the business goals in this file to ensure the UI supports high-density data entry.
