@@ -19,3 +19,5 @@ trigger: always_on
 ## Instruction to Agent
 - When working on the **Client**, always reference the business goals in this file to ensure the UI supports high-density data entry.
 - When working on the **Server**, ensure the math logic is robust and follows the enterprise reporting requirements.
+- Use no to ver minimal comments in code.
+- Keep the code clean and modular.

@@ -7,9 +7,10 @@ interface FormSidebarProps {
   onScrollTo: (groupId: string) => void;
   onReset?: () => void;
   onSaveDraft?: () => void;
+  isSubmitting?: boolean;
 }
 
-export const FormSidebar = ({ config, activeSection, onScrollTo, onReset, onSaveDraft }: FormSidebarProps) => {
+export const FormSidebar = ({ config, activeSection, onScrollTo, onReset, onSaveDraft, isSubmitting = false }: FormSidebarProps) => {
   return (
     <nav className="w-full lg:w-60 bg-white border-r border-slate-200 overflow-y-auto z-0 flex-shrink-0 flex flex-col">
       <div className="px-5 py-4 border-b border-slate-200 shrink-0">
@@ -22,9 +23,10 @@ export const FormSidebar = ({ config, activeSection, onScrollTo, onReset, onSave
         <div className="flex flex-col gap-2">
           <button
             type="submit"
-            className="w-full px-4 py-2 bg-slate-800 hover:bg-slate-700 active:scale-[0.98] text-white text-xs font-medium rounded transition-colors text-center select-none cursor-pointer"
+            disabled={isSubmitting}
+            className="w-full px-4 py-2 bg-slate-800 hover:bg-slate-700 active:scale-[0.98] text-white text-xs font-medium rounded transition-colors text-center select-none cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100"
           >
-            Generate Report
+            {isSubmitting ? 'Saving…' : 'Generate Report'}
           </button>
 
           <div className="grid grid-cols-2 gap-2">

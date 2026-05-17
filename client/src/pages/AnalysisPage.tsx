@@ -6,6 +6,7 @@ import { useScrollSpy } from '../hooks/useScrollSpy';
 import { FormSidebar } from '../features/analysis/FormSidebar';
 import { FormSection } from '../features/analysis/FormSection';
 import { useFormPersist } from '../hooks/useFormPersist';
+import { useUpsertLog } from '../hooks/useDailyLogs';
 
 export const AnalysisPage = () => {
   const methods = useForm<AnalysisSchema>({
@@ -15,6 +16,7 @@ export const AnalysisPage = () => {
   });
 
   const { saveDraft, clearStorage } = useFormPersist(methods, { key: 'analysis-form' });
+  const mutation = useUpsertLog();
 
   const sectionIds = analysisConfig.map((group) => group.groupId);
   const { activeSection: expanded, scrollTo: handleScrollTo } = useScrollSpy(
@@ -27,25 +29,19 @@ export const AnalysisPage = () => {
     clearStorage();
   };
 
-  const onSubmit = async (data: AnalysisSchema) => {
-    try {
-      const response = await fetch('http://localhost:3000/analysis', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+  const onSubmit = (data: AnalysisSchema) => {
+    const { todayDate, ...rest } = data;
+    mutation.mutate(
+      {
+        logDate: todayDate ?? new Date().toISOString().slice(0, 10),
+        metrics: rest as Record<string, unknown>,
+      },
+      {
+        onSuccess: () => {
+          clearStorage();
         },
-        body: JSON.stringify(data),
-      });
-
-      if (response.ok) {
-        clearStorage();
-        console.log("Report generated and persistence cleared.");
-      } else {
-        console.error("Backend error status:", response.status);
-      }
-    } catch (error) {
-      console.error("Failed to connect to backend:", error);
-    }
+      },
+    );
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
@@ -89,6 +85,7 @@ export const AnalysisPage = () => {
             onScrollTo={handleScrollTo} 
             onReset={handleReset}
             onSaveDraft={saveDraft}
+            isSubmitting={mutation.isPending}
           />
 
           <div className="flex-1 overflow-y-auto p-6 lg:p-8 bg-white relative scroll-smooth">
