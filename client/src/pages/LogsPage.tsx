@@ -186,10 +186,6 @@ export const LogsPage = () => {
           </div>
         )}
       </main>
-
-      <footer className="px-8 py-5 border-t border-slate-200 text-xs text-slate-500 font-semibold text-center shrink-0 bg-white mt-auto">
-        Enterprise Analytics System v1.0
-      </footer>
     </div>
   );
 };
