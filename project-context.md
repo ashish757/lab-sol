@@ -33,4 +33,21 @@ trigger: always_on
 - **Past Report Viewers:** The `/analysis/:id` path retrieves historical analytics summaries by UUID directly from NestJS and database records, showing a read-only, print-friendly analysis summary dashboard.
 - **Config-Driven Endpoints:** All client pages and backend API endpoints are strictly imported and driven by a central, maintainable configuration inside [routesConfig.ts](file:///Users/ashish/Developer/project/client/src/config/routesConfig.ts).
 
+## Unified Monorepo Configuration Sharing
+- **Single Source of Truth:** Bootstrapped the root [shared/](file:///Users/ashish/Developer/project/shared) directory containing the unified [analysisFields.ts](file:///Users/ashish/Developer/project/shared/analysisFields.ts) schema. Both front-end and back-end inherit their field list parameters and TypeScript grouping structures from this single file.
+- **Client Imports:** Configured Vite's dev server serve permissions inside [vite.config.ts](file:///Users/ashish/Developer/project/client/vite.config.ts) to permit external parent serving (`server: { fs: { allow: ['..'] } }`), allowing seamless hot-reloads of shared configurations.
+
+## Unified Excel Report Data Populator
+- **Dynamic Excel Processing:** Built an intelligent utility that processes the Excel template `daily_report_template.xlsx` to dynamically write numbers or formatted Date/Time values into the `rawData` worksheet.
+- **Formula Preservation:** For chemical analysis entries (Juices, molasses, massecuites), Brix values are written to Column B, and Pol values are written to Column C. Column D is left untouched, preserving the complex pre-configured Excel formulas (Purity calculation) completely intact.
+- **Decoupled Configuration & Utilities:**
+  - **Shared Configurations:** Created [excelMapping.ts](file:///Users/ashish/Developer/project/shared/excelMapping.ts) in the `shared/` folder, separating cell coordinates and row indices (`EXCEL_ROW_SINGLE_VALUES`, `EXCEL_ROW_BRIX_POL`) from application logic.
+  - **Isolated Cell Populator Utility:** Created [reports.utils.ts](file:///Users/ashish/Developer/project/server/src/reports/reports.utils.ts), encapsulating data processing, type safety validations, cell writes, and date formatting inside `populateRow()`.
+  - **Clean Service:** Refactored [reports.service.ts](file:///Users/ashish/Developer/project/server/src/reports/reports.service.ts) to delegate Excel row operations to the utility file, leaving the service strictly focused on workflow tasks (template loading, DB fetch, stream responses).
+- **Decoupled Business Access:**
+  1. **GET /api/reports/daily/download/:id:** Queries saved historical logs from the PostgreSQL database, parses JSON metrics, and streams the finished file to the browser.
+  2. **POST /api/reports/daily/preview:** Accepts raw client-sent JSON data, populates the template on-the-fly, and streams the Excel file directly to the browser without database persistence, perfect for previewing drafts.
+
+
+
 
