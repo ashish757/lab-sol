@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 
 export const HomePage = () => {
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col relative overflow-hidden">
+    <div className="flex-1 overflow-y-auto bg-slate-50 flex flex-col relative">
       {/* Background decorations */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full pointer-events-none">
         <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-blue-400/20 blur-[120px]" />

@@ -76,7 +76,7 @@ export const AnalysisPage = () => {
   };
 
   return (
-    <div className="h-screen bg-white overflow-hidden flex flex-col">
+    <div className="flex-1 flex overflow-hidden flex-col bg-white">
       <FormHeader title="Analysis" />
 
       <FormProvider {...methods}>
