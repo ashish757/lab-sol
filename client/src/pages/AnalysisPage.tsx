@@ -7,6 +7,8 @@ import { FormHeader } from '../features/analysis/FormHeader';
 import { FormSidebar } from '../features/analysis/FormSidebar';
 import { FormSection } from '../features/analysis/FormSection';
 
+import { useFormPersist } from '../hooks/useFormPersist';
+
 export const AnalysisPage = () => {
   const methods = useForm<AnalysisSchema>({
     resolver: zodResolver(analysisSchema),
@@ -14,14 +16,33 @@ export const AnalysisPage = () => {
     defaultValues: {},
   });
 
+  const { clearStorage } = useFormPersist(methods, { key: 'analysis-form' });
+
   const sectionIds = analysisConfig.map((group) => group.groupId);
   const { activeSection: expanded, scrollTo: handleScrollTo } = useScrollSpy(
     sectionIds,
     analysisConfig[0].groupId
   );
 
-  const onSubmit = (data: AnalysisSchema) => {
-    console.log("Data: ", data);
+  const onSubmit = async (data: AnalysisSchema) => {
+    try {
+      const response = await fetch('http://localhost:3000/analysis', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        clearStorage();
+        console.log("Report generated and persistence cleared.");
+      } else {
+        console.error("Backend error status:", response.status);
+      }
+    } catch (error) {
+      console.error("Failed to connect to backend:", error);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
