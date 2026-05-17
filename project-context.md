@@ -11,7 +11,7 @@ trigger: always_on
 
 ## Monorepo Architecture
 - **Root Directory:** Contains `client/` and `server/`.
-- **Client:** React + Vite (Frontend). Focus on performant data entry and visualization.
+- **Client:** React + Vite (Frontend). High-performance data entry and advanced metrics dashboard.
 - **Server:** NestJS + Prisma (Backend). Focus on "Secret Math" logic and document generation.
 - **Shared:** (If applicable) Shared Zod schemas and TypeScript interfaces.
 
