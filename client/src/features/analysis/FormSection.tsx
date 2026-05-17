@@ -1,3 +1,4 @@
+import React from 'react';
 import { type GroupConfig } from './analysisConfig';
 import { PrimitiveInput } from './PrimitiveInputs';
 
@@ -5,7 +6,7 @@ interface FormSectionProps {
   group: GroupConfig;
 }
 
-export const FormSection = ({ group }: FormSectionProps) => {
+export const FormSection = React.memo(({ group }: FormSectionProps) => {
   return (
     <div
       id={group.groupId}
@@ -44,4 +45,4 @@ export const FormSection = ({ group }: FormSectionProps) => {
       </div>
     </div>
   );
-};
+});

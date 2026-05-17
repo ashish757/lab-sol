@@ -1,49 +1,18 @@
+import React from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import type { FieldConfig } from './analysisConfig';
 
-interface PrimitiveInputProps {
+interface BaseInputProps {
   label: string;
   fields: FieldConfig[];
+}
+
+interface PrimitiveInputProps extends BaseInputProps {
   groupId?: string;
 }
 
-export const PrimitiveInput = ({ label, fields, groupId }: PrimitiveInputProps) => {
-  const { register, formState: { errors }, control } = useFormContext();
-
-  const fieldIds = fields.map(f => f.id);
-  const watchedValues = useWatch({
-    control,
-    name: fieldIds,
-  });
-
-  const getRatioDisplay = () => {
-    if (groupId !== 'analysisResults') return null;
-    
-    const brixIndex = fields.findIndex(f => f.id.toLowerCase().includes('brix'));
-    const polIndex = fields.findIndex(f => f.id.toLowerCase().includes('pol'));
-    
-    if (brixIndex === -1 || polIndex === -1) return null;
-
-    const brixVal = watchedValues[brixIndex];
-    const polVal = watchedValues[polIndex];
-
-    const brix = typeof brixVal === 'number' ? brixVal : parseFloat(brixVal as string);
-    const pol = typeof polVal === 'number' ? polVal : parseFloat(polVal as string);
-
-    let ratioText = '-';
-    if (!isNaN(brix) && !isNaN(pol) && brix !== 0) {
-      ratioText = (pol / brix).toFixed(2);
-    }
-
-    return (
-      <div className="w-16 flex-shrink-0 flex flex-col items-center justify-center ml-4 pl-4 border-l border-slate-200">
-        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Purity</span>
-        <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">
-          {ratioText}
-        </span>
-      </div>
-    );
-  };
+const BasePrimitiveInputRow = React.memo(({ label, fields, children }: BaseInputProps & { children?: React.ReactNode }) => {
+  const { register, formState: { errors } } = useFormContext();
 
   return (
     <tr className="border-b border-slate-100 hover:bg-slate-50 transition-colors relative group">
@@ -103,9 +72,55 @@ export const PrimitiveInput = ({ label, fields, groupId }: PrimitiveInputProps) 
               );
             })}
           </div>
-          {getRatioDisplay()}
+          {children}
         </div>
       </td>
     </tr>
   );
-};
+});
+
+const RatioCalculatedInput = React.memo(({ label, fields }: BaseInputProps) => {
+  const { control } = useFormContext();
+
+  const fieldIds = fields.map(f => f.id);
+  const watchedValues = useWatch({
+    control,
+    name: fieldIds,
+  });
+
+  const brixIndex = fields.findIndex(f => f.id.toLowerCase().includes('brix'));
+  const polIndex = fields.findIndex(f => f.id.toLowerCase().includes('pol'));
+  
+  if (brixIndex === -1 || polIndex === -1) {
+    return <BasePrimitiveInputRow label={label} fields={fields} />;
+  }
+
+  const brixVal = watchedValues[brixIndex];
+  const polVal = watchedValues[polIndex];
+
+  const brix = typeof brixVal === 'number' ? brixVal : parseFloat(brixVal as string);
+  const pol = typeof polVal === 'number' ? polVal : parseFloat(polVal as string);
+
+  let ratioText = '-';
+  if (!isNaN(brix) && !isNaN(pol) && brix !== 0) {
+    ratioText = (pol / brix).toFixed(2);
+  }
+
+  return (
+    <BasePrimitiveInputRow label={label} fields={fields}>
+      <div className="w-16 flex-shrink-0 flex flex-col items-center justify-center ml-4 pl-4 border-l border-slate-200">
+        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Purity</span>
+        <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">
+          {ratioText}
+        </span>
+      </div>
+    </BasePrimitiveInputRow>
+  );
+});
+
+export const PrimitiveInput = React.memo(({ label, fields, groupId }: PrimitiveInputProps) => {
+  if (groupId === 'analysisResults') {
+    return <RatioCalculatedInput label={label} fields={fields} />;
+  }
+  return <BasePrimitiveInputRow label={label} fields={fields} />;
+});
