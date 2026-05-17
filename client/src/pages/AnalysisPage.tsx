@@ -1,9 +1,55 @@
-import { AnalysisForm } from '../features/analysis/AnalysisForm';
+import { useForm, FormProvider } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { analysisSchema, type AnalysisSchema } from '../types/analysisSchema';
+import { analysisConfig } from '../features/analysis/analysisConfig';
+import { useScrollSpy } from '../hooks/useScrollSpy';
+import { FormHeader } from '../features/analysis/FormHeader';
+import { FormSidebar } from '../features/analysis/FormSidebar';
+import { FormSection } from '../features/analysis/FormSection';
 
 export const AnalysisPage = () => {
+  const methods = useForm<AnalysisSchema>({
+    resolver: zodResolver(analysisSchema),
+    mode: 'onBlur',
+    defaultValues: {},
+  });
+
+  const sectionIds = analysisConfig.map((group) => group.groupId);
+  const { activeSection: expanded, scrollTo: handleScrollTo } = useScrollSpy(
+    sectionIds,
+    analysisConfig[0].groupId
+  );
+
+  const onSubmit = (data: AnalysisSchema) => {
+    console.log("Data: ", data);
+  };
+
   return (
     <div className="min-h-screen bg-slate-100">
-      <AnalysisForm />
+      <div className="bg-white overflow-hidden flex flex-col h-[calc(100vh-3rem)]">
+        <FormHeader 
+          title="Analysis" 
+          onGenerateReport={methods.handleSubmit(onSubmit)} 
+        />
+
+        <FormProvider {...methods}>
+          <form onSubmit={methods.handleSubmit(onSubmit)} className="flex flex-1 overflow-hidden flex-col lg:flex-row">
+            <FormSidebar 
+              config={analysisConfig} 
+              activeSection={expanded} 
+              onScrollTo={handleScrollTo} 
+            />
+
+            <div className="flex-1 overflow-y-auto p-6 lg:p-8 bg-white relative scroll-smooth">
+              <div className="max-w-5xl mx-auto pb-24">
+                {analysisConfig.map((group) => (
+                  <FormSection key={group.groupId} group={group} />
+                ))}
+              </div>
+            </div>
+          </form>
+        </FormProvider>
+      </div>
     </div>
   );
 };
