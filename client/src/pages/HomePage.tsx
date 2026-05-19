@@ -6,7 +6,6 @@ import {
 } from 'lucide-react';
 import { useGetLogs } from '../hooks/useDailyLogs';
 import { PAGES, getPagePath } from '../config/routesConfig';
-import { getDownloadDailyReportUrl } from '../api/dailyLogs';
 
 export const HomePage = () => {
   const { data: logs = [], isLoading, isError, refetch } = useGetLogs();
@@ -43,16 +42,6 @@ export const HomePage = () => {
       month: 'short',
       year: 'numeric',
     });
-  };
-
-  const handleDownloadExcel = () => {
-    const url = getDownloadDailyReportUrl();
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'Daily_Report.xlsx');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   };
 
   return (
