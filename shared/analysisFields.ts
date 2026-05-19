@@ -1,4 +1,4 @@
-export type InputType = 'number' | 'date' | 'time';
+export type InputType = 'number' | 'date' | 'time' | 'text';
 
 export interface FieldConfig {
   id: string;
@@ -19,37 +19,44 @@ export interface GroupConfig {
 
 export const analysisConfig: GroupConfig[] = [
   {
-    groupId: "crushingData",
-    title: "CRUSHING DATA",
+    groupId: "seasonStartAndOff",
+    title: "Season Time Account",
     fields: [
       { id: "seasonStartDate", label: "Season Start Date", type: "date" },
       { id: "seasonStartTime", label: "Season Start Time", type: "time" },
-      { id: "seasonShutdownDate", label: "Season Shutdown Date", type: "date" },
-      { id: "seasonShutdownTime", label: "Season Shutdown Time", type: "time" },
+      { id: "seasonOffDate", label: "Season Off Date", type: "date" },
+      { id: "seasonOffTime", label: "Season Off Time", type: "time" },
       { id: "todayDate", label: "Today Date", type: "date", required: true },
       { id: "cropDay", label: "Cropday", type: "number", unit: "Nos" },
-      { id: "rain", label: "Rain (Inch)", type: "number", unit: "Inch" },
-      { id: "tempMax", label: "Temperature Max (Deg C)", type: "number", unit: "Deg C" },
-      { id: "tempMin", label: "Temperature Min (Deg C)", type: "number", unit: "Deg C" },
-      { id: "humidity", label: "Humidity (%)", type: "number", unit: "%" }
     ]
   },
   {
-    groupId: "controlParameters",
-    title: "CONTROL PARAMETERS",
+    groupId: "WeatherData",
+    title: "Weather Status",
     fields: [
-      { id: "caneCrushed", label: "Cane Crushed", type: "number", unit: "Qtls" },
+      { id: "rain", label: "Rain", type: "number", unit: "Inch" },
+      { id: "tempMax", label: "Temperature Max", type: "number", unit: "Deg C" },
+      { id: "tempMin", label: "Temperature Min", type: "number", unit: "Deg C" },
+      { id: "weatherCondition", label: "Weather Condition", type: "text", unit: "-" },
+      { id: "humidity", label: "Humidity", type: "number", unit: "%" }
+    ]
+  },
+  {
+    groupId: "CaneCrush",
+    title: "Cane Crushing Data",
+    fields: [
+      { id: "caneReceived", label: "Cane Received", type: "number", unit: "Qtls" },
       { id: "gate", label: "Gate", type: "number", unit: "Qtls" },
       { id: "road", label: "Road", type: "number", unit: "Qtls" },
-      { id: "closingBal", label: "Closing Bal", type: "number", unit: "Qtls" },
+      { id: "closingBal", label: "Closing Balance", type: "number", unit: "Qtls" },
       { id: "earlyVariety", label: "Early Variety", type: "number", unit: "Qtls" },
       { id: "totalCaneCrushed", label: "Total Cane Crushed", type: "number", unit: "Qtls" },
       { id: "divertedSyrup", label: "Diverted Syrup", type: "number", unit: "Qtls" },
       { id: "molassesSentOut", label: "Molasses Sent Out", type: "number", unit: "Qtls" },
-      { id: "imbibition", label: "Imbibition", type: "number", unit: "%" },
-      { id: "dirtPercent", label: "Dirt %", type: "number", unit: "%" },
+      { id: "imbibition", label: "Imbibition", type: "number", unit: "Qtls" },
+      { id: "dirtPercent", label: "Dirt %", type: "number", unit: "% Mixed Juice" },
       { id: "filterCakeProduction", label: "Filter Cake Production", type: "number", unit: "Qtls" },
-      { id: "grossMixedJuice", label: "Gross Mixed Juice", type: "number", unit: "%" },
+      { id: "grossMixedJuice", label: "Gross Mixed Juice", type: "number", unit: "Qtls" },
       { id: "l31S", label: "L 31 (S)", type: "number", unit: "Qtls" },
       { id: "m31S", label: "M 31 (S)", type: "number", unit: "Qtls" },
       { id: "s31S", label: "S 31 (S)", type: "number", unit: "Qtls" },
@@ -77,12 +84,12 @@ export const analysisConfig: GroupConfig[] = [
     fields: [
       { id: "lime", label: "Lime", type: "number", unit: "Qtls" },
       { id: "sulphur", label: "Sulphur", type: "number", unit: "Qtls" },
-      { id: "ppBags", label: "P P Bags", type: "number", unit: "Qtls" },
-      { id: "millSanitationChemicals", label: "Mill Sanitation Chemicals", type: "number", unit: "Qtls" },
-      { id: "lubricants", label: "Lubricants", type: "number", unit: "Qtls" },
-      { id: "grease", label: "Grease", type: "number", unit: "Qtls" },
-      { id: "phosphoricAcid", label: "Phosphoric Acid", type: "number", unit: "Qtls" },
-      { id: "colourPrecipitant", label: "Colour Precipitant", type: "number", unit: "Qtls" }
+      { id: "ppBags", label: "P P Bags", type: "number", unit: "Nos." },
+      { id: "millSanitationChemicals", label: "Mill Sanitation Chemicals", type: "number", unit: "Kgs" },
+      { id: "lubricants", label: "Lubricants", type: "number", unit: "Lts" },
+      { id: "grease", label: "Grease", type: "number", unit: "Kgs" },
+      { id: "phosphoricAcid", label: "Phosphoric Acid", type: "number", unit: "Kgs" },
+      { id: "colourPrecipitant", label: "Colour Precipitant", type: "number", unit: "Kgs" }
     ]
   },
   {
@@ -115,38 +122,38 @@ export const analysisConfig: GroupConfig[] = [
   },
   {
     groupId: "sugarAnalysis",
-    title: "SUGAR ANALYSIS (S Grade)",
+    title: "SUGAR ANALYSIS (L Grade)",
     fields: [
-      { id: "sugarColourGs10", label: "Sugar Colour GS-10", type: "number", unit: "ICUMSA" },
-      { id: "sugarColourGs8", label: "Sugar Colour GS-8", type: "number", unit: "ICUMSA" },
-      { id: "sugarReflectance", label: "Sugar Reflectance", type: "number", unit: "%" },
-      { id: "moisture", label: "Moisture", type: "number", unit: "%" },
-      { id: "particleSizeMa", label: "Particle Size MA", type: "number", unit: "%" },
-      { id: "particleSizeCv", label: "Particle Size CV", type: "number", unit: "%" }
+      { id: "LsugarColourGs10", label: "L Sugar Colour GS-10", type: "number", unit: "IU" },
+      { id: "LsugarColourGs8", label: "L Sugar Colour GS-8", type: "number", unit: "IU" },
+      { id: "LsugarReflectance", label: "L Sugar Reflectance", type: "number", unit: "%" },
+      { id: "Lmoisture", label: "L Sugar Moisture", type: "number", unit: "%" },
+      { id: "LparticleSizeMa", label: "L Sugar Particle Size MA", type: "number", unit: "mm" },
+      { id: "LparticleSizeCv", label: "L Sugar Particle Size CV", type: "number", unit: "%" }
     ]
   },
-   {
+  {
     groupId: "sugarAnalysis",
     title: "SUGAR ANALYSIS (M Grade)",
     fields: [
-      { id: "sugarColourGs10", label: "Sugar Colour GS-10", type: "number", unit: "ICUMSA" },
-      { id: "sugarColourGs8", label: "Sugar Colour GS-8", type: "number", unit: "ICUMSA" },
-      { id: "sugarReflectance", label: "Sugar Reflectance", type: "number", unit: "%" },
-      { id: "moisture", label: "Moisture", type: "number", unit: "%" },
-      { id: "particleSizeMa", label: "Particle Size MA", type: "number", unit: "%" },
-      { id: "particleSizeCv", label: "Particle Size CV", type: "number", unit: "%" }
+      { id: "MsugarColourGs10", label: "M Sugar Colour GS-10", type: "number", unit: "IU" },
+      { id: "MsugarColourGs8", label: "M Sugar Colour GS-8", type: "number", unit: "IU" },
+      { id: "MsugarReflectance", label: "M Sugar Reflectance", type: "number", unit: "%" },
+      { id: "Mmoisture", label: "M Sugar Moisture", type: "number", unit: "%" },
+      { id: "MparticleSizeMa", label: "M Sugar Particle Size MA", type: "number", unit: "mm" },
+      { id: "MparticleSizeCv", label: "M Sugar Particle Size CV", type: "number", unit: "%" }
     ]
   },
-   {
+  {
     groupId: "sugarAnalysis",
-    title: "SUGAR ANALYSIS (L Grade)",
+    title: "SUGAR ANALYSIS (S Grade)",
     fields: [
-      { id: "sugarColourGs10", label: "Sugar Colour GS-10", type: "number", unit: "ICUMSA" },
-      { id: "sugarColourGs8", label: "Sugar Colour GS-8", type: "number", unit: "ICUMSA" },
-      { id: "sugarReflectance", label: "Sugar Reflectance", type: "number", unit: "%" },
-      { id: "moisture", label: "Moisture", type: "number", unit: "%" },
-      { id: "particleSizeMa", label: "Particle Size MA", type: "number", unit: "%" },
-      { id: "particleSizeCv", label: "Particle Size CV", type: "number", unit: "%" }
+      { id: "SsugarColourGs10", label: "S Sugar Colour GS-10", type: "number", unit: "IU" },
+      { id: "SsugarColourGs8", label: "S Sugar Colour GS-8", type: "number", unit: "IU" },
+      { id: "SsugarReflectance", label: "S Sugar Reflectance", type: "number", unit: "%" },
+      { id: "Smoisture", label: "S Sugar Moisture", type: "number", unit: "%" },
+      { id: "SparticleSizeMa", label: "S Sugar Particle Size MA", type: "number", unit: "mm" },
+      { id: "SparticleSizeCv", label: "S Sugar Particle Size CV", type: "number", unit: "%" }
     ]
   },
   {
@@ -166,10 +173,10 @@ export const analysisConfig: GroupConfig[] = [
       { id: "rawWaterConsumption", label: "Raw Water Consumption", type: "number", unit: "KLtr" },
       { id: "treatedWaterDischarge", label: "Treated Water Discharge", type: "number", unit: "Ltr/MTCane" },
       { id: "treatedWaterRecycled", label: "Treated Water Re-cycled", type: "number", unit: "KLtr" },
-      { id: "dmWaterConsumption", label: "DM Water Consumption", type: "number", unit: "%" },
+      { id: "dmWaterConsumption", label: "DM Water Consumption", type: "number", unit: "KLtr" },
       { id: "steamGeneration", label: "Steam Generation", type: "number", unit: "MT" },
       { id: "steamFuelRatio", label: "Steam Fuel Ratio", type: "number", unit: "%" },
-      { id: "boilingHouseSteamConsumption", label: "Boiling House Steam Consumption", type: "number", unit: "%" }
+      { id: "boilingHouseSteamConsumption", label: "Boiling House Steam Consumption", type: "number", unit: "MT" }
     ]
   },
   {
@@ -242,8 +249,58 @@ export const analysisConfig: GroupConfig[] = [
       { id: "r3MassecuitePol", label: "R3 - Massecuite", type: "number", unit: "%", subLabel: "Pol" },
       { id: "r3MolassesBrix", label: "R3 - Molasses ", type: "number", unit: "%", subLabel: "Brix" },
       { id: "r3MolassesPol", label: "R3 - Molasses", type: "number", unit: "%", subLabel: "Pol" },
-      { id: "sentOutMolassesTrs", label: "Sent Out Molasses (TRS%)", type: "number", unit: "%" },
-      { id: "divertedSyrupTrs", label: "Diverted Syrup (TRS%)", type: "number", unit: "%" }
+      
     ]
-  }
+  },
+  {
+    groupId: "specialanalysisResults",
+    title: "TRS ANALYSIS RESULTS",
+    fields: [
+      { id: "divertedSyrupTrs", label: "Diverted Syrup", type: "number", unit: "%" },
+      { id: "BheavyMolassesTrs", label: "B-Heavy Molasses", type: "number", unit: "%" },
+      { id: "FinalMolassesTrs", label: "Final Molasses", type: "number", unit: "%" },
+      { id: "SucrosePurity", label: "Mixed Juice Sucrose Purity", type: "number", unit: "%" },
+    ]
+  },
+  {
+    groupId: "SucrosePurityAnalysisResults",
+    title: "Sucrose Purity ANALYSIS RESULTS",
+    fields: [
+      { id: "MJSucrosePurity", label: "Mixed Juice Sucrose Purity", type: "number", unit: "%" }
+    ]
+  },
+{
+    groupId: "rsanalysisResults",
+    title: "RS ANALYSIS RESULTS",
+    fields: [
+      { id: "rsPrimaryJuice", label: "Primary Juice", type: "number", unit: "Per 100 Bx" },
+      { id: "rsMixedJuice", label: "Mixed Juice", type: "number", unit: "Per 100 Bx" },
+      { id: "rsClearJuice", label: "Clear Juice", type: "number", unit: "Per 100 Bx" },
+      { id: "rsUnSulSyrup", label: "Un Sulphured Syrup", type: "number", unit: "Per 100 Bx" },
+      { id: "rsSulSyrup", label: "Sulphured Syrup", type: "number", unit: "Per 100 Bx" },
+      { id: "rsFinalMolasses", label: "Final Molasses", type: "number", unit: "Per 100 Bx" }
+    ]
+  },
+{
+    groupId: "coluoranalysisResults",
+    title: "COLUOR ANALYSIS RESULTS",
+    fields: [
+      { id: "ColourPrimaryJuice", label: "Primary Juice", type: "number", unit: "IU" },
+      { id: "ColourMixedJuice", label: "Mixed Juice", type: "number", unit: "IU" },
+      { id: "ColourClearJuice", label: "Clear Juice", type: "number", unit: "IU" },
+      { id: "ColourUnSulSyrup", label: "Un Sulphured Syrup", type: "number", unit: "IU" },
+      { id: "ColourSulSyrup", label: "Sulphured Syrup", type: "number", unit: "IU" },
+      { id: "ColourAMass", label: "A-Massecuite", type: "number", unit: "IU" },
+      { id: "ColourAlight", label: "A-Light", type: "number", unit: "IU" },
+      { id: "ColourAheavy", label: "A-Heavy", type: "number", unit: "IU" },
+      { id: "ColourBMass", label: "B-Massecuite", type: "number", unit: "IU" },
+      { id: "ColourBheavy", label: "B-Heavy", type: "number", unit: "IU" },
+      { id: "ColourBsugar", label: "B-Sugar", type: "number", unit: "IU" },
+      { id: "ColourCMass", label: "C-Massecuite", type: "number", unit: "IU" },
+      { id: "ColourCfwSugar", label: "CFW Sugar", type: "number", unit: "IU" },
+      { id: "ColourFinalMol", label: "Final Molasses", type: "number", unit: "IU" },
+      { id: "ColourClight", label: "Sulphured Syrup", type: "number", unit: "IU" },
+      { id: "ColourCawSugar", label: "CAW Sugar", type: "number", unit: "IU" }
+    ]
+  },
 ];
