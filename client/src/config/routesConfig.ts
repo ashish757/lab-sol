@@ -1,3 +1,5 @@
+import { getClientApiPath } from '../../../shared/routes';
+
 export const PAGES = {
   HOME: '/',
   LOGS_LIST: '/logs',
@@ -16,7 +18,7 @@ export const getPagePath = {
 };
 
 export const API_ENDPOINTS = {
-  DAILY_LOGS: '/api/daily-logs',
-  DAILY_LOG_BY_ID: (id: string | number) => `/api/daily-logs/${id}`,
-  DOWNLOAD_DAILY_REPORT: '/api/reports/daily/download',
+  DAILY_LOGS: getClientApiPath.dailyLogs.base(),
+  DAILY_LOG_BY_ID: (id: string | number) => getClientApiPath.dailyLogs.one(id),
+  DOWNLOAD_DAILY_REPORT: getClientApiPath.reports.downloadTemplate(),
 } as const;

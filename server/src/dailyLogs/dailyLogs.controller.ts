@@ -1,8 +1,9 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { DailyLogsService } from './dailyLogs.service';
-import { UpsertDailyLogDto } from './dto/dailyLog.dto';
+import { IpsertDailyLogDto } from './dto/dailyLog.dto';
+import { API_ROUTES } from '../../../shared/routes';
 
-@Controller('api/daily-logs')
+@Controller(API_ROUTES.DAILY_LOGS.BASE)
 export class DailyLogsController {
   constructor(private readonly dailyLogsService: DailyLogsService) { }
 
@@ -10,8 +11,8 @@ export class DailyLogsController {
    * POST /daily-logs
    * Submit a new daily analysis log entry.
    */
-  @Post()
-  create(@Body() dto: UpsertDailyLogDto) {
+  @Post(API_ROUTES.DAILY_LOGS.CREATE)
+  create(@Body() dto: IpsertDailyLogDto) {
     return this.dailyLogsService.create(dto);
   }
 
@@ -19,7 +20,7 @@ export class DailyLogsController {
    * GET /daily-logs
    * Fetch all logs, or filter by a specific date via ?date=YYYY-MM-DD
    */
-  @Get()
+  @Get(API_ROUTES.DAILY_LOGS.GET_ALL)
   findAll(@Query('date') date?: string) {
     if (date) {
       return this.dailyLogsService.findByDate(date);
@@ -31,7 +32,7 @@ export class DailyLogsController {
    * GET /daily-logs/:id
    * Fetch a single daily log by UUID.
    */
-  @Get(':id')
+  @Get(API_ROUTES.DAILY_LOGS.GET_ONE)
   findOne(@Param('id') id: string) {
     return this.dailyLogsService.findOne(id);
   }

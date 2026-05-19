@@ -1,17 +1,13 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
+import { API_ROUTES } from '../../shared/routes';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) { }
 
-  @Get("/health")
+  @Get(API_ROUTES.HEALTH.BASE)
   healthCheck(): string {
     return this.appService.healthCheck();
-  }
-
-  @Post("/analysis")
-  saveAnalysis(@Body() data: any): { success: boolean } {
-    return { success: true };
   }
 }

@@ -9,7 +9,7 @@ export function populateRow(
   rowNum: number,
   row: ExcelJS.Row,
   data: Record<string, any>,
-  fieldTypeMap: Map<string, 'number' | 'date' | 'time'>
+  fieldTypeMap: Map<string, 'number' | 'date' | 'time' | 'text'>
 ): void {
   // 1. Single value field matching
   if (EXCEL_ROW_SINGLE_VALUES[rowNum]) {

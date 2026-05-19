@@ -11,7 +11,7 @@ import { populateRow } from './reports.utils';
 export class ReportsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private fieldTypeMap: Map<string, 'number' | 'date' | 'time'> = new Map();
+  private fieldTypeMap: Map<string, 'number' | 'date' | 'time' | 'text'> = new Map();
 
   private initializeFieldTypes() {
     if (this.fieldTypeMap.size > 0) return;

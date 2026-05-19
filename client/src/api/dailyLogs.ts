@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { API_ENDPOINTS } from '../config/routesConfig';
+import { getClientApiPath } from '../../../shared/routes';
 
 export const apiClient = axios.create({
   baseURL: 'http://localhost:3000',
@@ -47,7 +48,7 @@ export async function getDailyLogById(id: string): Promise<DailyLogResponse> {
 export function getDownloadDailyReportUrl(id?: string): string {
   const base = apiClient.defaults.baseURL || 'http://localhost:3000';
   if (id && id !== 'new') {
-    return `${base}/api/reports/daily/download/${id}`;
+    return `${base}${getClientApiPath.reports.downloadOne(id)}`;
   }
   return `${base}${API_ENDPOINTS.DOWNLOAD_DAILY_REPORT}`;
 }
