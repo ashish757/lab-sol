@@ -12,8 +12,8 @@ interface PrimitiveInputProps extends BaseInputProps {
 }
 
 const getFieldUnit = (field: FieldConfig): string => {
-  if (field.type === 'date') return 'Date';
-  if (field.type === 'time') return 'Time';
+  if (field.type === 'date') return 'DD/MM/YYYY';
+  if (field.type === 'time') return 'HH:MM';
   return field.unit || '-';
 };
 
@@ -118,7 +118,7 @@ const RatioCalculatedInput = React.memo(({ label, fields }: BaseInputProps) => {
 
   let ratioText = '—';
   if (!isNaN(brix) && !isNaN(pol) && brix !== 0) {
-    ratioText = (pol / brix).toFixed(2);
+    ratioText = ((pol / brix) * 100).toFixed(2) + '%';
   }
 
   return (

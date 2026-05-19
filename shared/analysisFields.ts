@@ -22,10 +22,10 @@ export const analysisConfig: GroupConfig[] = [
     groupId: "crushingData",
     title: "CRUSHING DATA",
     fields: [
-      { id: "plantStartDate", label: "Plant Start Date", type: "date" },
-      { id: "plantStartTime", label: "Plant Start Time", type: "time" },
-      { id: "plantShutdownDate", label: "Plant Shutdown Date", type: "date" },
-      { id: "plantShutdownTime", label: "Plant Shutdown Time", type: "time" },
+      { id: "seasonStartDate", label: "Season Start Date", type: "date" },
+      { id: "seasonStartTime", label: "Season Start Time", type: "time" },
+      { id: "seasonShutdownDate", label: "Season Shutdown Date", type: "date" },
+      { id: "seasonShutdownTime", label: "Season Shutdown Time", type: "time" },
       { id: "todayDate", label: "Today Date", type: "date", required: true },
       { id: "cropDay", label: "Cropday", type: "number", unit: "Nos" },
       { id: "rain", label: "Rain (Inch)", type: "number", unit: "Inch" },
@@ -115,7 +115,31 @@ export const analysisConfig: GroupConfig[] = [
   },
   {
     groupId: "sugarAnalysis",
+    title: "SUGAR ANALYSIS (S Grade)",
+    fields: [
+      { id: "sugarColourGs10", label: "Sugar Colour GS-10", type: "number", unit: "ICUMSA" },
+      { id: "sugarColourGs8", label: "Sugar Colour GS-8", type: "number", unit: "ICUMSA" },
+      { id: "sugarReflectance", label: "Sugar Reflectance", type: "number", unit: "%" },
+      { id: "moisture", label: "Moisture", type: "number", unit: "%" },
+      { id: "particleSizeMa", label: "Particle Size MA", type: "number", unit: "%" },
+      { id: "particleSizeCv", label: "Particle Size CV", type: "number", unit: "%" }
+    ]
+  },
+   {
+    groupId: "sugarAnalysis",
     title: "SUGAR ANALYSIS (M Grade)",
+    fields: [
+      { id: "sugarColourGs10", label: "Sugar Colour GS-10", type: "number", unit: "ICUMSA" },
+      { id: "sugarColourGs8", label: "Sugar Colour GS-8", type: "number", unit: "ICUMSA" },
+      { id: "sugarReflectance", label: "Sugar Reflectance", type: "number", unit: "%" },
+      { id: "moisture", label: "Moisture", type: "number", unit: "%" },
+      { id: "particleSizeMa", label: "Particle Size MA", type: "number", unit: "%" },
+      { id: "particleSizeCv", label: "Particle Size CV", type: "number", unit: "%" }
+    ]
+  },
+   {
+    groupId: "sugarAnalysis",
+    title: "SUGAR ANALYSIS (L Grade)",
     fields: [
       { id: "sugarColourGs10", label: "Sugar Colour GS-10", type: "number", unit: "ICUMSA" },
       { id: "sugarColourGs8", label: "Sugar Colour GS-8", type: "number", unit: "ICUMSA" },
