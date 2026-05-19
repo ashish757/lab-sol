@@ -118,7 +118,7 @@ const RatioCalculatedInput = React.memo(({ label, fields }: BaseInputProps) => {
 
   let ratioText = '—';
   if (!isNaN(brix) && !isNaN(pol) && brix !== 0) {
-    ratioText = ((pol / brix) * 100).toFixed(2) + '%';
+    ratioText = ((pol / brix) * 100).toFixed(2);
   }
 
   return (

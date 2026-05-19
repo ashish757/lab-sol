@@ -32,7 +32,7 @@ export const HomePage = () => {
       purityCount++;
     }
   });
-  const avgPurity = purityCount > 0 ? (puritySum / purityCount).toFixed(2) + '%' : '—';
+  const avgPurity = purityCount > 0 ? (puritySum / purityCount).toFixed(2) : '—';
 
   // Format Date Helper
   const formatDate = (dateStr: string) => {
@@ -192,7 +192,7 @@ export const HomePage = () => {
                       const metrics = typeof log.metrics === 'string' ? JSON.parse(log.metrics) : log.metrics;
                       const brix = parseFloat(metrics?.primaryJuiceBrix) || 0;
                       const pol = parseFloat(metrics?.primaryJuicePol) || 0;
-                      const purity = brix > 0 ? ((pol / brix) * 100).toFixed(2) + '%' : '—';
+                      const purity = brix > 0 ? ((pol / brix) * 100).toFixed(2) : '—';
                       
                       return (
                         <tr key={log.id} className="hover:bg-slate-50/40 transition-colors">

@@ -147,7 +147,7 @@ export const AnalysisReportPage = () => {
   // Calculate high-contrast Purity ratios for metrics display
   const primaryBrix = parseFloat(getMetric(logData.metrics, 'primaryJuiceBrix', '0'));
   const primaryPol = parseFloat(getMetric(logData.metrics, 'primaryJuicePol', '0'));
-  const purity = primaryBrix > 0 ? ((primaryPol / primaryBrix) * 100).toFixed(2) + '%' : '—';
+  const purity = primaryBrix > 0 ? ((primaryPol / primaryBrix) * 100).toFixed(2) : '—';
 
   return (
     <div className="flex-1 flex flex-col bg-slate-50 overflow-y-auto">

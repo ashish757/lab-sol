@@ -12,7 +12,7 @@ interface FormSidebarProps {
 
 export const FormSidebar = ({ config, activeSection, onScrollTo, onReset, onSaveDraft, isSubmitting = false }: FormSidebarProps) => {
   return (
-    <nav className="w-full lg:w-64 bg-white border-r border-slate-200 overflow-y-auto z-0 flex-shrink-0 flex flex-col shadow-sm">
+    <nav className="w-full md:w-72 bg-white border-r border-slate-200 overflow-y-auto z-0 flex-shrink-0 flex flex-col shadow-sm">
       <div className="px-5 py-5 border-b border-slate-200 shrink-0 bg-slate-50/40">
         <h1 className="text-lg font-black text-slate-900 tracking-wider uppercase">New Analysis</h1>
         <p className="text-xs font-bold text-slate-500 mt-1 uppercase tracking-wide">Daily production log</p>
