@@ -10,12 +10,41 @@ export interface FieldConfig {
   required?: boolean;
 }
 
-export interface GroupConfig {
+export interface SubGroupConfig {
+  subGroupId: string;
+  title: string;
+  description?: string;
+  fields: FieldConfig[];
+}
+
+export interface FlatGroupConfig {
   groupId: string;
   title: string;
   description?: string;
   fields: FieldConfig[];
 }
+
+export interface ParentGroupConfig {
+  groupId: string;
+  title: string;
+  description?: string;
+  subGroups: SubGroupConfig[];
+}
+
+export type GroupConfig = FlatGroupConfig | ParentGroupConfig;
+
+export const isFlatGroup = (g: GroupConfig): g is FlatGroupConfig => 'fields' in g;
+export const isParentGroup = (g: GroupConfig): g is ParentGroupConfig => 'subGroups' in g;
+
+export const getAllFields = (config: GroupConfig[]): FieldConfig[] =>
+  config.flatMap((g) =>
+    isFlatGroup(g) ? g.fields : g.subGroups.flatMap((sg) => sg.fields)
+  );
+
+export const getAllSectionIds = (config: GroupConfig[]): string[] =>
+  config.flatMap((g) =>
+    isFlatGroup(g) ? [g.groupId] : g.subGroups.map((sg) => sg.subGroupId)
+  );
 
 export const analysisConfig: GroupConfig[] = [
   {
@@ -252,53 +281,59 @@ export const analysisConfig: GroupConfig[] = [
     ]
   },
   {
-    groupId: "specialanalysisResults",
-    title: "TRS ANALYSIS RESULTS",
-    fields: [
-      { id: "divertedSyrupTrs", label: "Diverted Syrup", type: "number", unit: "%" },
-      { id: "BheavyMolassesTrs", label: "B-Heavy Molasses", type: "number", unit: "%" },
-      { id: "FinalMolassesTrs", label: "Final Molasses", type: "number", unit: "%" },
-    ]
-  },
-  {
-    groupId: "SucrosePurityAnalysisResults",
-    title: "SUCROSE PURITY ANALYSIS RESULTS",
-    fields: [
-      { id: "MJSucrosePurity", label: "Mixed Juice Sucrose Purity", type: "number", unit: "%" }
-    ]
-  },
-{
-    groupId: "rsanalysisResults",
-    title: "RS ANALYSIS RESULTS",
-    fields: [
-      { id: "rsPrimaryJuice", label: "Primary Juice", type: "number", unit: "Per 100 Bx" },
-      { id: "rsMixedJuice", label: "Mixed Juice", type: "number", unit: "Per 100 Bx" },
-      { id: "rsClearJuice", label: "Clear Juice", type: "number", unit: "Per 100 Bx" },
-      { id: "rsUnSulSyrup", label: "Un Sulphured Syrup", type: "number", unit: "Per 100 Bx" },
-      { id: "rsSulSyrup", label: "Sulphured Syrup", type: "number", unit: "Per 100 Bx" },
-      { id: "rsFinalMolasses", label: "Final Molasses", type: "number", unit: "Per 100 Bx" }
-    ]
-  },
-{
-    groupId: "coluoranalysisResults",
-    title: "COLUOR ANALYSIS RESULTS",
-    fields: [
-      { id: "ColourPrimaryJuice", label: "Primary Juice", type: "number", unit: "IU" },
-      { id: "ColourMixedJuice", label: "Mixed Juice", type: "number", unit: "IU" },
-      { id: "ColourClearJuice", label: "Clear Juice", type: "number", unit: "IU" },
-      { id: "ColourUnSulSyrup", label: "Un Sulphured Syrup", type: "number", unit: "IU" },
-      { id: "ColourSulSyrup", label: "Sulphured Syrup", type: "number", unit: "IU" },
-      { id: "ColourAMass", label: "A-Massecuite", type: "number", unit: "IU" },
-      { id: "ColourAlight", label: "A-Light", type: "number", unit: "IU" },
-      { id: "ColourAheavy", label: "A-Heavy", type: "number", unit: "IU" },
-      { id: "ColourBMass", label: "B-Massecuite", type: "number", unit: "IU" },
-      { id: "ColourBheavy", label: "B-Heavy", type: "number", unit: "IU" },
-      { id: "ColourBsugar", label: "B-Sugar", type: "number", unit: "IU" },
-      { id: "ColourCMass", label: "C-Massecuite", type: "number", unit: "IU" },
-      { id: "ColourCfwSugar", label: "CFW Sugar", type: "number", unit: "IU" },
-      { id: "ColourFinalMol", label: "Final Molasses", type: "number", unit: "IU" },
-      { id: "ColourClight", label: "Sulphured Syrup", type: "number", unit: "IU" },
-      { id: "ColourCawSugar", label: "CAW Sugar", type: "number", unit: "IU" }
+    groupId: "specialAnalysisGroup",
+    title: "SPECIAL ANALYSIS",
+    subGroups: [
+      {
+        subGroupId: "specialanalysisResults",
+        title: "TRS ANALYSIS RESULTS",
+        fields: [
+          { id: "divertedSyrupTrs", label: "Diverted Syrup", type: "number", unit: "%" },
+          { id: "BheavyMolassesTrs", label: "B-Heavy Molasses", type: "number", unit: "%" },
+          { id: "FinalMolassesTrs", label: "Final Molasses", type: "number", unit: "%" },
+        ]
+      },
+      {
+        subGroupId: "SucrosePurityAnalysisResults",
+        title: "SUCROSE PURITY ANALYSIS RESULTS",
+        fields: [
+          { id: "MJSucrosePurity", label: "Mixed Juice Sucrose Purity", type: "number", unit: "%" }
+        ]
+      },
+      {
+        subGroupId: "rsanalysisResults",
+        title: "RS ANALYSIS RESULTS",
+        fields: [
+          { id: "rsPrimaryJuice", label: "Primary Juice", type: "number", unit: "Per 100 Bx" },
+          { id: "rsMixedJuice", label: "Mixed Juice", type: "number", unit: "Per 100 Bx" },
+          { id: "rsClearJuice", label: "Clear Juice", type: "number", unit: "Per 100 Bx" },
+          { id: "rsUnSulSyrup", label: "Un Sulphured Syrup", type: "number", unit: "Per 100 Bx" },
+          { id: "rsSulSyrup", label: "Sulphured Syrup", type: "number", unit: "Per 100 Bx" },
+          { id: "rsFinalMolasses", label: "Final Molasses", type: "number", unit: "Per 100 Bx" }
+        ]
+      },
+      {
+        subGroupId: "coluoranalysisResults",
+        title: "COLOUR ANALYSIS RESULTS",
+        fields: [
+          { id: "ColourPrimaryJuice", label: "Primary Juice", type: "number", unit: "IU" },
+          { id: "ColourMixedJuice", label: "Mixed Juice", type: "number", unit: "IU" },
+          { id: "ColourClearJuice", label: "Clear Juice", type: "number", unit: "IU" },
+          { id: "ColourUnSulSyrup", label: "Un Sulphured Syrup", type: "number", unit: "IU" },
+          { id: "ColourSulSyrup", label: "Sulphured Syrup", type: "number", unit: "IU" },
+          { id: "ColourAMass", label: "A-Massecuite", type: "number", unit: "IU" },
+          { id: "ColourAlight", label: "A-Light", type: "number", unit: "IU" },
+          { id: "ColourAheavy", label: "A-Heavy", type: "number", unit: "IU" },
+          { id: "ColourBMass", label: "B-Massecuite", type: "number", unit: "IU" },
+          { id: "ColourBheavy", label: "B-Heavy", type: "number", unit: "IU" },
+          { id: "ColourBsugar", label: "B-Sugar", type: "number", unit: "IU" },
+          { id: "ColourCMass", label: "C-Massecuite", type: "number", unit: "IU" },
+          { id: "ColourCfwSugar", label: "CFW Sugar", type: "number", unit: "IU" },
+          { id: "ColourFinalMol", label: "Final Molasses", type: "number", unit: "IU" },
+          { id: "ColourClight", label: "Sulphured Syrup", type: "number", unit: "IU" },
+          { id: "ColourCawSugar", label: "CAW Sugar", type: "number", unit: "IU" }
+        ]
+      },
     ]
   },
 ];

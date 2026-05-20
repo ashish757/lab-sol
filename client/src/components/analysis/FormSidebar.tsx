@@ -1,10 +1,11 @@
 import type { GroupConfig } from '../../config/analysisConfig';
+import { isFlatGroup } from '../../config/analysisConfig';
 import { FormProgress } from './FormProgress';
 
 interface FormSidebarProps {
   config: GroupConfig[];
   activeSection: string;
-  onScrollTo: (groupId: string) => void;
+  onScrollTo: (id: string) => void;
   onReset?: () => void;
   onSaveDraft?: () => void;
   isSubmitting?: boolean;
@@ -54,20 +55,54 @@ export const FormSidebar = ({ config, activeSection, onScrollTo, onReset, onSave
       </div>
 
       <div className="flex flex-col py-2">
-        {config.map((group) => (
-          <button
-            key={group.groupId}
-            type="button"
-            onClick={() => onScrollTo(group.groupId)}
-            className={`text-left px-5 py-2.5 text-xs font-medium transition-colors relative ${activeSection === group.groupId
-                ? 'bg-indigo-100 text-indigo-700 font-extrabold'
-                : 'text-slate-700 hover:bg-slate-50 hover:text-slate-950'
-              }`}
-          >
-            {group.title}
-          </button>
-        ))}
+        {config.map((group) => {
+          if (isFlatGroup(group)) {
+            return (
+              <button
+                key={group.groupId}
+                type="button"
+                onClick={() => onScrollTo(group.groupId)}
+                className={`text-left px-5 py-2.5 text-xs font-medium transition-colors relative ${
+                  activeSection === group.groupId
+                    ? 'bg-indigo-100 text-indigo-700 font-extrabold'
+                    : 'text-slate-700 hover:bg-slate-50 hover:text-slate-950'
+                }`}
+              >
+                {group.title}
+              </button>
+            );
+          }
+
+          const isParentActive = group.subGroups.some((sg) => sg.subGroupId === activeSection);
+
+          return (
+            <div key={group.groupId}>
+              <div
+                className={`text-left px-5 py-2.5 text-xs font-medium transition-colors relative ${
+                  isParentActive ? 'text-indigo-700' : 'text-slate-700'
+                }`}
+              >
+                {group.title}
+              </div>
+              {group.subGroups.map((subGroup) => (
+                <button
+                  key={subGroup.subGroupId}
+                  type="button"
+                  onClick={() => onScrollTo(subGroup.subGroupId)}
+                  className={`w-full text-left pl-10 pr-5 py-2 text-xs font-medium transition-colors relative ${
+                    activeSection === subGroup.subGroupId
+                      ? 'bg-indigo-100 text-indigo-700 font-extrabold'
+                      : 'text-slate-400 hover:bg-slate-50 hover:text-slate-950'
+                  }`}
+                >
+                  {subGroup.title}
+                </button>
+              ))}
+            </div>
+          );
+        })}
       </div>
     </nav>
   );
 };
+

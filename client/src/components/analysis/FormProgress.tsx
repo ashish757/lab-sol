@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
-import { analysisConfig } from '../../config/analysisConfig';
+import { analysisConfig, getAllFields } from '../../config/analysisConfig';
 
 const isFilled = (val: any): boolean => {
   if (val === undefined || val === null || val === '') return false;
@@ -16,22 +16,17 @@ export const FormProgress = React.memo(({ className }: FormProgressProps) => {
   const { control } = useFormContext();
   const values = useWatch({ control }) || {};
 
-  const totalFields = useMemo(() => {
-    return analysisConfig.reduce((acc, group) => acc + group.fields.length, 0);
-  }, []);
+  const allFields = useMemo(() => getAllFields(analysisConfig), []);
+
+  const totalFields = allFields.length;
 
   const filledCount = useMemo(() => {
     let count = 0;
-    for (const group of analysisConfig) {
-      for (const field of group.fields) {
-        const val = values[field.id];
-        if (isFilled(val)) {
-          count++;
-        }
-      }
+    for (const field of allFields) {
+      if (isFilled(values[field.id])) count++;
     }
     return count;
-  }, [values]);
+  }, [values, allFields]);
 
   const percentage = useMemo(() => {
     if (totalFields === 0) return 0;
@@ -57,3 +52,4 @@ export const FormProgress = React.memo(({ className }: FormProgressProps) => {
     </div>
   );
 });
+

@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as express from 'express';
 import { PrismaService } from '../prisma/prisma.service';
-import { analysisConfig } from '../../../shared/analysisFields';
+import { analysisConfig, getAllFields } from '../../../shared/analysisFields';
 import { populateRow } from './reports.utils';
 
 @Injectable()
@@ -15,10 +15,8 @@ export class ReportsService {
 
   private initializeFieldTypes() {
     if (this.fieldTypeMap.size > 0) return;
-    for (const group of analysisConfig) {
-      for (const field of group.fields) {
-        this.fieldTypeMap.set(field.id, field.type);
-      }
+    for (const field of getAllFields(analysisConfig)) {
+      this.fieldTypeMap.set(field.id, field.type);
     }
   }
 

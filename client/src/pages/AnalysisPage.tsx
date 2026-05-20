@@ -2,7 +2,7 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
 import { analysisSchema, type AnalysisSchema } from '../types/analysisSchema';
-import { analysisConfig } from '../config/analysisConfig';
+import { analysisConfig, getAllSectionIds } from '../config/analysisConfig';
 import { useScrollSpy } from '../hooks/useScrollSpy';
 import { FormSidebar } from '../components/analysis/FormSidebar';
 import { FormSection } from '../components/analysis/FormSection';
@@ -39,10 +39,11 @@ export const AnalysisPage = () => {
 
   const { saveDraft, clearStorage } = useFormPersist(methods, { key: 'analysis-form' });
 
-  const sectionIds = analysisConfig.map((group) => group.groupId);
+  const sectionIds = getAllSectionIds(analysisConfig);
+  const defaultSection = sectionIds[0] ?? '';
   const { activeSection: expanded, scrollTo: handleScrollTo } = useScrollSpy(
     sectionIds,
-    analysisConfig[0].groupId
+    defaultSection
   );
 
   const handleReset = () => {
