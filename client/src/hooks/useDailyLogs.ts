@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   getDailyLogs,
   getDailyLogById,
-  upsertDailyLog,
+  saveAndGenerateReport,
   type UpsertDailyLogPayload,
 } from '../api/dailyLogs';
 
@@ -12,7 +12,7 @@ export function useUpsertLog() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: UpsertDailyLogPayload) => upsertDailyLog(payload),
+    mutationFn: (payload: UpsertDailyLogPayload) => saveAndGenerateReport(payload),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });

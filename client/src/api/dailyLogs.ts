@@ -31,6 +31,30 @@ export async function upsertDailyLog(
   return response;
 }
 
+export interface SaveAndGenerateResponse {
+  id: string;
+  fileBlob: Blob;
+}
+
+export async function saveAndGenerateReport(
+  data: UpsertDailyLogPayload,
+): Promise<SaveAndGenerateResponse> {
+  const response = await apiClient.post<Blob>(
+    API_ENDPOINTS.SAVE_AND_GENERATE,
+    data,
+    { responseType: 'blob' },
+  );
+
+  const contentDisposition = response.headers['content-disposition'] || '';
+  const match = contentDisposition.match(/Daily_Report_([^.]+)\.xlsx/);
+  const id = match ? match[1] : 'new';
+
+  return {
+    id,
+    fileBlob: response.data,
+  };
+}
+
 export async function getDailyLogs(): Promise<DailyLogResponse[]> {
   const { data: response } = await apiClient.get<DailyLogResponse[]>(
     API_ENDPOINTS.DAILY_LOGS,

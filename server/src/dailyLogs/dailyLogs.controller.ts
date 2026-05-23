@@ -1,11 +1,11 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { DailyLogsService } from './dailyLogs.service';
 import { InsertDailyLogDto } from './dto/dailyLog.dto';
-import { API_ROUTES } from '../../../shared/routes';
+import { API_ROUTES } from '@shared/routes';
 
 @Controller(API_ROUTES.DAILY_LOGS.BASE)
 export class DailyLogsController {
-  constructor(private readonly dailyLogsService: DailyLogsService) { }
+  constructor(private readonly dailyLogsService: DailyLogsService) {}
 
   /**
    * POST /daily-logs

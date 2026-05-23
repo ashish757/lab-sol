@@ -1,10 +1,9 @@
-
 export const requiredFormulaIds: string[] = [
   'totalCaneCrushed',
   'totalSugarBagged',
   'primaryJuicePurity',
   'mixedJuicePurity',
-  'yieldEst'
+  'yieldEst',
 ];
 
 export type FormulaFunction = (data: Record<string, any>) => any;
@@ -46,5 +45,5 @@ export const FormulaRegistry: Record<string, FormulaFunction> = {
     const bagged = Number(data.totalSugarBagged) || 0;
     if (crushed === 0) return 0;
     return Number(((bagged / crushed) * 100).toFixed(2));
-  }
+  },
 };

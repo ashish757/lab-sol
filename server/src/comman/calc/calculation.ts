@@ -1,8 +1,8 @@
-import { FormulaRegistry } from "./formulas";
+import { FormulaRegistry } from './formulas';
 
 export function calculateReportData(
   rawData: Record<string, any>,
-  calculationOrder: string[]
+  calculationOrder: string[],
 ): Record<string, any> {
   const accumulatedData = JSON.parse(JSON.stringify(rawData));
 
@@ -10,8 +10,7 @@ export function calculateReportData(
     if (id in FormulaRegistry) {
       try {
         accumulatedData[id] = FormulaRegistry[id](accumulatedData);
-      } catch (error) {
-      }
+      } catch (error) {}
     }
   }
 

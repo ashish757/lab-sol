@@ -1,7 +1,16 @@
-import { Controller, Get, Param, Res, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Res,
+  NotFoundException,
+} from '@nestjs/common';
 import { ReportsService } from './reports.service';
 import * as express from 'express';
-import { API_ROUTES } from '../../../shared/routes';
+import { API_ROUTES } from '@shared/routes';
+import { InsertDailyLogDto } from '../dailyLogs/dto/dailyLog.dto';
 
 @Controller(API_ROUTES.REPORTS.BASE)
 export class ReportsController {
@@ -12,7 +21,9 @@ export class ReportsController {
    * Streams a blank template download of the daily report.
    */
   @Get(API_ROUTES.REPORTS.DOWNLOAD_TEMPLATE)
-  async downloadDailyReportTemplate(@Res() res: express.Response): Promise<void> {
+  async downloadDailyReportTemplate(
+    @Res() res: express.Response,
+  ): Promise<void> {
     res.setHeader(
       'Content-Type',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -30,7 +41,10 @@ export class ReportsController {
    * Streams a populated daily report spreadsheet by database ID.
    */
   @Get(API_ROUTES.REPORTS.DOWNLOAD_ONE)
-  async downloadDailyReport(@Param('id') id: string, @Res() res: express.Response): Promise<void> {
+  async downloadDailyReport(
+    @Param('id') id: string,
+    @Res() res: express.Response,
+  ): Promise<void> {
     try {
       const buffer = await this.reportsService.generateDailyReportById(id);
 
@@ -51,6 +65,21 @@ export class ReportsController {
         console.error(error);
         res.status(500).send('Internal server error generating spreadsheet');
       }
+    }
+  }
+
+  @Post(API_ROUTES.REPORTS.SAVE_AND_GENERATE)
+  async saveAndGenerateReport(
+    @Body() dto: InsertDailyLogDto,
+    @Res() res: express.Response,
+  ): Promise<void> {
+    try {
+      await this.reportsService.saveAndGenerateReport(dto, res);
+    } catch (error) {
+      console.error(error);
+      res
+        .status(500)
+        .send('Internal server error generating and saving spreadsheet');
     }
   }
 }

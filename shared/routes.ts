@@ -22,6 +22,7 @@ export const API_ROUTES = {
     BASE: 'api/reports',
     DOWNLOAD_TEMPLATE: 'daily-logs/download',
     DOWNLOAD_ONE: 'daily-logs/download/:id',
+    SAVE_AND_GENERATE: 'save-and-generate',
   },
 } as const;
 
@@ -35,5 +36,6 @@ export const getClientApiPath = {
   reports: {
     downloadTemplate: () => `/${API_ROUTES.REPORTS.BASE}/${API_ROUTES.REPORTS.DOWNLOAD_TEMPLATE}`,
     downloadOne: (id: string | number) => `/${API_ROUTES.REPORTS.BASE}/daily-logs/download/${id}`,
+    saveAndGenerate: () => `/${API_ROUTES.REPORTS.BASE}/save-and-generate`,
   },
 };

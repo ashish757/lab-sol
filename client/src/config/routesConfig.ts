@@ -21,4 +21,5 @@ export const API_ENDPOINTS = {
   DAILY_LOGS: getClientApiPath.dailyLogs.base(),
   DAILY_LOG_BY_ID: (id: string | number) => getClientApiPath.dailyLogs.one(id),
   DOWNLOAD_DAILY_REPORT: getClientApiPath.reports.downloadTemplate(),
+  SAVE_AND_GENERATE: getClientApiPath.reports.saveAndGenerate(),
 } as const;
