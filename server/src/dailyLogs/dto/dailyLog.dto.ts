@@ -1,6 +1,6 @@
 import { IsDateString, IsNotEmpty, IsObject } from 'class-validator';
 
-export class IpsertDailyLogDto {
+export class InsertDailyLogDto {
   @IsNotEmpty()
   @IsDateString()
   logDate: string;

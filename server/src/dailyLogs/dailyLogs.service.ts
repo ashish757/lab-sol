@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { IpsertDailyLogDto } from './dto/dailyLog.dto';
+import { InsertDailyLogDto } from './dto/dailyLog.dto';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class DailyLogsService {
   constructor(private readonly prisma: PrismaService) { }
 
-  async create(dto: IpsertDailyLogDto) {
+  async create(dto: InsertDailyLogDto) {
     const logDate = new Date(dto.logDate);
 
     return this.prisma.dailyAnalysisLog.create({

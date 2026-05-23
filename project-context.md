@@ -48,6 +48,12 @@ trigger: always_on
   1. **GET /api/reports/daily/download/:id:** Queries saved historical logs from the PostgreSQL database, parses JSON metrics, and streams the finished file to the browser.
   2. **POST /api/reports/daily/preview:** Accepts raw client-sent JSON data, populates the template on-the-fly, and streams the Excel file directly to the browser without database persistence, perfect for previewing drafts.
 
+## Factory Report Rules Engine
+- **Sequential Calculation Processor:** Created `calculateReportData` under [report.engine.ts](file:///Users/ashish/Developer/project/server/src/utils/report.engine.ts) to enrich raw daily report JSON input payloads with calculated fields.
+- **Formula Registry Pattern:** Established `FormulaRegistry` where key field IDs are mapped to functions that consume the accumulating data structure. This facilitates sequential calculation and chain reactions (dependent fields like `yieldEst` correctly using the output of previously calculated fields like `totalCaneCrushed` and `totalSugarBagged`).
+- **Immutability & Safety:** Ensures the input payload is deep-cloned to keep operations side-effect-free, and handles unregistered formula IDs gracefully without throwing.
+
+
 
 
 

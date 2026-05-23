@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { DailyLogsService } from './dailyLogs.service';
-import { IpsertDailyLogDto } from './dto/dailyLog.dto';
+import { InsertDailyLogDto } from './dto/dailyLog.dto';
 import { API_ROUTES } from '../../../shared/routes';
 
 @Controller(API_ROUTES.DAILY_LOGS.BASE)
@@ -12,7 +12,7 @@ export class DailyLogsController {
    * Submit a new daily analysis log entry.
    */
   @Post(API_ROUTES.DAILY_LOGS.CREATE)
-  create(@Body() dto: IpsertDailyLogDto) {
+  create(@Body() dto: InsertDailyLogDto) {
     return this.dailyLogsService.create(dto);
   }
 
