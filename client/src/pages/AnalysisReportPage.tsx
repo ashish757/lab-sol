@@ -48,7 +48,10 @@ export const AnalysisReportPage = () => {
           setCreatedLogId(data.id);
           // Replace URL with the actual report ID, so refreshing works
           setTimeout(() => {
-            navigate(getPagePath.analysisReport(data.id), { replace: true });
+            navigate(getPagePath.analysisReport(data.id), {
+              replace: true,
+              state: { preloadedData: data },
+            });
           }, 2400);
         },
         onError: (err) => {
@@ -63,10 +66,10 @@ export const AnalysisReportPage = () => {
     }
   }, [isNew, location.state]);
 
-  // Determine active log data
-  const logData = isNew ? mutation.data : query.data;
-  const isLoading = isNew ? (!createdLogId || mutation.isPending) : query.isLoading;
-  const isError = isNew ? mutation.isError : query.isError;
+  const preloaded = location.state?.preloadedData;
+  const logData = isNew ? mutation.data : (preloaded || query.data);
+  const isLoading = isNew ? (!createdLogId || mutation.isPending) : (!preloaded && query.isLoading);
+  const isError = isNew ? mutation.isError : (!preloaded && query.isError);
 
   // Format Helper
   const formatDate = (dateStr: string | undefined) => {
