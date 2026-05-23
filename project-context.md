@@ -53,6 +53,11 @@ trigger: always_on
 - **Formula Registry Pattern:** Established `FormulaRegistry` where key field IDs are mapped to functions that consume the accumulating data structure. This facilitates sequential calculation and chain reactions (dependent fields like `yieldEst` correctly using the output of previously calculated fields like `totalCaneCrushed` and `totalSugarBagged`).
 - **Immutability & Safety:** Ensures the input payload is deep-cloned to keep operations side-effect-free, and handles unregistered formula IDs gracefully without throwing.
 
+## Facade Save and Download Action
+- **Single-Request Workflow:** Created `POST /api/reports/save-and-generate` to support the single "Save and Download" facade action. It coordinates `DailyLogsService` to persist the raw log, runs the sequential `calculateReportData` engine on the metrics, generates the populated Excel workbook, and streams the finished file directly back to the client.
+- **Client Integration:** The React frontend (under `/analysis/new` loader page) posts form data to this facade endpoint, automatically downloads the spreadsheet response as a binary blob, and navigates to `/analysis/:id` showing the historical metrics summary.
+- **Nest CLI Path Alias Support:** Configured `entryFile: "server/src/main"` in `nest-cli.json` to handle the nested compilation output directory structure (`dist/server/src/main.js`) caused by importing files from the shared directory outside the server root.
+
 
 
 

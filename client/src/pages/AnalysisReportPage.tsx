@@ -27,6 +27,7 @@ export const AnalysisReportPage = () => {
     document.body.removeChild(link);
   };
 
+  const [createdLogId, setCreatedLogId] = useState<string | null>(null);
   const [loadingPhase, setLoadingPhase] = useState('Initializing payload...');
 
   // 1. Trigger log generation on mount if this is /analysis/new
@@ -44,16 +45,7 @@ export const AnalysisReportPage = () => {
 
       mutation.mutate(payload, {
         onSuccess: (data) => {
-          // Automatically trigger download of the returned Excel file
-          const url = window.URL.createObjectURL(data.fileBlob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.setAttribute('download', `Daily_Report_${data.id}.xlsx`);
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          window.URL.revokeObjectURL(url);
-
+          setCreatedLogId(data.id);
           // Replace URL with the actual report ID, so refreshing works
           setTimeout(() => {
             navigate(getPagePath.analysisReport(data.id), { replace: true });
@@ -72,8 +64,8 @@ export const AnalysisReportPage = () => {
   }, [isNew, location.state]);
 
   // Determine active log data
-  const logData = isNew ? null : query.data;
-  const isLoading = isNew ? !mutation.isError : query.isLoading;
+  const logData = isNew ? mutation.data : query.data;
+  const isLoading = isNew ? (!createdLogId || mutation.isPending) : query.isLoading;
   const isError = isNew ? mutation.isError : query.isError;
 
   // Format Helper
