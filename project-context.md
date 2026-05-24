@@ -15,6 +15,9 @@ trigger: always_on
 - **Server:** NestJS + Prisma (Backend). Focus on "Secret Math" logic and document generation.
 - **Shared:** (If applicable) Shared Zod schemas and TypeScript interfaces.
 
+## State & Routing Access Control
+- **RTK Query Transition**: Successfully eradicated Axios and TanStack Query, unifying all data fetching pipelines natively through `@reduxjs/toolkit/query/react`. Request payloads automatically map Redux state configurations mapping secure user `Authorization: Bearer` headers dynamically into the `apiSlice`.
+- **RBAC Protected Route Wrappers**: Enforced strict Role-Based Access Control logic via an intelligent dynamic routing component array (`routeConf.ts`). Dashboard mount points evaluate strict `SUPER_ADMIN`, `ORG_ADMIN`, `UNIT_ADMIN`, and `UNIT_OPERATOR` Prisma schema rules directly against Redux's deserialized authentication session payload. Unauthenticated endpoints forcefully redirect invalid requests immediately back to localized `/unauthorized` rendering layers.
 
 ## Instruction to Agent
 - When working on the **Client**, always reference the business goals in this file to ensure the UI supports high-density data entry.

@@ -28,7 +28,7 @@ model DailyAnalysisLog {
 enum Role {
   SUPER_ADMIN
   ORG_ADMIN
-  UNIT_MANAGER
+  UNIT_ADMIN
   UNIT_OPERATOR
 }
 

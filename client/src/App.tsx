@@ -9,6 +9,9 @@ import { SettingsPage } from './pages/SettingsPage';
 import { LogsPage } from './pages/LogsPage';
 import { SuperAdminDashboard } from './pages/SuperAdminDashboard';
 import { LoginPage } from './pages/LoginPage';
+import { UnauthorizedPage } from './pages/UnauthorizedPage';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { routeConfiguration } from './config/routeConfiguration';
 import { PAGES } from './config/routesConfig';
 
 function App() {
@@ -16,7 +19,15 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path={PAGES.LOGIN} element={<LoginPage />} />
+        <Route path="/unauthorized" element={<UnauthorizedPage />} />
         <Route element={<AppLayout />}>
+          {routeConfiguration.map((routeConfig) => (
+            <Route
+              key={routeConfig.path}
+              path={routeConfig.path}
+              element={<ProtectedRoute component={routeConfig.component} allowedRoles={routeConfig.allowedRoles} />}
+            />
+          ))}
           <Route index element={<HomePage />} />
           <Route path={PAGES.NEW_LOG} element={<AnalysisPage />} />
           <Route path={PAGES.NEW_ANALYSIS} element={<AnalysisReportPage />} />
