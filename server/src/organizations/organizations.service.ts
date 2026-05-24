@@ -53,4 +53,26 @@ export class OrganizationsService {
       return { success: true, orgId: org.id };
     });
   }
+
+  async getAllOrganizations() {
+    return this.prisma.organization.findMany({
+      include: {
+        _count: {
+          select: { units: true, users: true },
+        },
+      },
+    });
+  }
+
+  async getOrganizationById(id: string) {
+    return this.prisma.organization.findUnique({
+      where: { id },
+      include: {
+        units: true,
+        users: {
+          select: { id: true, email: true, role: true },
+        },
+      },
+    });
+  }
 }

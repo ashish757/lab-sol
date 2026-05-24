@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { OrganizationsService } from './organizations.service';
 import { InviteOrgDto } from './dto/inviteOrg.dto';
 import { API_ROUTES } from '@shared/routes';
@@ -16,5 +16,19 @@ export class OrganizationsController {
   @Roles(Role.SUPER_ADMIN)
   async invite(@Body() dto: InviteOrgDto) {
     return this.orgService.inviteOrganization(dto);
+  }
+
+  @Get(API_ROUTES.ORGANIZATIONS.GET_ALL)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
+  async getAllOrganizations() {
+    return this.orgService.getAllOrganizations();
+  }
+
+  @Get(API_ROUTES.ORGANIZATIONS.GET_ONE)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
+  async getOrganizationById(@Param('id') id: string) {
+    return this.orgService.getOrganizationById(id);
   }
 }

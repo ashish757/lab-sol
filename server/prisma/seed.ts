@@ -3,19 +3,71 @@ import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
-async function main() {
-  const email = 'admin@example.com';
-  const password = await bcrypt.hash('password123', 10);
+const seedConfig = {
+  organizations: [
+    { id: 'dummy-org-id', name: 'Acme Corporation' },
+    { id: 'global-tech-id', name: 'Global Tech Industries' },
+  ],
+  units: [
+    { id: 'dummy-unit-aplha', name: 'Acme Factory Alpha', orgId: 'dummy-org-id' },
+     { id: 'dummy-unit-beta', name: 'Acme Factory Bets', orgId: 'dummy-org-id' },
+    { id: 'global-unit-alpha', name: 'GT Alpha Site', orgId: 'global-tech-id' },
+    { id: 'global-unit-beta', name: 'GT Beta Site', orgId: 'global-tech-id' },
+  ],
+  users: [
+    // Super Admins
+    { email: 'admin@example.com', role: Role.SUPER_ADMIN },
+    
+    // Acme Corporation Users
+    { email: 'orgadmin@example.com', role: Role.ORG_ADMIN, orgId: 'dummy-org-id' },
+    { email: 'unitadmin@example.com', role: Role.UNIT_ADMIN, orgId: 'dummy-org-id', unitId: 'dummy-unit-id' },
+    { email: 'operator@example.com', role: Role.UNIT_OPERATOR, orgId: 'dummy-org-id', unitId: 'dummy-unit-id' },
 
-  await prisma.user.upsert({
-    where: { email },
-    update: { password, role: Role.SUPER_ADMIN },
-    create: {
-      email,
-      password,
-      role: Role.SUPER_ADMIN,
-    },
-  });
+    // Global Tech Industries Users
+    { email: 'ceo@globaltech.com', role: Role.ORG_ADMIN, orgId: 'global-tech-id' },
+    { email: 'manager@globaltech.com', role: Role.UNIT_ADMIN, orgId: 'global-tech-id', unitId: 'global-unit-alpha' },
+    { email: 'worker1@globaltech.com', role: Role.UNIT_OPERATOR, orgId: 'global-tech-id', unitId: 'global-unit-alpha' },
+    { email: 'worker2@globaltech.com', role: Role.UNIT_OPERATOR, orgId: 'global-tech-id', unitId: 'global-unit-beta' },
+  ],
+};
+
+async function main() {
+  const password = await bcrypt.hash('pass', 10);
+
+  console.log('Seeding Organizations...');
+  for (const org of seedConfig.organizations) {
+    await prisma.organization.upsert({
+      where: { id: org.id },
+      update: { name: org.name },
+      create: org,
+    });
+  }
+
+  console.log('Seeding Units...');
+  for (const unit of seedConfig.units) {
+    await prisma.unit.upsert({
+      where: { id: unit.id },
+      update: { name: unit.name, orgId: unit.orgId },
+      create: unit,
+    });
+  }
+
+  console.log('Seeding Users...');
+  for (const user of seedConfig.users) {
+    await prisma.user.upsert({
+      where: { email: user.email },
+      update: { password, role: user.role, orgId: user.orgId || null, unitId: user.unitId || null },
+      create: {
+        email: user.email,
+        password,
+        role: user.role,
+        orgId: user.orgId,
+        unitId: user.unitId,
+      },
+    });
+  }
+
+  console.log('Database successfully seeded via configuration!');
 }
 
 main()
