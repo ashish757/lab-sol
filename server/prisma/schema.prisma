@@ -24,3 +24,46 @@ model DailyAnalysisLog {
 
   @@map("daily_analysis_logs")
 }
+
+enum Role {
+  SUPER_ADMIN
+  ORG_ADMIN
+  UNIT_MANAGER
+  UNIT_OPERATOR
+}
+
+model Organization {
+  id    String @id @default(uuid())
+  name  String
+  units Unit[]
+  users User[]
+}
+
+model Unit {
+  id    String       @id @default(uuid())
+  name  String
+  orgId String
+  org   Organization @relation(fields: [orgId], references: [id])
+  users User[]
+}
+
+model User {
+  id       String        @id @default(uuid())
+  email    String        @unique
+  password String?
+  role     Role
+  orgId    String?
+  org      Organization? @relation(fields: [orgId], references: [id])
+  unitId   String?
+  unit     Unit?         @relation(fields: [unitId], references: [id])
+}
+
+model InviteToken {
+  id          String   @id @default(uuid())
+  tokenString String   @unique
+  email       String
+  role        Role
+  orgId       String
+  expiresAt   DateTime
+  isUsed      Boolean  @default(false)
+}

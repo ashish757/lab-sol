@@ -7,6 +7,7 @@ import { HomePage } from './pages/HomePage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { LogsPage } from './pages/LogsPage';
+import { SuperAdminDashboard } from './pages/SuperAdminDashboard';
 import { PAGES } from './config/routesConfig';
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
           <Route path={PAGES.ANALYSIS_REPORT} element={<AnalysisReportPage />} />
           <Route path={PAGES.LOGS_LIST} element={<LogsPage />} />
           <Route path={PAGES.SETTINGS} element={<SettingsPage />} />
+          <Route path={PAGES.SUPER_ADMIN_INVITE} element={<SuperAdminDashboard />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

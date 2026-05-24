@@ -12,6 +12,10 @@ export const API_ROUTES = {
   AUTH: {
     BASE: 'auth',
   },
+  ORGANIZATIONS: {
+    BASE: 'api/organizations',
+    INVITE: 'invite',
+  },
   DAILY_LOGS: {
     BASE: 'api/daily-logs',
     CREATE: '',
@@ -29,6 +33,9 @@ export const API_ROUTES = {
 // Absolute path generators for client consumption
 export const getClientApiPath = {
   health: () => `/${API_ROUTES.HEALTH.BASE}`,
+  organizations: {
+    invite: () => `/${API_ROUTES.ORGANIZATIONS.BASE}/${API_ROUTES.ORGANIZATIONS.INVITE}`,
+  },
   dailyLogs: {
     base: () => `/${API_ROUTES.DAILY_LOGS.BASE}`,
     one: (id: string | number) => `/${API_ROUTES.DAILY_LOGS.BASE}/${id}`,

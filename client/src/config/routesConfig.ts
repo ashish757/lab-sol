@@ -7,6 +7,7 @@ export const PAGES = {
   NEW_ANALYSIS: '/analysis/new',
   ANALYSIS_REPORT: '/analysis/:id',
   SETTINGS: '/settings',
+  SUPER_ADMIN_INVITE: '/super-admin/invite',
 } as const;
 
 export const getPagePath = {
@@ -15,6 +16,7 @@ export const getPagePath = {
   newLog: () => PAGES.NEW_LOG,
   newAnalysis: () => PAGES.NEW_ANALYSIS,
   analysisReport: (id: string | number) => `/analysis/${id}`,
+  superAdminInvite: () => PAGES.SUPER_ADMIN_INVITE,
 };
 
 export const API_ENDPOINTS = {
@@ -22,4 +24,5 @@ export const API_ENDPOINTS = {
   DAILY_LOG_BY_ID: (id: string | number) => getClientApiPath.dailyLogs.one(id),
   DOWNLOAD_DAILY_REPORT: getClientApiPath.reports.downloadTemplate(),
   SAVE_AND_GENERATE: getClientApiPath.reports.saveAndGenerate(),
+  INVITE_ORGANIZATION: getClientApiPath.organizations.invite(),
 } as const;
