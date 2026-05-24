@@ -1,10 +1,20 @@
 import axios from 'axios';
 import { API_ENDPOINTS } from '../config/routesConfig';
 import { getClientApiPath } from '../../../shared/routes';
+import { store } from '../store/store';
 
 export const apiClient = axios.create({
   baseURL: 'http://localhost:3000',
   headers: { 'Content-Type': 'application/json' },
+});
+
+apiClient.interceptors.request.use((config) => {
+  const state = store.getState();
+  const token = state.auth.token;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export interface UpsertDailyLogPayload {

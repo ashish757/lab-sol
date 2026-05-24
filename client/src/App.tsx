@@ -8,12 +8,14 @@ import { NotFoundPage } from './pages/NotFoundPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { LogsPage } from './pages/LogsPage';
 import { SuperAdminDashboard } from './pages/SuperAdminDashboard';
+import { LoginPage } from './pages/LoginPage';
 import { PAGES } from './config/routesConfig';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path={PAGES.LOGIN} element={<LoginPage />} />
         <Route element={<AppLayout />}>
           <Route index element={<HomePage />} />
           <Route path={PAGES.NEW_LOG} element={<AnalysisPage />} />
@@ -22,6 +24,7 @@ function App() {
           <Route path={PAGES.LOGS_LIST} element={<LogsPage />} />
           <Route path={PAGES.SETTINGS} element={<SettingsPage />} />
           <Route path={PAGES.SUPER_ADMIN_INVITE} element={<SuperAdminDashboard />} />
+          <Route path={PAGES.ADMIN_DASHBOARD} element={<div className="p-8"><h1 className="text-2xl font-bold">Admin Dashboard</h1></div>} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

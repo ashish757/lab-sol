@@ -10,7 +10,8 @@ export const API_ROUTES = {
     BASE: 'health',
   },
   AUTH: {
-    BASE: 'auth',
+    BASE: 'api/auth',
+    LOGIN: 'login',
   },
   ORGANIZATIONS: {
     BASE: 'api/organizations',
@@ -33,6 +34,9 @@ export const API_ROUTES = {
 // Absolute path generators for client consumption
 export const getClientApiPath = {
   health: () => `/${API_ROUTES.HEALTH.BASE}`,
+  auth: {
+    login: () => `/${API_ROUTES.AUTH.BASE}/${API_ROUTES.AUTH.LOGIN}`,
+  },
   organizations: {
     invite: () => `/${API_ROUTES.ORGANIZATIONS.BASE}/${API_ROUTES.ORGANIZATIONS.INVITE}`,
   },
