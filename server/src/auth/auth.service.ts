@@ -11,31 +11,45 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async login(dto: LoginDto) {
-    const usr = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+  /**
+   * Authenticates a user based on their login credentials.
+   * Compares the hashed password using bcrypt and generates a robust JWT payload.
+   */
+  async login(loginCredentials: LoginDto) {
+    // 1. Fetch the user record from the database using the provided email.
+    const existingUserRecord = await this.prisma.user.findUnique({
+      where: { email: loginCredentials.email },
     });
-    if (!usr) {
-      throw new UnauthorizedException();
+
+    if (!existingUserRecord) {
+      throw new UnauthorizedException('Invalid authentication credentials.');
     }
-    const isMatch = await bcrypt.compare(dto.password, usr.password || '');
-    if (!isMatch) {
-      throw new UnauthorizedException();
+
+    // 2. Securely compare the provided plaintext password against the stored bcrypt hash.
+    const isPasswordMatching = await bcrypt.compare(loginCredentials.password, existingUserRecord.password || '');
+    
+    if (!isPasswordMatching) {
+      throw new UnauthorizedException('Invalid authentication credentials.');
     }
-    const payload = {
-      sub: usr.id,
-      email: usr.email,
-      role: usr.role,
-      orgId: usr.orgId,
-      unitId: usr.unitId,
+
+    // 3. Construct a standard JWT payload containing all vital Role-Based Access Control identifiers.
+    const authenticationPayload = {
+      sub: existingUserRecord.id,
+      email: existingUserRecord.email,
+      role: existingUserRecord.role,
+      orgId: existingUserRecord.orgId,
+      unitId: existingUserRecord.unitId,
     };
-    const tok = await this.jwtService.signAsync(payload);
+
+    // 4. Sign the payload using the injected JwtService.
+    const authenticationToken = await this.jwtService.signAsync(authenticationPayload);
+    
     return {
-      token: tok,
+      token: authenticationToken,
       user: {
-        id: usr.id,
-        email: usr.email,
-        role: usr.role,
+        id: existingUserRecord.id,
+        email: existingUserRecord.email,
+        role: existingUserRecord.role,
       },
     };
   }

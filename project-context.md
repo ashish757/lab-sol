@@ -18,6 +18,7 @@ trigger: always_on
 ## State & Routing Access Control
 - **RTK Query Transition**: Successfully eradicated Axios and TanStack Query, unifying all data fetching pipelines natively through `@reduxjs/toolkit/query/react`. Request payloads automatically map Redux state configurations mapping secure user `Authorization: Bearer` headers dynamically into the `apiSlice`.
 - **RBAC Protected Route Wrappers**: Enforced strict Role-Based Access Control logic via an intelligent dynamic routing component array (`routeConf.ts`). Dashboard mount points evaluate strict `SUPER_ADMIN`, `ORG_ADMIN`, `UNIT_ADMIN`, and `UNIT_OPERATOR` Prisma schema rules directly against Redux's deserialized authentication session payload. Unauthenticated endpoints forcefully redirect invalid requests immediately back to localized `/unauthorized` rendering layers.
+- **Strict Dash Namespace Taxonomy**: All internal routes are hard-sandboxed under the `/dash/` namespace (e.g., `/operator/dash/home`, `/admin/dash/invite`). All bare requests (like `/`) are strictly routed to the operator home if authenticated, ensuring zero unprotected entry points exist within `App.tsx`.
 
 ## Instruction to Agent
 - When working on the **Client**, always reference the business goals in this file to ensure the UI supports high-density data entry.

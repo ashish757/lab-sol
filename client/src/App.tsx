@@ -1,4 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import type { RootState } from './store/store';
+import { Role } from './types/auth';
 import './App.css';
 import { AppLayout } from './components/layout/AppLayout';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -7,6 +10,28 @@ import { UnauthorizedPage } from './pages/UnauthorizedPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { routeConfiguration } from './config/routeConfiguration';
 import { PAGES } from './config/routesConfig';
+
+const IndexRedirect = () => {
+  const authState = useSelector((state: RootState) => state.auth);
+  const userRole = authState.user?.role;
+  
+  if (!authState.isAuthenticated || !userRole) {
+    return <Navigate to={PAGES.LOGIN} replace />;
+  }
+
+  switch (userRole) {
+    case Role.SUPER_ADMIN:
+      return <Navigate to={PAGES.ADMIN_DASHBOARD} replace />;
+    case Role.ORG_ADMIN:
+      return <Navigate to={PAGES.ORG_DASHBOARD} replace />;
+    case Role.UNIT_ADMIN:
+      return <Navigate to={PAGES.UNIT_DASHBOARD} replace />;
+    case Role.UNIT_OPERATOR:
+      return <Navigate to={PAGES.HOME} replace />;
+    default:
+      return <Navigate to="/unauthorized" replace />;
+  }
+};
 
 function App() {
   return (
@@ -22,7 +47,7 @@ function App() {
               element={<ProtectedRoute component={routeConfig.component} allowedRoles={routeConfig.allowedRoles} />}
             />
           ))}
-          <Route path="/" element={<Navigate to={PAGES.HOME} replace />} />
+          <Route path="/" element={<IndexRedirect />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

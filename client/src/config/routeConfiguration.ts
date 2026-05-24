@@ -1,26 +1,28 @@
-import { SuperAdminDash } from '../pages/dashboards/SuperAdminDash';
-import { OrgAdminDash } from '../pages/dashboards/OrgAdminDash';
-import { UnitAdminDash } from '../pages/dashboards/UnitAdminDash';
-import { UnitOpDash } from '../pages/dashboards/UnitOpDash';
-import { SuperAdminDashboard } from '../pages/SuperAdminDashboard';
-import { HomePage } from '../pages/HomePage';
-import { LogsPage } from '../pages/LogsPage';
-import { AnalysisReportPage } from '../pages/AnalysisReportPage';
-import { SettingsPage } from '../pages/SettingsPage';
+import { lazy } from 'react';
 import { Role } from '../types/auth';
 import { PAGES } from './routesConfig';
+
+const SuperAdminDash = lazy(() => import('../pages/dashboards/SuperAdminDash').then(m => ({ default: m.SuperAdminDash })));
+const OrgAdminDash = lazy(() => import('../pages/dashboards/OrgAdminDash').then(m => ({ default: m.OrgAdminDash })));
+const UnitAdminDash = lazy(() => import('../pages/dashboards/UnitAdminDash').then(m => ({ default: m.UnitAdminDash })));
+const UnitOpDash = lazy(() => import('../pages/dashboards/UnitOpDash').then(m => ({ default: m.UnitOpDash })));
+const SuperAdminDashboard = lazy(() => import('../pages/SuperAdminDashboard').then(m => ({ default: m.SuperAdminDashboard })));
+const HomePage = lazy(() => import('../pages/HomePage').then(m => ({ default: m.HomePage })));
+const LogsPage = lazy(() => import('../pages/LogsPage').then(m => ({ default: m.LogsPage })));
+const AnalysisReportPage = lazy(() => import('../pages/AnalysisReportPage').then(m => ({ default: m.AnalysisReportPage })));
+const SettingsPage = lazy(() => import('../pages/SettingsPage').then(m => ({ default: m.SettingsPage })));
 
 const allRoles = [Role.SUPER_ADMIN, Role.ORG_ADMIN, Role.UNIT_ADMIN, Role.UNIT_OPERATOR];
 
 export const routeConfiguration = [
   { path: PAGES.ADMIN_DASHBOARD, component: SuperAdminDash, allowedRoles: [Role.SUPER_ADMIN] },
   { path: PAGES.SUPER_ADMIN_INVITE, component: SuperAdminDashboard, allowedRoles: [Role.SUPER_ADMIN] },
-  { path: PAGES.ORG_DASHBOARD, component: OrgAdminDash, allowedRoles: [Role.SUPER_ADMIN, Role.ORG_ADMIN] },
-  { path: PAGES.UNIT_DASHBOARD, component: UnitAdminDash, allowedRoles: [Role.SUPER_ADMIN, Role.ORG_ADMIN, Role.UNIT_ADMIN] },
-  { path: PAGES.NEW_LOG, component: UnitOpDash, allowedRoles: allRoles },
-  { path: PAGES.HOME, component: HomePage, allowedRoles: allRoles },
-  { path: PAGES.LOGS_LIST, component: LogsPage, allowedRoles: allRoles },
-  { path: PAGES.NEW_ANALYSIS, component: AnalysisReportPage, allowedRoles: allRoles },
-  { path: PAGES.ANALYSIS_REPORT, component: AnalysisReportPage, allowedRoles: allRoles },
+  { path: PAGES.ORG_DASHBOARD, component: OrgAdminDash, allowedRoles: [Role.ORG_ADMIN] },
+  { path: PAGES.UNIT_DASHBOARD, component: UnitAdminDash, allowedRoles: [Role.UNIT_ADMIN] },
+  { path: PAGES.NEW_LOG, component: UnitOpDash, allowedRoles: [Role.UNIT_OPERATOR] },
+  { path: PAGES.HOME, component: HomePage, allowedRoles: [Role.UNIT_OPERATOR] },
+  { path: PAGES.LOGS_LIST, component: LogsPage, allowedRoles: [Role.UNIT_OPERATOR] },
+  { path: PAGES.NEW_ANALYSIS, component: AnalysisReportPage, allowedRoles: [Role.UNIT_OPERATOR] },
+  { path: PAGES.ANALYSIS_REPORT, component: AnalysisReportPage, allowedRoles: [Role.UNIT_OPERATOR] },
   { path: PAGES.SETTINGS, component: SettingsPage, allowedRoles: allRoles },
 ];

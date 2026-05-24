@@ -6,31 +6,36 @@ export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
     baseUrl: 'http://localhost:3000',
-    prepareHeaders: (hdrs, { getState }) => {
-      const tok = (getState() as RootState).auth.token;
-      if (tok) {
-        hdrs.set('Authorization', `Bearer ${tok}`);
+    /**
+     * Replaces the legacy Axios interceptor requirement.
+     * Automatically extracts the JWT authentication token from the Redux RootState
+     * and strictly injects it into the Authorization header for all outgoing API requests.
+     */
+    prepareHeaders: (headers, { getState }) => {
+      const authenticationToken = (getState() as RootState).auth.token;
+      if (authenticationToken) {
+        headers.set('Authorization', `Bearer ${authenticationToken}`);
       }
-      return hdrs;
+      return headers;
     },
   }),
   tagTypes: ['Logs'],
-  endpoints: (bld) => ({
-    login: bld.mutation({
-      query: (creds) => ({
+  endpoints: (builder) => ({
+    login: builder.mutation({
+      query: (loginCredentials) => ({
         url: API_ENDPOINTS.LOGIN,
         method: 'POST',
-        body: creds,
+        body: loginCredentials,
       }),
     }),
-    inviteOrganization: bld.mutation({
+    inviteOrganization: builder.mutation({
       query: (body) => ({
         url: API_ENDPOINTS.INVITE_ORGANIZATION,
         method: 'POST',
         body,
       }),
     }),
-    upsertDailyLog: bld.mutation({
+    upsertDailyLog: builder.mutation({
       query: (body) => ({
         url: API_ENDPOINTS.DAILY_LOGS,
         method: 'POST',
@@ -38,7 +43,7 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Logs'],
     }),
-    saveAndGenerateReport: bld.mutation({
+    saveAndGenerateReport: builder.mutation({
       query: (body) => ({
         url: API_ENDPOINTS.SAVE_AND_GENERATE,
         method: 'POST',
@@ -52,18 +57,18 @@ export const apiSlice = createApi({
         return { id, fileBlob: res };
       },
     }),
-    getDailyLogs: bld.query({
+    getDailyLogs: builder.query({
       query: () => API_ENDPOINTS.DAILY_LOGS,
       providesTags: ['Logs'],
     }),
-    getDailyLogsByDate: bld.query({
+    getDailyLogsByDate: builder.query({
       query: (date: string) => ({
         url: API_ENDPOINTS.DAILY_LOGS,
         params: { date },
       }),
       providesTags: ['Logs'],
     }),
-    getDailyLogById: bld.query({
+    getDailyLogById: builder.query({
       query: (id: string) => API_ENDPOINTS.DAILY_LOG_BY_ID(id),
       providesTags: ['Logs'],
     }),

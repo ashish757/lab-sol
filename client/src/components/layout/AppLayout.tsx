@@ -1,16 +1,17 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { Home, FileText, List, Settings } from 'lucide-react';
-
-import { PAGES } from '../../config/routesConfig';
-
-const navItems = [
-  { to: PAGES.HOME, icon: Home, label: 'Home', end: true },
-  { to: PAGES.NEW_LOG, icon: FileText, label: 'New Analysis' },
-  { to: PAGES.LOGS_LIST, icon: List, label: 'Logs' },
-  { to: PAGES.SETTINGS, icon: Settings, label: 'Settings' },
-];
+import { useSelector } from 'react-redux';
+import { Suspense } from 'react';
+import type { RootState } from '../../store/store';
+import { navigationConfig } from '../../config/navigationConfig';
+import { LoadingIndicator } from '../ui/LoadingIndicator';
+import { Role } from '../../types/auth';
 
 export const AppLayout = () => {
+  const authState = useSelector((state: RootState) => state.auth);
+  const userRole = authState.user?.role as Role;
+
+  const dynamicNavItems = userRole && navigationConfig[userRole] ? navigationConfig[userRole] : [];
+
   return (
     <div className="h-screen w-full flex overflow-hidden bg-slate-50">
       <nav className="w-16 bg-slate-950 border-r border-slate-900 flex flex-col pb-6 pt-5 items-center z-50 shrink-0">
@@ -21,9 +22,8 @@ export const AppLayout = () => {
           </svg>
         </div>
 
-
         <div className="flex flex-col items-end gap-2 flex-1 w-full pl-2">
-          {navItems.map(({ to, icon: Icon, label, end }) => (
+          {dynamicNavItems.map(({ to, icon: Icon, label, end }) => (
             <NavLink
               key={to}
               to={to}
@@ -50,8 +50,10 @@ export const AppLayout = () => {
         </div>
       </nav>
 
-      <div className="flex-1 flex overflow-hidden bg-slate-50">
-        <Outlet />
+      <div className="flex-1 flex overflow-hidden bg-slate-50 relative">
+        <Suspense fallback={<LoadingIndicator />}>
+          <Outlet />
+        </Suspense>
       </div>
     </div>
   );
