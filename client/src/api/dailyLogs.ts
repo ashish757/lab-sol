@@ -62,6 +62,14 @@ export async function getDailyLogs(): Promise<DailyLogResponse[]> {
   return response;
 }
 
+export async function getDailyLogsByDate(date: string): Promise<DailyLogResponse[]> {
+  const { data: response } = await apiClient.get<DailyLogResponse[]>(
+    API_ENDPOINTS.DAILY_LOGS,
+    { params: { date } }
+  );
+  return response;
+}
+
 export async function getDailyLogById(id: string): Promise<DailyLogResponse> {
   const { data: response } = await apiClient.get<DailyLogResponse>(
     API_ENDPOINTS.DAILY_LOG_BY_ID(id),

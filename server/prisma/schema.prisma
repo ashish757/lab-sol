@@ -11,7 +11,7 @@ datasource db {
 model DailyAnalysisLog {
   id          String    @id @default(uuid()) @unique()
   
-  logDate     DateTime   @map("log_date")
+  logDate     DateTime   @unique @map("log_date")
   
   metrics     Json
 

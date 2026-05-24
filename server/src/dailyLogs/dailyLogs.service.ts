@@ -10,8 +10,12 @@ export class DailyLogsService {
   async create(dto: InsertDailyLogDto) {
     const logDate = new Date(dto.logDate);
 
-    return this.prisma.dailyAnalysisLog.create({
-      data: {
+    return this.prisma.dailyAnalysisLog.upsert({
+      where: { logDate },
+      update: {
+        metrics: dto.metrics as Prisma.InputJsonValue,
+      },
+      create: {
         logDate,
         metrics: dto.metrics as Prisma.InputJsonValue,
       },

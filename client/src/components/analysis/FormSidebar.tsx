@@ -7,11 +7,12 @@ interface FormSidebarProps {
   activeSection: string;
   onScrollTo: (id: string) => void;
   onReset?: () => void;
-  onSaveDraft?: () => void;
+  onUploadData?: () => void;
   isSubmitting?: boolean;
+  hasUnsavedChanges?: boolean;
 }
 
-export const FormSidebar = ({ config, activeSection, onScrollTo, onReset, onSaveDraft, isSubmitting = false }: FormSidebarProps) => {
+export const FormSidebar = ({ config, activeSection, onScrollTo, onReset, onUploadData, isSubmitting = false, hasUnsavedChanges = false }: FormSidebarProps) => {
   return (
     <nav className="w-full md:w-72 bg-white border-r border-slate-200 overflow-y-auto z-0 flex-shrink-0 flex flex-col shadow-sm">
       <div className="px-5 py-5 border-b border-slate-200 shrink-0 bg-slate-50/40">
@@ -21,6 +22,12 @@ export const FormSidebar = ({ config, activeSection, onScrollTo, onReset, onSave
 
       <div className="px-5 py-5 border-b border-slate-200 flex flex-col gap-4 shrink-0 bg-slate-50">
         <FormProgress className="w-full select-none flex flex-col gap-2" />
+
+        {hasUnsavedChanges && (
+          <div className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded border border-amber-200 text-center uppercase tracking-wider">
+            Unsaved Changes
+          </div>
+        )}
 
         <div className="flex flex-col gap-2 mt-1">
           <button
@@ -32,22 +39,23 @@ export const FormSidebar = ({ config, activeSection, onScrollTo, onReset, onSave
           </button>
 
           <div className="grid grid-cols-2 gap-2">
-            {onSaveDraft && (
+            {onUploadData && (
               <button
                 type="button"
-                onClick={onSaveDraft}
+                onClick={onUploadData}
                 className="px-2 py-2 bg-white hover:bg-slate-50 active:scale-[0.97] text-slate-700 text-xs font-bold rounded-lg border border-slate-400 transition-all text-center select-none cursor-pointer uppercase tracking-wide"
               >
-                Save Draft
+                Upload Data
               </button>
             )}
             {onReset && (
               <button
                 type="button"
                 onClick={onReset}
-                className="px-2 py-2 bg-white hover:bg-slate-50 active:scale-[0.97] text-slate-700 text-xs font-bold rounded-lg border border-slate-400 transition-all text-center select-none cursor-pointer uppercase tracking-wide"
+                disabled={true}
+                className="px-2 py-2 bg-slate-100 text-slate-400 text-xs font-bold rounded-lg border border-slate-200 text-center select-none cursor-not-allowed uppercase tracking-wide"
               >
-                Reset
+                Lock Data
               </button>
             )}
           </div>

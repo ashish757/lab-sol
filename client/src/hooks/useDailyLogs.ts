@@ -3,6 +3,7 @@ import {
   getDailyLogs,
   getDailyLogById,
   upsertDailyLog,
+  getDailyLogsByDate,
   type UpsertDailyLogPayload,
 } from '../api/dailyLogs';
 
@@ -29,6 +30,16 @@ export function useGetLogs() {
     queryKey: QUERY_KEY,
     queryFn: getDailyLogs,
     staleTime: 30_000, // re-fetch at most every 30 s
+    retry: 1,
+  });
+}
+
+export function useGetLogsByDate(date: string) {
+  return useQuery({
+    queryKey: [...QUERY_KEY, 'date', date],
+    queryFn: () => getDailyLogsByDate(date),
+    enabled: !!date,
+    staleTime: 30_000,
     retry: 1,
   });
 }

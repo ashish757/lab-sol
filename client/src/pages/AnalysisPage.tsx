@@ -1,13 +1,13 @@
+import { useState, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate } from 'react-router-dom';
 import { analysisSchema, type AnalysisSchema } from '../types/analysisSchema';
 import { analysisConfig, getAllSectionIds } from '../config/analysisConfig';
 import { useScrollSpy } from '../hooks/useScrollSpy';
 import { FormSidebar } from '../components/analysis/FormSidebar';
 import { FormSection } from '../components/analysis/FormSection';
-import { useFormPersist } from '../hooks/useFormPersist';
-import { PAGES } from '../config/routesConfig';
+import { useUpsertLog, useGetLogsByDate } from '../hooks/useDailyLogs';
+import { saveAndGenerateReport } from '../api/dailyLogs';
 
 const getInitialValues = () => {
   const today = new Date();
@@ -30,14 +30,25 @@ const getInitialValues = () => {
 };
 
 export const AnalysisPage = () => {
-  const navigate = useNavigate();
   const methods = useForm<AnalysisSchema>({
     resolver: zodResolver(analysisSchema),
     mode: 'onBlur',
     defaultValues: getInitialValues(),
   });
 
-  const { saveDraft, clearStorage } = useFormPersist(methods, { key: 'analysis-form' });
+  const upsertMutation = useUpsertLog();
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const initialValues = getInitialValues();
+  const { data: todayLogs } = useGetLogsByDate(initialValues.todayDate);
+
+  useEffect(() => {
+    if (todayLogs && todayLogs.length > 0) {
+      const log = todayLogs[0];
+      const parsedMetrics = typeof log.metrics === 'string' ? JSON.parse(log.metrics) : log.metrics;
+      methods.reset({ ...initialValues, ...parsedMetrics, todayDate: log.logDate.split('T')[0] });
+    }
+  }, [todayLogs, methods]);
 
   const sectionIds = getAllSectionIds(analysisConfig);
   const defaultSection = sectionIds[0] ?? '';
@@ -48,19 +59,50 @@ export const AnalysisPage = () => {
 
   const handleReset = () => {
     methods.reset(getInitialValues());
-    clearStorage();
   };
 
-  const onSubmit = (data: AnalysisSchema) => {
+  const handleUploadData = () => {
+    const data = methods.getValues();
     const { todayDate, ...rest } = data;
-    const payload = {
-      logDate: todayDate ?? new Date().toISOString().slice(0, 10),
+    const payload  = {
+      logDate: todayDate as string ?? new Date().toISOString().slice(0, 10),
       metrics: rest as Record<string, unknown>,
     };
 
-    clearStorage();
+    upsertMutation.mutate(payload, {
+      onSuccess: () => {
+        methods.reset(methods.getValues());
+      }
+    });
+  };
 
-    navigate(PAGES.NEW_ANALYSIS, { state: { payload } });
+  const onSubmit = async (data: AnalysisSchema) => {
+    const { todayDate, ...rest } = data;
+    const payload = {
+      logDate: todayDate as string ?? new Date().toISOString().slice(0, 10),
+      metrics: rest as Record<string, unknown>,
+    };
+
+    try {
+      setIsGenerating(true);
+      const { id, fileBlob } = await saveAndGenerateReport(payload);
+      
+      const url = URL.createObjectURL(fileBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Daily_Report_${id || 'new'}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      methods.reset(methods.getValues());
+    } catch (error) {
+      console.error("Failed to generate report", error);
+      alert("Failed to generate report");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
@@ -103,8 +145,9 @@ export const AnalysisPage = () => {
             activeSection={expanded}
             onScrollTo={handleScrollTo}
             onReset={handleReset}
-            onSaveDraft={saveDraft}
-            isSubmitting={false}
+            onUploadData={handleUploadData}
+            isSubmitting={isGenerating || upsertMutation.isPending}
+            hasUnsavedChanges={methods.formState.isDirty}
           />
 
           <div className="flex-1 overflow-y-auto p-6 lg:p-8 bg-slate-50 relative scroll-smooth">
