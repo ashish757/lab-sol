@@ -27,7 +27,7 @@ const IndexRedirect = () => {
     case Role.UNIT_ADMIN:
       return <Navigate to={PAGES.UNIT_DASHBOARD} replace />;
     case Role.UNIT_OPERATOR:
-      return <Navigate to={PAGES.HOME} replace />;
+      return <Navigate to={PAGES.NEW_LOG} replace />;
     default:
       return <Navigate to="/unauthorized" replace />;
   }

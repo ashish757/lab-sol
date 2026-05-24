@@ -6,9 +6,10 @@ import { DailyLogsModule } from './dailyLogs/dailyLogs.module';
 import { ReportsModule } from './reports/reports.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { OrganizationsModule } from './organizations/organizations.module';
+import { UnitsModule } from './units/units.module';
 
 @Module({
-  imports: [AuthModule, DailyLogsModule, ReportsModule, PrismaModule, OrganizationsModule],
+  imports: [AuthModule, DailyLogsModule, ReportsModule, PrismaModule, OrganizationsModule, UnitsModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -19,6 +19,10 @@ export const API_ROUTES = {
     GET_ALL: '',
     GET_ONE: ':id',
   },
+  UNITS: {
+    BASE: 'api/units',
+    GET_ONE: ':id',
+  },
   DAILY_LOGS: {
     BASE: 'api/daily-logs',
     CREATE: '',
@@ -43,6 +47,9 @@ export const getClientApiPath = {
     invite: () => `/${API_ROUTES.ORGANIZATIONS.BASE}/${API_ROUTES.ORGANIZATIONS.INVITE}`,
     getAll: () => `/${API_ROUTES.ORGANIZATIONS.BASE}`,
     getOne: (id: string | number) => `/${API_ROUTES.ORGANIZATIONS.BASE}/${id}`,
+  },
+  units: {
+    getOne: (id: string | number) => `/${API_ROUTES.UNITS.BASE}/${id}`,
   },
   dailyLogs: {
     base: () => `/${API_ROUTES.DAILY_LOGS.BASE}`,

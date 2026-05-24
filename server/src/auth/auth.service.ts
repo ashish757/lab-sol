@@ -50,6 +50,8 @@ export class AuthService {
         id: existingUserRecord.id,
         email: existingUserRecord.email,
         role: existingUserRecord.role,
+        orgId: existingUserRecord.orgId,
+        unitId: existingUserRecord.unitId,
       },
     };
   }

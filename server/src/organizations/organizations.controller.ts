@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards, Req, ForbiddenException } from '@nestjs/common';
 import { OrganizationsService } from './organizations.service';
 import { InviteOrgDto } from './dto/inviteOrg.dto';
 import { API_ROUTES } from '@shared/routes';
@@ -27,8 +27,12 @@ export class OrganizationsController {
 
   @Get(API_ROUTES.ORGANIZATIONS.GET_ONE)
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN)
-  async getOrganizationById(@Param('id') id: string) {
+  @Roles(Role.SUPER_ADMIN, Role.ORG_ADMIN)
+  async getOrganizationById(@Param('id') id: string, @Req() req: any) {
+    const userRole = req.user.role;
+    if (userRole === Role.ORG_ADMIN && req.user.orgId !== id) {
+      throw new ForbiddenException('You can only view your own organization.');
+    }
     return this.orgService.getOrganizationById(id);
   }
 }

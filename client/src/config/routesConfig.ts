@@ -1,9 +1,9 @@
 import { getClientApiPath } from '../../../shared/routes';
 
 export const PAGES = {
-  HOME: '/operator/dash/home',
   LOGS_LIST: '/operator/dash/logs',
   NEW_LOG: '/operator/dash',
+  DATA_ENTRY: '/operator/dash/entry',
   NEW_ANALYSIS: '/operator/dash/analysis/new',
   ANALYSIS_REPORT: '/operator/dash/analysis/:id',
   SETTINGS: '/settings',
@@ -16,9 +16,9 @@ export const PAGES = {
 } as const;
 
 export const getPagePath = {
-  home: () => PAGES.HOME,
   logsList: () => PAGES.LOGS_LIST,
   newLog: () => PAGES.NEW_LOG,
+  dataEntry: () => PAGES.DATA_ENTRY,
   newAnalysis: () => PAGES.NEW_ANALYSIS,
   analysisReport: (id: string | number) => `/operator/dash/analysis/${id}`,
   superAdminInvite: () => PAGES.SUPER_ADMIN_INVITE,
@@ -32,6 +32,7 @@ export const API_ENDPOINTS = {
   INVITE_ORGANIZATION: getClientApiPath.organizations.invite(),
   GET_ORGANIZATIONS: getClientApiPath.organizations.getAll(),
   GET_ORGANIZATION_BY_ID: (id: string | number) => getClientApiPath.organizations.getOne(id),
+  GET_UNIT_BY_ID: (id: string | number) => getClientApiPath.units.getOne(id),
   DAILY_LOGS: getClientApiPath.dailyLogs.base(),
   DAILY_LOG_BY_ID: (id: string | number) => getClientApiPath.dailyLogs.one(id),
   DOWNLOAD_DAILY_REPORT: getClientApiPath.reports.downloadTemplate(),

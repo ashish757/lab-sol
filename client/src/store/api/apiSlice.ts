@@ -19,7 +19,7 @@ export const apiSlice = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Logs', 'Organizations'],
+  tagTypes: ['Logs', 'Organizations', 'Units'],
   endpoints: (builder) => ({
     login: builder.mutation({
       query: (loginCredentials) => ({
@@ -42,6 +42,10 @@ export const apiSlice = createApi({
     getOrganizationById: builder.query({
       query: (id: string) => API_ENDPOINTS.GET_ORGANIZATION_BY_ID(id),
       providesTags: ['Organizations'] as const,
+    }),
+    getUnitById: builder.query({
+      query: (id: string) => API_ENDPOINTS.GET_UNIT_BY_ID(id),
+      providesTags: ['Units'] as const,
     }),
     upsertDailyLog: builder.mutation({
       query: (body) => ({
@@ -93,4 +97,5 @@ export const {
   useGetDailyLogByIdQuery,
   useGetOrganizationsQuery,
   useGetOrganizationByIdQuery,
+  useGetUnitByIdQuery,
 } = apiSlice;

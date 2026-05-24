@@ -1,5 +1,6 @@
 import { lazy } from 'react';
 import { Role } from '../types/auth';
+import { AnalysisPage } from '../pages/AnalysisPage';
 import { PAGES } from './routesConfig';
 
 const SuperAdminDash = lazy(() => import('../pages/dashboards/SuperAdminDash').then(m => ({ default: m.SuperAdminDash })));
@@ -8,7 +9,6 @@ const OrgAdminDash = lazy(() => import('../pages/dashboards/OrgAdminDash').then(
 const UnitAdminDash = lazy(() => import('../pages/dashboards/UnitAdminDash').then(m => ({ default: m.UnitAdminDash })));
 const UnitOpDash = lazy(() => import('../pages/dashboards/UnitOpDash').then(m => ({ default: m.UnitOpDash })));
 const SuperAdminDashboard = lazy(() => import('../pages/SuperAdminDashboard').then(m => ({ default: m.SuperAdminDashboard })));
-const HomePage = lazy(() => import('../pages/HomePage').then(m => ({ default: m.HomePage })));
 const LogsPage = lazy(() => import('../pages/LogsPage').then(m => ({ default: m.LogsPage })));
 const AnalysisReportPage = lazy(() => import('../pages/AnalysisReportPage').then(m => ({ default: m.AnalysisReportPage })));
 const SettingsPage = lazy(() => import('../pages/SettingsPage').then(m => ({ default: m.SettingsPage })));
@@ -22,7 +22,7 @@ export const routeConfiguration = [
   { path: PAGES.ORG_DASHBOARD, component: OrgAdminDash, allowedRoles: [Role.ORG_ADMIN] },
   { path: PAGES.UNIT_DASHBOARD, component: UnitAdminDash, allowedRoles: [Role.UNIT_ADMIN] },
   { path: PAGES.NEW_LOG, component: UnitOpDash, allowedRoles: [Role.UNIT_OPERATOR] },
-  { path: PAGES.HOME, component: HomePage, allowedRoles: [Role.UNIT_OPERATOR] },
+  { path: PAGES.DATA_ENTRY, component: AnalysisPage, allowedRoles: [Role.UNIT_OPERATOR] },
   { path: PAGES.LOGS_LIST, component: LogsPage, allowedRoles: [Role.UNIT_OPERATOR] },
   { path: PAGES.NEW_ANALYSIS, component: AnalysisReportPage, allowedRoles: [Role.UNIT_OPERATOR] },
   { path: PAGES.ANALYSIS_REPORT, component: AnalysisReportPage, allowedRoles: [Role.UNIT_OPERATOR] },
