@@ -186,7 +186,7 @@ export const LogsPage = () => {
                               className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 hover:text-indigo-800 text-[10px] font-bold rounded-lg border border-indigo-200 transition-colors uppercase tracking-wider"
                             >
                               <FileText size={11} />
-                              View Report
+                              View Details
                             </Link>
                           </td>
                         </tr>

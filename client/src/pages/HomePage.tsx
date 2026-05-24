@@ -213,7 +213,7 @@ export const HomePage = () => {
                               to={getPagePath.analysisReport(log.id)}
                               className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-750 text-[10px] font-extrabold rounded-lg transition-all uppercase tracking-wide cursor-pointer"
                             >
-                              View Report
+                              View Details
                               <ArrowRight size={11} />
                             </Link>
                           </td>
