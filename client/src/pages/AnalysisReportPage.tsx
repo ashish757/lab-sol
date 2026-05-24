@@ -4,9 +4,9 @@ import {
   CheckCircle2, Calendar, ArrowLeft, 
   Plus, ShieldAlert, Database, Download
 } from 'lucide-react';
-import { useUpsertLog, useGetLogById } from '../hooks/useDailyLogs';
+import { useUpsertDailyLogMutation, useGetDailyLogByIdQuery } from '../store/api/apiSlice';
 import { PAGES, getPagePath } from '../config/routesConfig';
-import { getDownloadDailyReportUrl } from '../api/dailyLogs';
+import { getDownloadDailyReportUrl } from '../utils/urlHelpers';
 
 export const AnalysisReportPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -14,8 +14,9 @@ export const AnalysisReportPage = () => {
   const navigate = useNavigate();
   
   const isNew = !id || id === 'new';
-  const mutation = useUpsertLog();
-  const query = useGetLogById(id);
+  const [upsertLog, mutation] = useUpsertDailyLogMutation();
+
+  const query = useGetDailyLogByIdQuery(id || '');
 
   const handleDownloadExcel = () => {
     const url = getDownloadDailyReportUrl(id);
@@ -43,8 +44,9 @@ export const AnalysisReportPage = () => {
       const timer1 = setTimeout(() => setLoadingPhase('Calculating sugar recovery & ratios...'), 800);
       const timer2 = setTimeout(() => setLoadingPhase('Securing transaction to PostgreSQL database...'), 1600);
 
-      mutation.mutate(payload, {
-        onSuccess: (data) => {
+      const runMutation = async () => {
+        try {
+          const data = await upsertLog(payload).unwrap();
           setCreatedLogId(data.id);
           // Replace URL with the actual report ID, so refreshing works
           setTimeout(() => {
@@ -53,11 +55,12 @@ export const AnalysisReportPage = () => {
               state: { preloadedData: data },
             });
           }, 2400);
-        },
-        onError: (err) => {
+        } catch (err) {
           console.error(err);
         }
-      });
+      };
+
+      runMutation();
 
       return () => {
         clearTimeout(timer1);
@@ -68,7 +71,7 @@ export const AnalysisReportPage = () => {
 
   const preloaded = location.state?.preloadedData;
   const logData = isNew ? mutation.data : (preloaded || query.data);
-  const isLoading = isNew ? (!createdLogId || mutation.isPending) : (!preloaded && query.isLoading);
+  const isLoading = isNew ? (!createdLogId || mutation.isLoading) : (!preloaded && query.isLoading);
   const isError = isNew ? mutation.isError : (!preloaded && query.isError);
 
   // Format Helper

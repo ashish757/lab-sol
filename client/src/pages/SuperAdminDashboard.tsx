@@ -1,35 +1,28 @@
 import { useState } from 'react';
-import axios from 'axios';
-import { API_ENDPOINTS } from '../config/routesConfig';
+import { useInviteOrganizationMutation } from '../store/api/apiSlice';
 
 export const SuperAdminDashboard = () => {
   const [orgName, setOrgName] = useState('');
   const [contactEmail, setContactEmail] = useState('');
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [inviteOrg, { isLoading: loading }] = useInviteOrganizationMutation();
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
     setSuccess(false);
 
     try {
-      const res = await axios.post(`http://localhost:3000${API_ENDPOINTS.INVITE_ORGANIZATION}`, {
-        orgName,
-        contactEmail,
-      });
+      const res = await inviteOrg({ orgName, contactEmail }).unwrap();
 
-      if (res.data?.success) {
+      if (res?.success) {
         setSuccess(true);
         setOrgName('');
         setContactEmail('');
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to invite organization');
-    } finally {
-      setLoading(false);
+      setError(err?.data?.message || 'Failed to invite organization');
     }
   };
 

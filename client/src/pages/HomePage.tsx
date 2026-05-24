@@ -4,26 +4,27 @@ import {
   TrendingUp, Calendar, CalendarDays, RefreshCw, 
   Plus, Cpu, ShieldCheck
 } from 'lucide-react';
-import { useGetLogs } from '../hooks/useDailyLogs';
+import { useGetDailyLogsQuery } from '../store/api/apiSlice';
 import { PAGES, getPagePath } from '../config/routesConfig';
+import type { DailyLogResponse } from '../types/dailyLogs';
 
 export const HomePage = () => {
-  const { data: logs = [], isLoading, isError, refetch } = useGetLogs();
+  const { data: logs = [], isLoading, isError, refetch } = useGetDailyLogsQuery({});
 
   // 1. On-the-fly factory metrics aggregation
-  const totalCane = logs.reduce((acc, log) => {
+  const totalCane = logs.reduce((acc: number, log: DailyLogResponse) => {
     const metrics = typeof log.metrics === 'string' ? JSON.parse(log.metrics) : log.metrics;
     return acc + (parseFloat(metrics?.caneCrushed) || 0);
   }, 0);
 
-  const totalSugar = logs.reduce((acc, log) => {
+  const totalSugar = logs.reduce((acc: number, log: DailyLogResponse) => {
     const metrics = typeof log.metrics === 'string' ? JSON.parse(log.metrics) : log.metrics;
     return acc + (parseFloat(metrics?.totalSugarBagged) || 0);
   }, 0);
 
   let puritySum = 0;
   let purityCount = 0;
-  logs.forEach(log => {
+  logs.forEach((log: DailyLogResponse) => {
     const metrics = typeof log.metrics === 'string' ? JSON.parse(log.metrics) : log.metrics;
     const brix = parseFloat(metrics?.primaryJuiceBrix) || 0;
     const pol = parseFloat(metrics?.primaryJuicePol) || 0;
@@ -188,7 +189,7 @@ export const HomePage = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {logs.slice(0, 4).map((log) => {
+                    {logs.slice(0, 4).map((log: DailyLogResponse) => {
                       const metrics = typeof log.metrics === 'string' ? JSON.parse(log.metrics) : log.metrics;
                       const brix = parseFloat(metrics?.primaryJuiceBrix) || 0;
                       const pol = parseFloat(metrics?.primaryJuicePol) || 0;

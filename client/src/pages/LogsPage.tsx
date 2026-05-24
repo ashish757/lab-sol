@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useMemo } from 'react';
-import { useGetLogs } from '../hooks/useDailyLogs';
-import type { DailyLogResponse } from '../api/dailyLogs';
+import { useGetDailyLogsQuery } from '../store/api/apiSlice';
+import type { DailyLogResponse } from '../types/dailyLogs';
 import { FileText, AlertCircle, RefreshCw, Layers } from 'lucide-react';
 import { getPagePath } from '../config/routesConfig';
 
@@ -50,7 +50,7 @@ function SkeletonRow() {
 }
 
 export const LogsPage = () => {
-  const { data: logs, isLoading, isError, refetch, isFetching } = useGetLogs();
+  const { data: logs, isLoading, isError, refetch, isFetching } = useGetDailyLogsQuery({});
 
   const metricsSummary = useMemo(() => {
     if (!logs || logs.length === 0) {
@@ -58,7 +58,7 @@ export const LogsPage = () => {
     }
     let totalCane = 0;
     let totalSugar = 0;
-    logs.forEach(log => {
+    logs.forEach((log: DailyLogResponse) => {
       const cane = parseFloat(log.metrics?.caneCrushed as string);
       const sugar = parseFloat(log.metrics?.totalSugarBagged as string);
       if (!isNaN(cane)) totalCane += cane;

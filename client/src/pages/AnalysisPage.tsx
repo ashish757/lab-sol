@@ -6,8 +6,7 @@ import { analysisConfig, getAllSectionIds } from '../config/analysisConfig';
 import { useScrollSpy } from '../hooks/useScrollSpy';
 import { FormSidebar } from '../components/analysis/FormSidebar';
 import { FormSection } from '../components/analysis/FormSection';
-import { useUpsertLog, useGetLogsByDate } from '../hooks/useDailyLogs';
-import { saveAndGenerateReport } from '../api/dailyLogs';
+import { useUpsertDailyLogMutation, useGetDailyLogsByDateQuery, useSaveAndGenerateReportMutation } from '../store/api/apiSlice';
 
 const getInitialValues = () => {
   const today = new Date();
@@ -36,11 +35,11 @@ export const AnalysisPage = () => {
     defaultValues: getInitialValues(),
   });
 
-  const upsertMutation = useUpsertLog();
-  const [isGenerating, setIsGenerating] = useState(false);
-
+  const [upsertLog, { isLoading: isUpserting }] = useUpsertDailyLogMutation();
+  const [saveReport] = useSaveAndGenerateReportMutation();
   const initialValues = getInitialValues();
-  const { data: todayLogs } = useGetLogsByDate(initialValues.todayDate);
+  const { data: todayLogs } = useGetDailyLogsByDateQuery(initialValues.todayDate);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     if (todayLogs && todayLogs.length > 0) {
@@ -61,7 +60,7 @@ export const AnalysisPage = () => {
     methods.reset(getInitialValues());
   };
 
-  const handleUploadData = () => {
+  const handleUploadData = async () => {
     const data = methods.getValues();
     const { todayDate, ...rest } = data;
     const payload  = {
@@ -69,11 +68,8 @@ export const AnalysisPage = () => {
       metrics: rest as Record<string, unknown>,
     };
 
-    upsertMutation.mutate(payload, {
-      onSuccess: () => {
-        methods.reset(methods.getValues());
-      }
-    });
+    await upsertLog(payload).unwrap();
+    methods.reset(methods.getValues());
   };
 
   const onSubmit = async (data: AnalysisSchema) => {
@@ -85,7 +81,7 @@ export const AnalysisPage = () => {
 
     try {
       setIsGenerating(true);
-      const { id, fileBlob } = await saveAndGenerateReport(payload);
+      const { id, fileBlob } = await saveReport(payload).unwrap();
       
       const url = URL.createObjectURL(fileBlob);
       const link = document.createElement('a');
@@ -146,7 +142,7 @@ export const AnalysisPage = () => {
             onScrollTo={handleScrollTo}
             onReset={handleReset}
             onUploadData={handleUploadData}
-            isSubmitting={isGenerating || upsertMutation.isPending}
+            isSubmitting={isGenerating || isUpserting}
             hasUnsavedChanges={methods.formState.isDirty}
           />
 

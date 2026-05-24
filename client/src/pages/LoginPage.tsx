@@ -1,33 +1,30 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { apiClient } from '../api/dailyLogs';
-import { API_ENDPOINTS, getPagePath } from '../config/routesConfig';
+import { getPagePath } from '../config/routesConfig';
 import { login } from '../store/slices/authSlice';
+import { useLoginMutation } from '../store/api/apiSlice';
 
 export const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [loginApi, { isLoading: loading }] = useLoginMutation();
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
 
     try {
-      const res = await apiClient.post(API_ENDPOINTS.LOGIN, { email, password });
-      if (res.data?.token) {
-        dispatch(login({ token: res.data.token, user: res.data.user }));
+      const res = await loginApi({ email, password }).unwrap();
+      if (res?.token) {
+        dispatch(login({ token: res.token, user: res.user }));
         navigate(getPagePath.adminDashboard());
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed');
-    } finally {
-      setLoading(false);
+      setError(err?.data?.message || 'Login failed');
     }
   };
 
