@@ -12,7 +12,7 @@ const OrgStaffDash = lazy(() => import('../pages/orgStaff/OrgStaffDash').then(m 
 const UnitOpDash = lazy(() => import('../pages/unitOperator/UnitOperatorDash').then(m => ({ default: m.UnitOpDash })));
 const LogsPage = lazy(() => import('../pages/unitOperator/LogsPage').then(m => ({ default: m.LogsPage })));
 const AnalysisPage = lazy(() => import('../pages/unitOperator/AnalysisPage').then(m => ({ default: m.AnalysisPage })));
-const AnalysisReportPage = lazy(() => import('../pages/unitOperator/AnalysisReportPage').then(m => ({ default: m.AnalysisReportPage })));
+const AnalysisReportPage = lazy(() => import('../pages/unitOperator/AnalysisPage').then(m => ({ default: m.AnalysisPage })));
 const SettingsPage = lazy(() => import('../pages/SettingsPage').then(m => ({ default: m.SettingsPage })));
 
 const allRoles = [Role.SUPER_ADMIN, Role.ORG_ADMIN, Role.ORG_STAFF, Role.UNIT_OPERATOR];

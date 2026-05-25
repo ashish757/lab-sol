@@ -109,6 +109,25 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Logs'],
     }),
+    fetchUnitLogs: builder.query({
+      query: (unitId: string) => API_ENDPOINTS.FETCH_UNIT_LOGS(unitId),
+      providesTags: ['Logs'],
+    }),
+    upsertUnitLog: builder.mutation({
+      query: ({ unitId, data }) => ({
+        url: API_ENDPOINTS.UPSERT_UNIT_LOG(unitId),
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: ['Logs'],
+    }),
+    lockUnitLog: builder.mutation({
+      query: (logId: string) => ({
+        url: API_ENDPOINTS.LOCK_UNIT_LOG(logId),
+        method: 'PATCH',
+      }),
+      invalidatesTags: ['Logs'],
+    }),
     saveAndGenerateReport: builder.mutation({
       query: (body) => ({
         url: API_ENDPOINTS.SAVE_AND_GENERATE,
@@ -146,6 +165,9 @@ export const {
   useInviteOrganizationMutation,
   useCancelOrganizationInviteMutation,
   useUpsertDailyLogMutation,
+  useFetchUnitLogsQuery,
+  useUpsertUnitLogMutation,
+  useLockUnitLogMutation,
   useSaveAndGenerateReportMutation,
   useGetDailyLogsQuery,
   useGetDailyLogsByDateQuery,

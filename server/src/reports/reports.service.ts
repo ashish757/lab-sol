@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import * as ExcelJS from 'exceljs';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -123,7 +123,20 @@ export class ReportsService {
     res: express.Response,
     user: any,
   ): Promise<void> {
-    const savedLog = await this.dailyLogsService.upsertLog(user.unitId, user.orgId, dto);
+    let savedLog;
+    try {
+      savedLog = await this.dailyLogsService.upsertLog(user.unitId, user.orgId, dto);
+    } catch (error) {
+      if (error instanceof ForbiddenException && error.message === 'Log is locked and cannot be edited') {
+        const requestedDate = new Date(dto.date);
+        savedLog = await this.prisma.dailyLog.findUnique({
+          where: { unitId_date: { unitId: user.unitId, date: requestedDate } },
+        });
+        if (!savedLog) throw new NotFoundException('Log not found');
+      } else {
+        throw error;
+      }
+    }
     const metrics = (
       typeof savedLog.payload === 'string'
         ? JSON.parse(savedLog.payload)
