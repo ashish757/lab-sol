@@ -38,9 +38,11 @@ export const API_ENDPOINTS = {
 
   // Users API
   INVITE_USER: getClientApiPath.users.invite(),
+  CANCEL_USER_INVITE: (tokenId: string) => getClientApiPath.users.cancelInvite(tokenId),
 
   // Organizations API
   INVITE_ORGANIZATION: getClientApiPath.organizations.inviteOrg(),
+  CANCEL_ORG_INVITE: (id: string | number) => getClientApiPath.organizations.cancelInvite(id),
   GET_ORGANIZATIONS: getClientApiPath.organizations.getAll(),
   GET_ORGANIZATION_BY_ID: getClientApiPath.organizations.getOne,
 

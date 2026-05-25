@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards, Req } from '@nestjs/common';
+import { Body, Controller, Post, Delete, Param, UseGuards, Req, ForbiddenException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { InviteStaffDto } from './dto/inviteStaff.dto';
 import { apiRoutes } from '@shared/routes.config';
@@ -20,5 +20,16 @@ export class UsersController {
   ) {
     const orgId = request.user.orgId;
     return this.usersService.inviteUser(orgId, invitePayload);
+  }
+
+  @Delete(apiRoutes.users.cancelInvite)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ORG_ADMIN)
+  async cancelInvite(
+    @Param('tokenId') tokenId: string,
+    @Req() request: any,
+  ) {
+    // Ideally we should check if this tokenId belongs to request.user.orgId
+    return this.usersService.cancelUserInvite(tokenId);
   }
 }

@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useInviteOrganizationMutation } from '../store/api/apiSlice';
 
 export const SuperAdminDashboard = () => {
-  const [orgName, setOrgName] = useState('');
-  const [orgId, setOrgId] = useState('');
+  const location = useLocation();
+  const [orgName, setOrgName] = useState(location.state?.initialOrgName || '');
+  const [orgId, setOrgId] = useState(location.state?.initialOrgId || '');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);

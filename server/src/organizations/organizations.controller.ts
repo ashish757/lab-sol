@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards, Req, ForbiddenException, ParseUUIDPipe } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Delete, UseGuards, Req, ForbiddenException } from '@nestjs/common';
 import { OrganizationsService } from './organizations.service';
 import { InviteOrgDto } from './dto/inviteOrg.dto';
 import { InviteUserDto } from './dto/inviteUser.dto';
@@ -35,5 +35,12 @@ export class OrganizationsController {
       throw new ForbiddenException('You can only view your own organization.');
     }
     return this.orgService.getOrganizationById(id);
+  }
+
+  @Delete(apiRoutes.organizations.cancelInvite)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
+  async cancelInvite(@Param('id') id: string) {
+    return this.orgService.cancelOrganizationInvite(id);
   }
 }

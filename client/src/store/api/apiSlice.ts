@@ -36,12 +36,26 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Organizations'],
     }),
+    cancelOrganizationInvite: builder.mutation({
+      query: (id: string) => ({
+        url: API_ENDPOINTS.CANCEL_ORG_INVITE(id),
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Organizations'],
+    }),
     inviteUser: builder.mutation({
       query: (body) => ({
         url: API_ENDPOINTS.INVITE_USER,
         method: 'POST',
         body,
       }),
+    }),
+    cancelUserInvite: builder.mutation({
+      query: (tokenId: string) => ({
+        url: API_ENDPOINTS.CANCEL_USER_INVITE(tokenId),
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Organizations'],
     }),
     createUnit: builder.mutation({
       query: (body) => ({
@@ -130,6 +144,7 @@ export const apiSlice = createApi({
 export const {
   useLoginMutation,
   useInviteOrganizationMutation,
+  useCancelOrganizationInviteMutation,
   useUpsertDailyLogMutation,
   useSaveAndGenerateReportMutation,
   useGetDailyLogsQuery,
@@ -139,6 +154,7 @@ export const {
   useGetOrganizationByIdQuery,
   useGetUnitByIdQuery,
   useInviteUserMutation,
+  useCancelUserInviteMutation,
   useCreateUnitMutation,
   useSetupAccountMutation,
   useSetupUserMutation,

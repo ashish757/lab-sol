@@ -43,4 +43,14 @@ export class UsersService {
       inviteToken: rawToken,
     };
   }
+
+  async cancelUserInvite(tokenId: string) {
+    const token = await this.prisma.inviteToken.findUnique({ where: { id: tokenId } });
+    if (!token) throw new BadRequestException('Invite token not found');
+    if (token.isUsed) throw new BadRequestException('Cannot cancel an already used invite');
+
+    await this.prisma.inviteToken.delete({ where: { id: tokenId } });
+
+    return { success: true, message: 'User invite cancelled' };
+  }
 }

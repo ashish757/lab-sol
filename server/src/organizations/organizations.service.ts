@@ -58,7 +58,7 @@ export class OrganizationsService {
   }
 
   async getOrganizationById(id: string) {
-    return this.prisma.organization.findUnique({
+    const org = await this.prisma.organization.findUnique({
       where: { id },
       include: {
         units: true,
@@ -66,6 +66,28 @@ export class OrganizationsService {
           select: { id: true, email: true, role: true },
         },
       },
+    });
+
+    if (!org) return null;
+
+    const pendingInvites = await this.prisma.inviteToken.findMany({
+      where: { orgId: id, isUsed: false },
+    });
+
+    return { ...org, pendingInvites };
+  }
+
+  async cancelOrganizationInvite(id: string) {
+    const org = await this.prisma.organization.findUnique({ where: { id } });
+    if (!org) throw new BadRequestException('Organization not found');
+    if (org.status !== 'INACTIVE') {
+      throw new BadRequestException('Cannot cancel an active organization');
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      await tx.inviteToken.deleteMany({ where: { orgId: id } });
+      await tx.organization.delete({ where: { id } });
+      return { success: true, message: 'Organization invite cancelled' };
     });
   }
 }

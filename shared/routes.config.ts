@@ -13,10 +13,12 @@ export const apiRoutes = {
   users: {
     base: 'api/users',
     invite: 'invite',
+    cancelInvite: 'invite/:tokenId',
   },
   organizations: {
     base: 'api/organizations',
     inviteOrg: 'invite',
+    cancelInvite: ':id/invite',
     getAll: '',
     getOne: ':id',
   },
@@ -77,9 +79,11 @@ export const getClientApiPath = {
   },
   users: {
     invite: () => `/${apiRoutes.users.base}/${apiRoutes.users.invite}`,
+    cancelInvite: (tokenId: string) => `/${apiRoutes.users.base}/invite/${tokenId}`,
   },
   organizations: {
     inviteOrg: () => `/${apiRoutes.organizations.base}/${apiRoutes.organizations.inviteOrg}`,
+    cancelInvite: (id: string | number) => `/${apiRoutes.organizations.base}/${id}/invite`,
     getAll: () => `/${apiRoutes.organizations.base}`,
     getOne: (id: string | number) => `/${apiRoutes.organizations.base}/${id}`,
   },

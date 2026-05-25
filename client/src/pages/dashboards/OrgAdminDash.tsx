@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux';
-import { useGetOrganizationByIdQuery } from '../../store/api/apiSlice';
-import { Users, Network, Mail, Building, Plus } from 'lucide-react';
+import { useGetOrganizationByIdQuery, useCancelUserInviteMutation, useInviteUserMutation } from '../../store/api/apiSlice';
+import { Users, Network, Mail, Building, Plus, Trash2, RefreshCw } from 'lucide-react';
 import type { RootState } from '../../store/store';
 import { useState } from 'react';
 import { CreateUnitModal } from './components/CreateUnitModal';
@@ -13,6 +13,32 @@ export const OrgAdminDash = () => {
   });
   const [isUnitModalOpen, setIsUnitModalOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  const [cancelInvite, { isLoading: isCancelling }] = useCancelUserInviteMutation();
+  const [resendInvite, { isLoading: isResending }] = useInviteUserMutation();
+
+  const handleCancelInvite = async (tokenId: string) => {
+    if (confirm('Are you sure you want to cancel this user invitation?')) {
+      try {
+        await cancelInvite(tokenId).unwrap();
+        alert('Invitation cancelled successfully.');
+      } catch (err: any) {
+        alert(err?.data?.message || 'Failed to cancel invitation');
+      }
+    }
+  };
+
+  const handleResendInvite = async (invite: any) => {
+    try {
+      const payload: any = { email: invite.email, role: invite.role };
+      if (invite.role === 'UNIT_OPERATOR') {
+        payload.unitId = invite.unitId;
+      }
+      await resendInvite(payload).unwrap();
+      alert('Invitation resent successfully.');
+    } catch (err: any) {
+      alert(err?.data?.message || 'Failed to resend invitation');
+    }
+  };
 
   if (isLoading) {
     return (
@@ -29,6 +55,11 @@ export const OrgAdminDash = () => {
       </div>
     );
   }
+
+  const allUsers = [
+    ...(org.users || []).map((u: any) => ({ ...u, status: 'ACTIVE' })),
+    ...(org.pendingInvites || []).map((i: any) => ({ ...i, status: 'PENDING', isInvite: true }))
+  ];
 
   return (
     <div className="p-8 w-full h-full overflow-y-auto bg-slate-50">
@@ -48,7 +79,7 @@ export const OrgAdminDash = () => {
             </div>
             <div className="px-4 py-2 bg-emerald-50 border border-emerald-100 rounded-lg flex items-center gap-2">
               <Users size={18} className="text-emerald-600" />
-              <span className="font-bold text-emerald-900">{org.users?.length || 0} Users</span>
+              <span className="font-bold text-emerald-900">{allUsers.length} Users</span>
             </div>
           </div>
         </div>
@@ -104,25 +135,48 @@ export const OrgAdminDash = () => {
             )}
           </div>
           <div className="p-0 overflow-y-auto max-h-[600px]">
-            {org.users?.length > 0 ? (
+            {allUsers.length > 0 ? (
               <ul className="divide-y divide-slate-100">
-                {org.users.map((user: any) => (
-                  <li key={user.id} className="p-6 hover:bg-slate-50 transition-colors flex items-center justify-between">
+                {allUsers.map((user: any) => (
+                  <li key={user.id} className="p-6 hover:bg-slate-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
                         <Mail size={16} className="text-slate-400" />
                         <h3 className="text-sm font-semibold text-slate-900">{user.email}</h3>
+                        <span className={`px-2 py-0.5 text-[10px] font-bold rounded-md uppercase tracking-wide ${
+                          user.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                        }`}>
+                          {user.status}
+                        </span>
                       </div>
                       <p className="text-xs text-slate-400 font-mono">ID: {user.id}</p>
                     </div>
-                    <div className="flex flex-col items-end gap-2">
-                      <span className={`px-2.5 py-1 text-xs font-bold rounded-md ${
+                    <div className="flex flex-col sm:items-end gap-2">
+                      <span className={`px-2.5 py-1 text-xs font-bold rounded-md w-fit ${
                         user.role === 'ORG_ADMIN' ? 'bg-purple-100 text-purple-700' :
-                        user.role === 'UNIT_ADMIN' ? 'bg-blue-100 text-blue-700' :
+                        user.role === 'UNIT_OPERATOR' ? 'bg-blue-100 text-blue-700' :
                         'bg-slate-100 text-slate-700'
                       }`}>
                         {user.role.replace('_', ' ')}
                       </span>
+                      {user.isInvite && (
+                        <div className="flex items-center gap-2 mt-1">
+                          <button
+                            onClick={() => handleCancelInvite(user.id)}
+                            disabled={isCancelling}
+                            className="flex items-center gap-1 text-xs font-semibold text-red-600 hover:text-red-700 transition-colors"
+                          >
+                            <Trash2 size={14} /> Cancel
+                          </button>
+                          <button
+                            onClick={() => handleResendInvite(user)}
+                            disabled={isResending}
+                            className="flex items-center gap-1 text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
+                          >
+                            <RefreshCw size={14} /> Resend
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </li>
                 ))}
