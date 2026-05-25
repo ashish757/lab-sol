@@ -11,5 +11,5 @@ export class InviteOrgDto {
 
   @IsEmail()
   @IsNotEmpty()
-  contactEmail: string;
+  email: string;
 }

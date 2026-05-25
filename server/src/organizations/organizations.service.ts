@@ -31,12 +31,12 @@ export class OrganizationsService {
 
       // MagicLinkService handles the crypto, bcrypt, and DB save
       const rawToken = await this.magicLinkService.generateAndSaveToken({
-        email: dto.contactEmail,
+        email: dto.email,
         orgId: org.id,
         role: Role.ORG_ADMIN,
       });
 
-      await this.mailService.sendOrgAdminInvite(dto.contactEmail, dto.orgName, rawToken);
+      await this.mailService.sendOrgAdminInvite(dto.email, dto.orgName, rawToken);
 
       return {
         success: true,

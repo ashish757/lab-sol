@@ -75,9 +75,6 @@ export const apiSlice = createApi({
     invitePreview: builder.query({
       query: (token: string) => API_ENDPOINTS.INVITE_PREVIEW(token),
     }),
-    getTokenDetails: builder.query({
-      query: (token: string) => API_ENDPOINTS.GET_TOKEN(token),
-    }),
     getOrganizations: builder.query({
       query: () => API_ENDPOINTS.GET_ORGANIZATIONS,
       providesTags: ['Organizations'] as const,
@@ -145,7 +142,6 @@ export const {
   useCreateUnitMutation,
   useSetupAccountMutation,
   useSetupUserMutation,
-  useGetTokenDetailsQuery,
   useActivateStaffMutation,
   useInvitePreviewQuery,
 } = apiSlice;

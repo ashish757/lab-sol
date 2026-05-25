@@ -33,7 +33,6 @@ export const API_ENDPOINTS = {
   LOGIN: getClientApiPath.auth.login(),
   SETUP_ORG: getClientApiPath.auth.setupAccount(),
   SETUP_USER: getClientApiPath.auth.setupUser(),
-  GET_TOKEN: getClientApiPath.auth.getToken,
   INVITE_PREVIEW: getClientApiPath.auth.invitePreview,
   ACTIVATE_STAFF: getClientApiPath.auth.activateStaff(),
 

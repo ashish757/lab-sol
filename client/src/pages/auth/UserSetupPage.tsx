@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { useGetTokenDetailsQuery, useSetupUserMutation } from '../../store/api/apiSlice';
+import { useInvitePreviewQuery, useSetupUserMutation } from '../../store/api/apiSlice';
 import { Users, ArrowRight } from 'lucide-react';
 import { PAGES } from '../../config/routesConfig';
 
@@ -9,7 +9,7 @@ export const UserSetupPage = () => {
   const token = searchParams.get('token');
   const navigate = useNavigate();
 
-  const { data: tokenDetails, isLoading, error } = useGetTokenDetailsQuery(token as string, {
+  const { data: tokenDetails, isLoading, error } = useInvitePreviewQuery(token as string, {
     skip: !token,
   });
 
