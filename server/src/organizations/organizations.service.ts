@@ -4,6 +4,7 @@ import { InviteOrgDto } from './dto/inviteOrg.dto';
 import { Resend } from 'resend';
 import { v4 as uuidv4 } from 'uuid';
 import { Role } from '@prisma/client';
+import { InviteUserDto } from './dto/inviteUser.dto';
 
 @Injectable()
 export class OrganizationsService {
@@ -14,12 +15,14 @@ export class OrganizationsService {
   }
 
   async inviteOrganization(dto: InviteOrgDto) {
-    const { orgName, contactEmail } = dto;
+    const { orgName, orgId, contactEmail } = dto;
 
     return this.prisma.$transaction(async (tx) => {
       const org = await tx.organization.create({
         data: {
+          id: orgId || uuidv4(),
           name: orgName,
+          status: 'INACTIVE',
         },
       });
 
@@ -37,14 +40,14 @@ export class OrganizationsService {
         },
       });
 
-      const inviteLink = `http://localhost:3000/setup-account?token=${tok}`;
+      const inviteLink = `http://localhost:5173/account/setup/org?token=${tok}`;
 
       try {
         await this.resend.emails.send({
           from: 'onboarding@resend.dev',
           to: contactEmail,
           subject: 'Organization Setup Invitation',
-          html: `<p>Click here to setup: <a href="${inviteLink}">${inviteLink}</a></p>`,
+          html: `<p>Click here to setup your organization: <a href="${inviteLink}">${inviteLink}</a></p>`,
         });
       } catch (err) {
         console.error(err);
@@ -52,6 +55,40 @@ export class OrganizationsService {
 
       return { success: true, orgId: org.id };
     });
+  }
+
+  async inviteUser(orgId: string, dto: InviteUserDto) {
+    const { email, role, unitId } = dto;
+
+    const tok = uuidv4();
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 24);
+
+    await this.prisma.inviteToken.create({
+      data: {
+        tokenString: tok,
+        email,
+        role,
+        orgId,
+        unitId,
+        expiresAt,
+      },
+    });
+
+    const inviteLink = `http://localhost:5173/account/setup/user?token=${tok}`;
+
+    try {
+      await this.resend.emails.send({
+        from: 'onboarding@resend.dev',
+        to: email,
+        subject: 'User Setup Invitation',
+        html: `<p>Click here to setup your user account: <a href="${inviteLink}">${inviteLink}</a></p>`,
+      });
+    } catch (err) {
+      console.error(err);
+    }
+
+    return { success: true };
   }
 
   async getAllOrganizations() {

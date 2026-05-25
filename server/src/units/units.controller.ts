@@ -1,14 +1,23 @@
-import { Controller, Get, Param, Req, UseGuards, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Req, UseGuards, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { UnitsService } from './units.service';
 import { API_ROUTES } from '@shared/routes';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { CreateUnitDto } from './dto/createUnit.dto';
 import { Role } from '@prisma/client';
 
 @Controller(API_ROUTES.UNITS.BASE)
 export class UnitsController {
   constructor(private readonly unitsService: UnitsService) {}
+
+  @Post(API_ROUTES.UNITS.CREATE)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ORG_ADMIN)
+  async createUnit(@Body() dto: CreateUnitDto, @Req() request: any) {
+    const orgId = request.user.orgId;
+    return this.unitsService.createUnit(orgId, dto);
+  }
 
   @Get(API_ROUTES.UNITS.GET_ONE)
   @UseGuards(AuthGuard, RolesGuard)

@@ -34,6 +34,39 @@ export const apiSlice = createApi({
         method: 'POST',
         body,
       }),
+      invalidatesTags: ['Organizations'],
+    }),
+    inviteUser: builder.mutation({
+      query: ({ orgId, ...body }) => ({
+        url: API_ENDPOINTS.INVITE_USER(orgId),
+        method: 'POST',
+        body,
+      }),
+    }),
+    createUnit: builder.mutation({
+      query: (body) => ({
+        url: API_ENDPOINTS.CREATE_UNIT,
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Units', 'Organizations'],
+    }),
+    setupOrg: builder.mutation({
+      query: (body) => ({
+        url: API_ENDPOINTS.SETUP_ORG,
+        method: 'POST',
+        body,
+      }),
+    }),
+    setupUser: builder.mutation({
+      query: (body) => ({
+        url: API_ENDPOINTS.SETUP_USER,
+        method: 'POST',
+        body,
+      }),
+    }),
+    getTokenDetails: builder.query({
+      query: (token: string) => API_ENDPOINTS.GET_TOKEN(token),
     }),
     getOrganizations: builder.query({
       query: () => API_ENDPOINTS.GET_ORGANIZATIONS,
@@ -98,4 +131,9 @@ export const {
   useGetOrganizationsQuery,
   useGetOrganizationByIdQuery,
   useGetUnitByIdQuery,
+  useInviteUserMutation,
+  useCreateUnitMutation,
+  useSetupOrgMutation,
+  useSetupUserMutation,
+  useGetTokenDetailsQuery,
 } = apiSlice;

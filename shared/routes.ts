@@ -12,15 +12,20 @@ export const API_ROUTES = {
   AUTH: {
     BASE: 'api/auth',
     LOGIN: 'login',
+    SETUP_ORG: 'setup-org',
+    SETUP_USER: 'setup-user',
+    GET_TOKEN: 'setup-token/:token',
   },
   ORGANIZATIONS: {
     BASE: 'api/organizations',
     INVITE: 'invite',
+    INVITE_USER: ':id/invite-user',
     GET_ALL: '',
     GET_ONE: ':id',
   },
   UNITS: {
     BASE: 'api/units',
+    CREATE: '',
     GET_ONE: ':id',
   },
   DAILY_LOGS: {
@@ -42,13 +47,18 @@ export const getClientApiPath = {
   health: () => `/${API_ROUTES.HEALTH.BASE}`,
   auth: {
     login: () => `/${API_ROUTES.AUTH.BASE}/${API_ROUTES.AUTH.LOGIN}`,
+    setupOrg: () => `/${API_ROUTES.AUTH.BASE}/${API_ROUTES.AUTH.SETUP_ORG}`,
+    setupUser: () => `/${API_ROUTES.AUTH.BASE}/${API_ROUTES.AUTH.SETUP_USER}`,
+    getToken: (token: string) => `/${API_ROUTES.AUTH.BASE}/setup-token/${token}`,
   },
   organizations: {
     invite: () => `/${API_ROUTES.ORGANIZATIONS.BASE}/${API_ROUTES.ORGANIZATIONS.INVITE}`,
+    inviteUser: (id: string | number) => `/${API_ROUTES.ORGANIZATIONS.BASE}/${id}/invite-user`,
     getAll: () => `/${API_ROUTES.ORGANIZATIONS.BASE}`,
     getOne: (id: string | number) => `/${API_ROUTES.ORGANIZATIONS.BASE}/${id}`,
   },
   units: {
+    create: () => `/${API_ROUTES.UNITS.BASE}`,
     getOne: (id: string | number) => `/${API_ROUTES.UNITS.BASE}/${id}`,
   },
   dailyLogs: {

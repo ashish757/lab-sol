@@ -37,8 +37,8 @@ async function main() {
   for (const org of seedConfig.organizations) {
     await prisma.organization.upsert({
       where: { id: org.id },
-      update: { name: org.name },
-      create: org,
+      update: { name: org.name, status: 'ACTIVE' },
+      create: { ...org, status: 'ACTIVE' },
     });
   }
 
@@ -55,13 +55,22 @@ async function main() {
   for (const user of seedConfig.users) {
     await prisma.user.upsert({
       where: { email: user.email },
-      update: { password, role: user.role, orgId: user.orgId || null, unitId: user.unitId || null },
+      update: { 
+        password, 
+        role: user.role, 
+        orgId: user.orgId || null, 
+        unitId: user.unitId || null,
+        status: 'ACTIVE',
+        name: user.email.split('@')[0],
+      },
       create: {
         email: user.email,
+        name: user.email.split('@')[0],
         password,
         role: user.role,
         orgId: user.orgId,
         unitId: user.unitId,
+        status: 'ACTIVE',
       },
     });
   }

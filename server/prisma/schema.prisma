@@ -35,9 +35,10 @@ enum Role {
 }
 
 model Organization {
-  id    String             @id @default(uuid())
-  name  String
-  units Unit[]
+  id     String             @id @default(uuid())
+  name   String
+  status String             @default("INACTIVE")
+  units  Unit[]
   users User[]
   logs  DailyAnalysisLog[]
 }
@@ -53,8 +54,10 @@ model Unit {
 
 model User {
   id       String        @id @default(uuid())
+  name     String?
   email    String        @unique
   password String?
+  status   String        @default("INACTIVE")
   role     Role
   orgId    String?
   org      Organization? @relation(fields: [orgId], references: [id])
@@ -68,6 +71,7 @@ model InviteToken {
   email       String
   role        Role
   orgId       String
+  unitId      String?
   expiresAt   DateTime
   isUsed      Boolean  @default(false)
 }

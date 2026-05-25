@@ -1,9 +1,13 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class InviteOrgDto {
   @IsString()
   @IsNotEmpty()
   orgName: string;
+
+  @IsString()
+  @IsOptional()
+  orgId?: string;
 
   @IsEmail()
   @IsNotEmpty()

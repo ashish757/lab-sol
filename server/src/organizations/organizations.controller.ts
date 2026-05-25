@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Param, Post, UseGuards, Req, ForbiddenException } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards, Req, ForbiddenException, ParseUUIDPipe } from '@nestjs/common';
 import { OrganizationsService } from './organizations.service';
 import { InviteOrgDto } from './dto/inviteOrg.dto';
+import { InviteUserDto } from './dto/inviteUser.dto';
 import { API_ROUTES } from '@shared/routes';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -16,6 +17,20 @@ export class OrganizationsController {
   @Roles(Role.SUPER_ADMIN)
   async invite(@Body() dto: InviteOrgDto) {
     return this.orgService.inviteOrganization(dto);
+  }
+
+  @Post(API_ROUTES.ORGANIZATIONS.INVITE_USER)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ORG_ADMIN)
+  async inviteUser(
+    @Param('id', ParseUUIDPipe) orgId: string,
+    @Body() dto: InviteUserDto,
+    @Req() request: any,
+  ) {
+    if (request.user.orgId !== orgId) {
+      throw new ForbiddenException('You can only invite users to your own organization.');
+    }
+    return this.orgService.inviteUser(orgId, dto);
   }
 
   @Get(API_ROUTES.ORGANIZATIONS.GET_ALL)

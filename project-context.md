@@ -62,6 +62,11 @@ trigger: always_on
 - **Client Integration:** The React frontend (under `/analysis/new` loader page) posts form data to this facade endpoint, automatically downloads the spreadsheet response as a binary blob, and navigates to `/analysis/:id` showing the historical metrics summary.
 - **Nest CLI Path Alias Support:** Configured `entryFile: "server/src/main"` in `nest-cli.json` to handle the nested compilation output directory structure (`dist/server/src/main.js`) caused by importing files from the shared directory outside the server root.
 
+## Magic Link Onboarding & Account Setup
+- **Decoupled Registration:** Organizations and lower-tier users are invited via the SuperAdmin or OrgAdmin dashboards using a Magic Link system. Invited entities are initialized in the database with a `status` of `"INACTIVE"`.
+- **Token Infrastructure:** An `InviteToken` (uuid) is generated and emailed to the target, encapsulating their target `role`, `orgId`, and optional `unitId`.
+- **Public Setup Boundaries:** Invited users navigate to the public frontend routes (`/account/setup/org` or `/account/setup/user`), which fetch their pre-configured entity details dynamically. Upon successful password creation and name registration, the backend marks the token as used, hashes the password securely, and transitions the account status to `"ACTIVE"`.
+
 
 
 

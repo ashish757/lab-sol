@@ -1,17 +1,44 @@
 import { useNavigate } from 'react-router-dom';
-import { useGetOrganizationsQuery } from '../../store/api/apiSlice';
+import { useGetOrganizationsQuery, useInviteOrganizationMutation } from '../../store/api/apiSlice';
 import { getPagePath } from '../../config/routesConfig';
-import { Building2, Users, Network } from 'lucide-react';
+import { Building2, Users, Network, Plus, X } from 'lucide-react';
+import { useState } from 'react';
 
 export const SuperAdminDash = () => {
   const { data: orgs, isLoading } = useGetOrganizationsQuery({});
+  const [inviteOrganization] = useInviteOrganizationMutation();
   const navigate = useNavigate();
+
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [inviteForm, setInviteForm] = useState({ orgName: '', orgId: '', contactEmail: '' });
+
+  const handleInviteSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await inviteOrganization(inviteForm).unwrap();
+      setIsInviteModalOpen(false);
+      setInviteForm({ orgName: '', orgId: '', contactEmail: '' });
+      alert('Invitation sent successfully!');
+    } catch (err) {
+      alert('Failed to send invitation');
+      console.error(err);
+    }
+  };
 
   return (
     <div className="p-8 w-full h-full overflow-y-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Super Administrator Dashboard</h1>
-        <p className="text-slate-500 mt-2">Manage organizations, factory units, and organizational admins across the entire network.</p>
+      <div className="mb-8 flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Super Administrator Dashboard</h1>
+          <p className="text-slate-500 mt-2">Manage organizations, factory units, and organizational admins across the entire network.</p>
+        </div>
+        <button
+          onClick={() => setIsInviteModalOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-sm transition-colors duration-200"
+        >
+          <Plus size={18} />
+          Invite Organization
+        </button>
       </div>
 
       {isLoading ? (
@@ -54,6 +81,68 @@ export const SuperAdminDash = () => {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {isInviteModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+              <h2 className="text-xl font-bold text-slate-800">Invite Organization</h2>
+              <button onClick={() => setIsInviteModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+                <X size={24} />
+              </button>
+            </div>
+            <form onSubmit={handleInviteSubmit} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Organization Name</label>
+                <input
+                  type="text"
+                  required
+                  value={inviteForm.orgName}
+                  onChange={(e) => setInviteForm({ ...inviteForm, orgName: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                  placeholder="e.g. Acme Corp"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Organization ID (Optional)</label>
+                <input
+                  type="text"
+                  value={inviteForm.orgId}
+                  onChange={(e) => setInviteForm({ ...inviteForm, orgId: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                  placeholder="Leave empty to auto-generate"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Admin Email</label>
+                <input
+                  type="email"
+                  required
+                  value={inviteForm.contactEmail}
+                  onChange={(e) => setInviteForm({ ...inviteForm, contactEmail: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                  placeholder="admin@acme.com"
+                />
+              </div>
+              <div className="pt-4 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsInviteModalOpen(false)}
+                  className="px-4 py-2 text-slate-600 hover:bg-slate-100 font-medium rounded-lg"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg"
+                >
+                  Send Invitation
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
