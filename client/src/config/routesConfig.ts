@@ -14,6 +14,7 @@ export const PAGES = {
   ADMIN_ORG_DETAILS: clientRoutes.admin.orgDetails,
   ORG_DASHBOARD: clientRoutes.org.dashboard,
   UNIT_DASHBOARD: clientRoutes.unit.dashboard,
+  STAFF_SETUP: clientRoutes.auth.staffSetup,
 } as const;
 
 export const getPagePath = {
@@ -33,10 +34,14 @@ export const API_ENDPOINTS = {
   SETUP_ORG: getClientApiPath.auth.setupAccount(),
   SETUP_USER: getClientApiPath.auth.setupUser(),
   GET_TOKEN: getClientApiPath.auth.getToken,
+  INVITE_PREVIEW: getClientApiPath.auth.invitePreview,
+  ACTIVATE_STAFF: getClientApiPath.auth.activateStaff(),
+
+  // Users API
+  INVITE_USER: getClientApiPath.users.invite(),
 
   // Organizations API
   INVITE_ORGANIZATION: getClientApiPath.organizations.inviteOrg(),
-  INVITE_USER: getClientApiPath.organizations.inviteUser,
   GET_ORGANIZATIONS: getClientApiPath.organizations.getAll(),
   GET_ORGANIZATION_BY_ID: getClientApiPath.organizations.getOne,
 

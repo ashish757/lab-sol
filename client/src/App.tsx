@@ -9,6 +9,7 @@ import { LoginPage } from './pages/LoginPage';
 import { SetupAccount } from './pages/auth/SetupAccount';
 import { UserSetupPage } from './pages/auth/UserSetupPage';
 import { UnauthorizedPage } from './pages/UnauthorizedPage';
+import { StaffSetupAccount } from './pages/auth/StaffSetupAccount';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { routeConfiguration } from './config/routeConfiguration';
 import { PAGES } from './config/routesConfig';
@@ -40,6 +41,7 @@ function App() {
       <Routes>
         <Route path={PAGES.LOGIN} element={<LoginPage />} />
         <Route path={PAGES.SETUP_ORG} element={<SetupAccount />} />
+        <Route path={PAGES.STAFF_SETUP} element={<StaffSetupAccount />} />
         <Route path={PAGES.SETUP_USER} element={<UserSetupPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
         <Route element={<AppLayout />}>

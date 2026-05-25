@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { SetupAccountDto } from './dto/setupAccount.dto';
 import { SetupUserDto } from './dto/setupUser.dto';
+import { ActivateStaffDto } from './dto/activateStaff.dto';
 import { apiRoutes } from '@shared/routes.config';
 
 @Controller(apiRoutes.auth.base)
@@ -28,8 +29,13 @@ export class AuthController {
     return this.authService.setupUser(setupPayload);
   }
 
-  @Get(apiRoutes.auth.getToken)
-  async getTokenDetails(@Param('token') token: string) {
-    return this.authService.getTokenDetails(token);
+  @Get(apiRoutes.auth.invitePreview)
+  async invitePreview(@Query('token') token: string) {
+    return this.authService.invitePreview(token);
+  }
+
+  @Post(apiRoutes.auth.activateStaff)
+  async activateStaff(@Body() activatePayload: ActivateStaffDto) {
+    return this.authService.activateStaff(activatePayload);
   }
 }

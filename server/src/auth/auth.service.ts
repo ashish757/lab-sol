@@ -5,12 +5,15 @@ import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
 import { SetupAccountDto } from './dto/setupAccount.dto';
 import { SetupUserDto } from './dto/setupUser.dto';
+import { ActivateStaffDto } from './dto/activateStaff.dto';
+import { MagicLinkService } from './magicLink.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly magicLinkService: MagicLinkService,
   ) {}
 
   /**
@@ -59,28 +62,8 @@ export class AuthService {
   }
 
   async setupAccount(setupPayload: SetupAccountDto) {
-    const [tokenId, rawRandomToken] = setupPayload.token.split('.');
-
-    if (!tokenId || !rawRandomToken) {
-      throw new UnauthorizedException('Malformed invite token.');
-    }
-
-    const tokenRecord = await this.prisma.inviteToken.findUnique({
-      where: { id: tokenId },
-    });
-
-    if (!tokenRecord || tokenRecord.isUsed) {
-      throw new UnauthorizedException('Invalid or expired token.');
-    }
-
-    const isTokenValid = await bcrypt.compare(rawRandomToken, tokenRecord.tokenString);
-    if (!isTokenValid) {
-      throw new UnauthorizedException('Invalid or expired token.');
-    }
-
-    if (tokenRecord.expiresAt < new Date()) {
-      throw new UnauthorizedException('Token has expired.');
-    }
+    // 1. Verify and consume the token safely via MagicLinkService
+    const tokenRecord = await this.magicLinkService.verifyAndConsumeToken(setupPayload.token);
 
     return this.prisma.$transaction(async (tx) => {
       // Transaction Step 1: Update the Organization record
@@ -102,48 +85,16 @@ export class AuthService {
         },
       });
 
-      // Transaction Step 3: Mark the InviteToken as used
-      await tx.inviteToken.update({
-        where: { id: tokenRecord.id },
-        data: { isUsed: true },
-      });
+      // Note: MagicLinkService already marked the token as isUsed = true
 
       return { success: true, userId: user.id };
     });
   }
 
   async setupUser(setupPayload: SetupUserDto) {
-    const [tokenId, rawRandomToken] = setupPayload.token.split('.');
-
-    if (!tokenId || !rawRandomToken) {
-      throw new UnauthorizedException('Malformed invite token.');
-    }
-
-    const tokenRecord = await this.prisma.inviteToken.findUnique({
-      where: { id: tokenId },
-    });
-
-    if (!tokenRecord || tokenRecord.isUsed) {
-      throw new UnauthorizedException('Invalid or expired token.');
-    }
-
-    const isTokenValid = await bcrypt.compare(rawRandomToken, tokenRecord.tokenString);
-    if (!isTokenValid) {
-      throw new UnauthorizedException('Invalid or expired token.');
-    }
-
-    if (tokenRecord.expiresAt < new Date()) {
-      throw new UnauthorizedException('Token has expired.');
-    }
+    const tokenRecord = await this.magicLinkService.verifyAndConsumeToken(setupPayload.token);
 
     return this.prisma.$transaction(async (tx) => {
-      // Mark token as used
-      await tx.inviteToken.update({
-        where: { id: tokenRecord.id },
-        data: { isUsed: true },
-      });
-
-      // Create User
       const hashedPassword = await bcrypt.hash(setupPayload.password, 10);
       const user = await tx.user.create({
         data: {
@@ -161,48 +112,28 @@ export class AuthService {
     });
   }
 
-  async getTokenDetails(token: string) {
-    const [tokenId, rawRandomToken] = token.split('.');
+  async invitePreview(token: string) {
+    return this.magicLinkService.previewTokenData(token);
+  }
 
-    if (!tokenId || !rawRandomToken) {
-      throw new UnauthorizedException('Malformed invite token.');
-    }
+  async activateStaff(activatePayload: ActivateStaffDto) {
+    const tokenRecord = await this.magicLinkService.verifyAndConsumeToken(activatePayload.token);
 
-    const tokenRecord = await this.prisma.inviteToken.findUnique({
-      where: { id: tokenId },
-    });
-
-    if (!tokenRecord || tokenRecord.isUsed) {
-      throw new UnauthorizedException('Invalid or expired token.');
-    }
-
-    const isTokenValid = await bcrypt.compare(rawRandomToken, tokenRecord.tokenString);
-    if (!isTokenValid) {
-      throw new UnauthorizedException('Invalid or expired token.');
-    }
-
-    if (tokenRecord.expiresAt < new Date()) {
-      throw new UnauthorizedException('Token has expired.');
-    }
-
-    const org = await this.prisma.organization.findUnique({
-      where: { id: tokenRecord.orgId },
-    });
-
-    let unit: { id: string; orgId: string; name: string; } | null = null;
-    if (tokenRecord.unitId) {
-      unit = await this.prisma.unit.findUnique({
-        where: { id: tokenRecord.unitId },
+    return this.prisma.$transaction(async (tx) => {
+      const hashedPassword = await bcrypt.hash(activatePayload.password, 10);
+      const user = await tx.user.create({
+        data: {
+          email: tokenRecord.email,
+          name: activatePayload.fullName,
+          password: hashedPassword,
+          role: tokenRecord.role,
+          orgId: tokenRecord.orgId,
+          unitId: tokenRecord.unitId,
+          status: 'ACTIVE',
+        },
       });
-    }
 
-    return {
-      email: tokenRecord.email,
-      role: tokenRecord.role,
-      orgId: tokenRecord.orgId,
-      orgName: org?.name,
-      unitId: tokenRecord.unitId,
-      unitName: unit?.name,
-    };
+      return { success: true, userId: user.id };
+    });
   }
 }

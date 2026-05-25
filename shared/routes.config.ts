@@ -8,11 +8,16 @@ export const apiRoutes = {
     setupAccount: 'setup-account',
     setupUser: 'setup-user',
     getToken: 'setup-token/:token',
+    invitePreview: 'invite-preview',
+    activateStaff: 'activate-staff',
+  },
+  users: {
+    base: 'api/users',
+    invite: 'invite',
   },
   organizations: {
     base: 'api/organizations',
     inviteOrg: 'invite',
-    inviteUser: ':id/invite-user',
     getAll: '',
     getOne: ':id',
   },
@@ -40,6 +45,7 @@ export const clientRoutes = {
     login: '/login',
     setupAccount: '/account/setup',
     setupUser: '/account/setup/user',
+    staffSetup: '/account/staff-setup',
   },
   admin: {
     dashboard: '/admin/dash',
@@ -68,10 +74,14 @@ export const getClientApiPath = {
     setupAccount: () => `/${apiRoutes.auth.base}/${apiRoutes.auth.setupAccount}`,
     setupUser: () => `/${apiRoutes.auth.base}/${apiRoutes.auth.setupUser}`,
     getToken: (token: string) => `/${apiRoutes.auth.base}/setup-token/${token}`,
+    invitePreview: (token: string) => `/${apiRoutes.auth.base}/${apiRoutes.auth.invitePreview}?token=${token}`,
+    activateStaff: () => `/${apiRoutes.auth.base}/${apiRoutes.auth.activateStaff}`,
+  },
+  users: {
+    invite: () => `/${apiRoutes.users.base}/${apiRoutes.users.invite}`,
   },
   organizations: {
     inviteOrg: () => `/${apiRoutes.organizations.base}/${apiRoutes.organizations.inviteOrg}`,
-    inviteUser: (id: string | number) => `/${apiRoutes.organizations.base}/${id}/invite-user`,
     getAll: () => `/${apiRoutes.organizations.base}`,
     getOne: (id: string | number) => `/${apiRoutes.organizations.base}/${id}`,
   },

@@ -19,20 +19,6 @@ export class OrganizationsController {
     return this.orgService.inviteOrganization(invitePayload);
   }
 
-  @Post(apiRoutes.organizations.inviteUser)
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.ORG_ADMIN)
-  async inviteUser(
-    @Param('id', ParseUUIDPipe) orgId: string,
-    @Body() invitePayload: InviteUserDto,
-    @Req() request: any,
-  ) {
-    if (request.user.orgId !== orgId) {
-      throw new ForbiddenException('You can only invite users to your own organization.');
-    }
-    return this.orgService.inviteUser(orgId, invitePayload);
-  }
-
   @Get(apiRoutes.organizations.getAll)
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)

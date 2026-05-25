@@ -37,8 +37,8 @@ export const apiSlice = createApi({
       invalidatesTags: ['Organizations'],
     }),
     inviteUser: builder.mutation({
-      query: ({ orgId, ...body }) => ({
-        url: API_ENDPOINTS.INVITE_USER(orgId),
+      query: (body) => ({
+        url: API_ENDPOINTS.INVITE_USER,
         method: 'POST',
         body,
       }),
@@ -64,6 +64,16 @@ export const apiSlice = createApi({
         method: 'POST',
         body,
       }),
+    }),
+    activateStaff: builder.mutation({
+      query: (body) => ({
+        url: API_ENDPOINTS.ACTIVATE_STAFF,
+        method: 'POST',
+        body,
+      }),
+    }),
+    invitePreview: builder.query({
+      query: (token: string) => API_ENDPOINTS.INVITE_PREVIEW(token),
     }),
     getTokenDetails: builder.query({
       query: (token: string) => API_ENDPOINTS.GET_TOKEN(token),
@@ -136,4 +146,6 @@ export const {
   useSetupAccountMutation,
   useSetupUserMutation,
   useGetTokenDetailsQuery,
+  useActivateStaffMutation,
+  useInvitePreviewQuery,
 } = apiSlice;
