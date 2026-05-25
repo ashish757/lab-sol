@@ -178,7 +178,7 @@ export const UnitOpDash = () => {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse text-xs">
                     <thead>
-                      <tr className="bg-slate-50/50 border-b border-slate-150 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                      <tr className="bg-slate-50/50 border-b border-slate-400 text-[10px] font-black text-slate-500 uppercase tracking-widest">
                         <th className="px-5 py-3">Log Date</th>
                         <th className="px-5 py-3">Cane Crushed</th>
                         <th className="px-5 py-3">Sugar Output</th>
