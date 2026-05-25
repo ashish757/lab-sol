@@ -35,6 +35,11 @@ export class DailyLogsService {
     return this.prisma.dailyAnalysisLog.findMany({
       where: whereClause,
       orderBy: { logDate: 'desc' },
+      include: {
+        unit: {
+          select: { id: true, name: true }
+        }
+      }
     });
   }
 
@@ -59,6 +64,11 @@ export class DailyLogsService {
     return this.prisma.dailyAnalysisLog.findMany({
       where: whereClause,
       orderBy: { createdAt: 'desc' },
+      include: {
+        unit: {
+          select: { id: true, name: true }
+        }
+      }
     });
   }
 

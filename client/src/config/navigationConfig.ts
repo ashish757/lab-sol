@@ -10,10 +10,12 @@ export const navigationConfig = {
   ],
   [Role.ORG_ADMIN]: [
     { to: PAGES.ORG_DASHBOARD, icon: Building, label: 'Organization', end: true },
+    { to: PAGES.LOGS_LIST, icon: List, label: 'Logs', end: true },
     { to: PAGES.SETTINGS, icon: Settings, label: 'Settings', end: false },
   ],
   [Role.ORG_STAFF]: [
     { to: PAGES.STAFF_DASHBOARD, icon: Building, label: 'Organization', end: true },
+    { to: PAGES.LOGS_LIST, icon: List, label: 'Logs', end: true },
     { to: PAGES.SETTINGS, icon: Settings, label: 'Settings', end: false },
   ],
   [Role.UNIT_OPERATOR]: [
