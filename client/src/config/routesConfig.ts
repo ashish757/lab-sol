@@ -1,11 +1,10 @@
 import { getClientApiPath } from '../../../shared/routes';
 
 export const PAGES = {
-  LOGS_LIST: '/operator/dash/logs',
-  NEW_LOG: '/operator/dash',
-  DATA_ENTRY: '/operator/dash/entry',
-  NEW_ANALYSIS: '/operator/dash/analysis/new',
-  ANALYSIS_REPORT: '/operator/dash/analysis/:id',
+  LOGS_LIST: '/unit/dash/logs',
+  DATA_ENTRY: '/unit/dash/entry',
+  NEW_ANALYSIS: '/unit/dash/analysis/new',
+  ANALYSIS_REPORT: '/unit/dash/analysis/:id',
   SETTINGS: '/settings',
   SUPER_ADMIN_INVITE: '/admin/dash/invite',
   LOGIN: '/login',
@@ -17,10 +16,9 @@ export const PAGES = {
 
 export const getPagePath = {
   logsList: () => PAGES.LOGS_LIST,
-  newLog: () => PAGES.NEW_LOG,
   dataEntry: () => PAGES.DATA_ENTRY,
   newAnalysis: () => PAGES.NEW_ANALYSIS,
-  analysisReport: (id: string | number) => `/operator/dash/analysis/${id}`,
+  analysisReport: (id: string | number) => `/unit/dash/analysis/${id}`,
   superAdminInvite: () => PAGES.SUPER_ADMIN_INVITE,
   login: () => PAGES.LOGIN,
   adminDashboard: () => PAGES.ADMIN_DASHBOARD,

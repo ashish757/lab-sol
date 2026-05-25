@@ -15,12 +15,14 @@ model DailyAnalysisLog {
   
   metrics     Json
 
+  unitId      String
+  unit        Unit         @relation(fields: [unitId], references: [id])
+  
+  orgId       String
+  org         Organization @relation(fields: [orgId], references: [id])
+
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
-
-  // Optional: If you have a User model, you can link who submitted it
-  // createdById String?   @map("created_by_id")
-  // createdBy   User?     @relation(fields: [createdById], references: [id])
 
   @@map("daily_analysis_logs")
 }
@@ -28,23 +30,25 @@ model DailyAnalysisLog {
 enum Role {
   SUPER_ADMIN
   ORG_ADMIN
-  UNIT_ADMIN
+  ORG_STAFF
   UNIT_OPERATOR
 }
 
 model Organization {
-  id    String @id @default(uuid())
+  id    String             @id @default(uuid())
   name  String
   units Unit[]
   users User[]
+  logs  DailyAnalysisLog[]
 }
 
 model Unit {
-  id    String       @id @default(uuid())
+  id    String             @id @default(uuid())
   name  String
   orgId String
-  org   Organization @relation(fields: [orgId], references: [id])
+  org   Organization       @relation(fields: [orgId], references: [id])
   users User[]
+  logs  DailyAnalysisLog[]
 }
 
 model User {

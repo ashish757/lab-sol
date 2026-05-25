@@ -7,7 +7,7 @@ import { useLoginMutation } from '../store/api/apiSlice';
 
 export const LoginPage = () => {
   const [email, setEmail] = useState('admin@example.com');
-  const [password, setPassword] = useState('password123');
+  const [password, setPassword] = useState('pass');
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const dispatch = useDispatch();

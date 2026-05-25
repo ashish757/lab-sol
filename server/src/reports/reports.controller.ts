@@ -6,7 +6,11 @@ import {
   Param,
   Res,
   NotFoundException,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
+import { AuthGuard } from '../auth/guards/auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import { ReportsService } from './reports.service';
 import * as express from 'express';
 import { API_ROUTES } from '@shared/routes';
@@ -41,6 +45,7 @@ export class ReportsController {
    * Streams a populated daily report spreadsheet by database ID.
    */
   @Get(API_ROUTES.REPORTS.DOWNLOAD_ONE)
+  @UseGuards(AuthGuard)
   async downloadDailyReport(
     @Param('id') id: string,
     @Res() res: express.Response,
@@ -69,12 +74,14 @@ export class ReportsController {
   }
 
   @Post(API_ROUTES.REPORTS.SAVE_AND_GENERATE)
+  @UseGuards(AuthGuard)
   async saveAndGenerateReport(
     @Body() dto: InsertDailyLogDto,
     @Res() res: express.Response,
+    @Req() req: any,
   ): Promise<void> {
     try {
-      await this.reportsService.saveAndGenerateReport(dto, res);
+      await this.reportsService.saveAndGenerateReport(dto, res, req.user);
     } catch (error) {
       console.error(error);
       res

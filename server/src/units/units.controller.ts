@@ -12,20 +12,20 @@ export class UnitsController {
 
   @Get(API_ROUTES.UNITS.GET_ONE)
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN, Role.ORG_ADMIN, Role.UNIT_ADMIN, Role.UNIT_OPERATOR)
-  async getUnitById(@Param('id') id: string, @Req() req: any) {
-    const user = req.user;
+  @Roles(Role.SUPER_ADMIN, Role.ORG_ADMIN, Role.ORG_STAFF, Role.UNIT_OPERATOR)
+  async getUnitById(@Param('id') id: string, @Req() request: any) {
+    const currentUser = request.user;
     const unit = await this.unitsService.getUnitById(id);
     
     if (!unit) {
       throw new NotFoundException('Unit not found');
     }
 
-    if ((user.role === Role.UNIT_ADMIN || user.role === Role.UNIT_OPERATOR) && user.unitId !== id) {
+    if (currentUser.role === Role.UNIT_OPERATOR && currentUser.unitId !== id) {
       throw new ForbiddenException('You can only view your own unit.');
     }
 
-    if (user.role === Role.ORG_ADMIN && user.orgId !== unit.orgId) {
+    if ((currentUser.role === Role.ORG_ADMIN || currentUser.role === Role.ORG_STAFF) && currentUser.orgId !== unit.orgId) {
       throw new ForbiddenException('You can only view units within your organization.');
     }
 

@@ -1,7 +1,11 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UseGuards, Req } from '@nestjs/common';
 import { DailyLogsService } from './dailyLogs.service';
 import { InsertDailyLogDto } from './dto/dailyLog.dto';
 import { API_ROUTES } from '@shared/routes';
+import { AuthGuard } from '../auth/guards/auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '@prisma/client';
 
 @Controller(API_ROUTES.DAILY_LOGS.BASE)
 export class DailyLogsController {
@@ -12,8 +16,12 @@ export class DailyLogsController {
    * Submit a new daily analysis log entry.
    */
   @Post(API_ROUTES.DAILY_LOGS.CREATE)
-  create(@Body() dto: InsertDailyLogDto) {
-    return this.dailyLogsService.create(dto);
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ORG_ADMIN, Role.UNIT_OPERATOR)
+  create(@Body() dto: InsertDailyLogDto, @Req() request: any) {
+    const currentUser = request.user;
+    // Inject the user's unitId and orgId into the payload if they are an operator, etc.
+    return this.dailyLogsService.create(dto, currentUser);
   }
 
   /**
@@ -21,11 +29,14 @@ export class DailyLogsController {
    * Fetch all logs, or filter by a specific date via ?date=YYYY-MM-DD
    */
   @Get(API_ROUTES.DAILY_LOGS.GET_ALL)
-  findAll(@Query('date') date?: string) {
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ORG_ADMIN, Role.ORG_STAFF, Role.UNIT_OPERATOR)
+  findAll(@Query('date') date: string | undefined, @Req() request: any) {
+    const currentUser = request.user;
     if (date) {
-      return this.dailyLogsService.findByDate(date);
+      return this.dailyLogsService.findByDate(date, currentUser);
     }
-    return this.dailyLogsService.findAll();
+    return this.dailyLogsService.findAll(currentUser);
   }
 
   /**
@@ -33,7 +44,10 @@ export class DailyLogsController {
    * Fetch a single daily log by UUID.
    */
   @Get(API_ROUTES.DAILY_LOGS.GET_ONE)
-  findOne(@Param('id') id: string) {
-    return this.dailyLogsService.findOne(id);
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ORG_ADMIN, Role.ORG_STAFF, Role.UNIT_OPERATOR)
+  findOne(@Param('id') id: string, @Req() request: any) {
+    const currentUser = request.user;
+    return this.dailyLogsService.findOne(id, currentUser);
   }
 }

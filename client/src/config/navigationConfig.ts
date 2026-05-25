@@ -1,4 +1,4 @@
-import { List, Settings, LayoutDashboard, UserPlus, Building, Network, FileText } from 'lucide-react';
+import { List, Settings, LayoutDashboard, UserPlus, Building, FileText } from 'lucide-react';
 import { PAGES } from './routesConfig';
 import { Role } from '../types/auth';
 
@@ -12,12 +12,12 @@ export const navigationConfig = {
     { to: PAGES.ORG_DASHBOARD, icon: Building, label: 'Organization', end: true },
     { to: PAGES.SETTINGS, icon: Settings, label: 'Settings', end: false },
   ],
-  [Role.UNIT_ADMIN]: [
-    { to: PAGES.UNIT_DASHBOARD, icon: Network, label: 'Unit Management', end: true },
+  [Role.ORG_STAFF]: [
+    { to: PAGES.ORG_DASHBOARD, icon: Building, label: 'Organization', end: true },
     { to: PAGES.SETTINGS, icon: Settings, label: 'Settings', end: false },
   ],
   [Role.UNIT_OPERATOR]: [
-    { to: PAGES.NEW_LOG, icon: LayoutDashboard, label: 'Dashboard', end: true },
+    { to: PAGES.UNIT_DASHBOARD, icon: LayoutDashboard, label: 'Dashboard', end: true },
     { to: PAGES.DATA_ENTRY, icon: FileText, label: 'New Analysis', end: true },
     { to: PAGES.LOGS_LIST, icon: List, label: 'Logs', end: true },
     { to: PAGES.SETTINGS, icon: Settings, label: 'Settings', end: false },

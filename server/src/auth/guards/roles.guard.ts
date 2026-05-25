@@ -7,17 +7,17 @@ import { ROLES_KEY } from '../decorators/roles.decorator';
 export class RolesGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
-  canActivate(ctx: ExecutionContext): boolean {
-    const reqRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
-      ctx.getHandler(),
-      ctx.getClass(),
+  canActivate(context: ExecutionContext): boolean {
+    const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
+      context.getHandler(),
+      context.getClass(),
     ]);
-    if (!reqRoles) {
+    if (!requiredRoles) {
       return true;
     }
-    const req = ctx.switchToHttp().getRequest();
-    const usr = req.user;
-    if (!usr || !reqRoles.includes(usr.role)) {
+    const request = context.switchToHttp().getRequest();
+    const currentUser = request.user;
+    if (!currentUser || !requiredRoles.includes(currentUser.role)) {
       throw new ForbiddenException();
     }
     return true;

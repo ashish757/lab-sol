@@ -9,8 +9,8 @@ const seedConfig = {
     { id: 'global-tech-id', name: 'Global Tech Industries' },
   ],
   units: [
-    { id: 'dummy-unit-aplha', name: 'Acme Factory Alpha', orgId: 'dummy-org-id' },
-     { id: 'dummy-unit-beta', name: 'Acme Factory Bets', orgId: 'dummy-org-id' },
+    { id: 'dummy-unit-alpha', name: 'Acme Factory Alpha', orgId: 'dummy-org-id' },
+    { id: 'dummy-unit-beta', name: 'Acme Factory Beta', orgId: 'dummy-org-id' },
     { id: 'global-unit-alpha', name: 'GT Alpha Site', orgId: 'global-tech-id' },
     { id: 'global-unit-beta', name: 'GT Beta Site', orgId: 'global-tech-id' },
   ],
@@ -20,12 +20,11 @@ const seedConfig = {
     
     // Acme Corporation Users
     { email: 'orgadmin@example.com', role: Role.ORG_ADMIN, orgId: 'dummy-org-id' },
-    { email: 'unitadmin@example.com', role: Role.UNIT_ADMIN, orgId: 'dummy-org-id', unitId: 'dummy-unit-id' },
-    { email: 'operator@example.com', role: Role.UNIT_OPERATOR, orgId: 'dummy-org-id', unitId: 'dummy-unit-id' },
+    { email: 'staff@example.com', role: Role.ORG_STAFF, orgId: 'dummy-org-id' },
+    { email: 'operator@example.com', role: Role.UNIT_OPERATOR, orgId: 'dummy-org-id', unitId: 'dummy-unit-alpha' },
 
     // Global Tech Industries Users
     { email: 'ceo@globaltech.com', role: Role.ORG_ADMIN, orgId: 'global-tech-id' },
-    { email: 'manager@globaltech.com', role: Role.UNIT_ADMIN, orgId: 'global-tech-id', unitId: 'global-unit-alpha' },
     { email: 'worker1@globaltech.com', role: Role.UNIT_OPERATOR, orgId: 'global-tech-id', unitId: 'global-unit-alpha' },
     { email: 'worker2@globaltech.com', role: Role.UNIT_OPERATOR, orgId: 'global-tech-id', unitId: 'global-unit-beta' },
   ],

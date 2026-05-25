@@ -7,6 +7,8 @@ import {
 import { useUpsertDailyLogMutation, useGetDailyLogByIdQuery } from '../store/api/apiSlice';
 import { PAGES, getPagePath } from '../config/routesConfig';
 import { getDownloadDailyReportUrl } from '../utils/urlHelpers';
+import { RoleGuard } from '../components/RoleGuard';
+import { Role } from '../types/auth';
 
 export const AnalysisReportPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -36,7 +38,7 @@ export const AnalysisReportPage = () => {
     if (isNew) {
       const payload = location.state?.payload;
       if (!payload) {
-        navigate(PAGES.NEW_LOG, { replace: true });
+        navigate(PAGES.UNIT_DASHBOARD, { replace: true });
         return;
       }
 
@@ -139,12 +141,14 @@ export const AnalysisReportPage = () => {
               {isNew ? 'Failed to archive log entry.' : 'The requested report UUID could not be resolved.'}
             </p>
           </div>
-          <Link
-            to={PAGES.NEW_LOG}
-            className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-lg border border-slate-950 transition-colors uppercase tracking-wider"
-          >
-            Create New Log
-          </Link>
+          <RoleGuard allowedRoles={[Role.SUPER_ADMIN, Role.ORG_ADMIN, Role.UNIT_OPERATOR]}>
+            <Link
+              to={PAGES.UNIT_DASHBOARD}
+              className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-lg border border-slate-950 transition-colors uppercase tracking-wider"
+            >
+              Create New Log
+            </Link>
+          </RoleGuard>
         </div>
       </div>
     );
@@ -174,13 +178,15 @@ export const AnalysisReportPage = () => {
         </div>
         
         <div className="flex items-center gap-2">
-          <Link
-            to={PAGES.NEW_LOG}
-            className="inline-flex items-center gap-2 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg cursor-pointer uppercase tracking-wider shadow-md shadow-indigo-600/10"
-          >
-            <Plus size={14} />
-            New Entry
-          </Link>
+          <RoleGuard allowedRoles={[Role.SUPER_ADMIN, Role.ORG_ADMIN, Role.UNIT_OPERATOR]}>
+            <Link
+              to={PAGES.UNIT_DASHBOARD}
+              className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 bg-indigo-50/50 hover:bg-indigo-50 px-3 py-2 rounded-lg font-bold text-xs uppercase tracking-wide transition-all"
+            >
+              <Plus size={14} />
+              New Entry
+            </Link>
+          </RoleGuard>
         </div>
       </div>
 

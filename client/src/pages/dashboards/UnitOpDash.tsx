@@ -5,6 +5,8 @@ import { ShieldCheck, Network, ArrowRight, Activity, TrendingUp, Calendar, Calen
 import { Link, useNavigate } from 'react-router-dom';
 import { PAGES, getPagePath } from '../../config/routesConfig';
 import type { DailyLogResponse } from '../../types/dailyLogs';
+import { RoleGuard } from '../../components/RoleGuard';
+import { Role } from '../../types/auth';
 
 export const UnitOpDash = () => {
   const navigate = useNavigate();
@@ -76,13 +78,15 @@ export const UnitOpDash = () => {
               </div>
 
               <div className="shrink-0">
-                <button
-                  onClick={() => navigate(PAGES.DATA_ENTRY)}
-                  className="inline-flex items-center gap-2 px-4.5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-indigo-650/30 uppercase tracking-wider active:scale-[0.98]"
-                >
-                  <Plus size={14} />
-                  New entry
-                </button>
+                <RoleGuard allowedRoles={[Role.SUPER_ADMIN, Role.ORG_ADMIN, Role.UNIT_OPERATOR]}>
+                  <button
+                    onClick={() => navigate(PAGES.DATA_ENTRY)}
+                    className="inline-flex items-center gap-2 px-4.5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-indigo-650/30 uppercase tracking-wider active:scale-[0.98]"
+                  >
+                    <Plus size={14} />
+                    New entry
+                  </button>
+                </RoleGuard>
               </div>
             </div>
           </div>

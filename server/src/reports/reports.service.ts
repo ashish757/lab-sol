@@ -121,8 +121,9 @@ export class ReportsService {
   async saveAndGenerateReport(
     dto: InsertDailyLogDto,
     res: express.Response,
+    user: any,
   ): Promise<void> {
-    const savedLog = await this.dailyLogsService.create(dto);
+    const savedLog = await this.dailyLogsService.create(dto, user);
     const metrics = (
       typeof savedLog.metrics === 'string'
         ? JSON.parse(savedLog.metrics)
