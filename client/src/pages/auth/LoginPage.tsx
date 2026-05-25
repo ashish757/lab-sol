@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { getPagePath } from '../../config/routesConfig';
+import { PAGES } from '../../config/routesConfig';
 import { login } from '../../store/slices/authSlice';
 import { useLoginMutation } from '../../store/api/apiSlice';
 
@@ -21,7 +21,22 @@ export const LoginPage = () => {
       const res = await loginApi({ email, password }).unwrap();
       if (res?.token) {
         dispatch(login({ token: res.token, user: res.user }));
-        navigate(getPagePath.adminDashboard());
+        switch (res.user.role) {
+          case 'SUPER_ADMIN':
+            navigate(PAGES.ADMIN_DASHBOARD);
+            break;
+          case 'ORG_ADMIN':
+            navigate(PAGES.ORG_DASHBOARD);
+            break;
+          case 'ORG_STAFF':
+            navigate(PAGES.STAFF_DASHBOARD);
+            break;
+          case 'UNIT_OPERATOR':
+            navigate(PAGES.UNIT_DASHBOARD);
+            break;
+          default:
+            navigate('/');
+        }
       }
     } catch (err: any) {
       setError(err?.data?.message || 'Login failed');

@@ -100,7 +100,7 @@ export const SuperAdminDash = () => {
                     onClick={() => navigate(getPagePath.adminOrgDetails(org.id))}
                     className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors duration-200 w-full"
                   >
-                    View Details & Management
+                    View Details & Manage
                   </button>
                 )}
               </div>
