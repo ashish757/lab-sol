@@ -66,6 +66,7 @@ export const clientRoutes = {
     logsList: '/unit/logs',
   },
   settings: '/settings',
+  profile: '/profile',
 };
 
 // Absolute path generators for client consumption

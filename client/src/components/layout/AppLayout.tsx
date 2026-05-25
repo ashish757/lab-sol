@@ -45,9 +45,9 @@ export const AppLayout = () => {
           ))}
         </div>
 
-        <div className="w-10 h-10 rounded-full bg-slate-300 flex items-center justify-center text-slate-900 text-xs font-bold cursor-pointer hover:bg-slate-800 hover:text-white hover:scale-105 transition-all shadow-md shadow-black/20">
-          U
-        </div>
+        <NavLink to="/profile" className={({ isActive }) => `w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold cursor-pointer transition-all shadow-md shadow-black/20 ${isActive ? 'bg-indigo-600 text-white border-2 border-indigo-400' : 'bg-slate-300 text-slate-900 hover:bg-slate-800 hover:text-white hover:scale-105'}`}>
+          {authState.user?.email?.[0]?.toUpperCase() || 'U'}
+        </NavLink>
       </nav>
 
       <div className="flex-1 flex overflow-hidden bg-slate-50 relative">

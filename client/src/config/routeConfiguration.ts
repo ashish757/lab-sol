@@ -13,6 +13,7 @@ const UnitOpDash = lazy(() => import('../pages/unitOperator/UnitOperatorDash').t
 const LogsPage = lazy(() => import('../pages/unitOperator/LogListPage').then(m => ({ default: m.LogsPage })));
 const NewLogPage = lazy(() => import('../pages/unitOperator/NewLogPage').then(m => ({ default: m.NewLogPage })));
 const SettingsPage = lazy(() => import('../pages/SettingsPage').then(m => ({ default: m.SettingsPage })));
+const ProfilePage = lazy(() => import('../pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
 
 const allRoles = [Role.SUPER_ADMIN, Role.ORG_ADMIN, Role.ORG_STAFF, Role.UNIT_OPERATOR];
 
@@ -26,4 +27,5 @@ export const routeConfiguration = [
   { path: PAGES.DATA_ENTRY, component: NewLogPage, allowedRoles: [Role.UNIT_OPERATOR] },
   { path: PAGES.LOGS_LIST, component: LogsPage, allowedRoles: [Role.UNIT_OPERATOR, Role.ORG_ADMIN, Role.ORG_STAFF] },
   { path: PAGES.SETTINGS, component: SettingsPage, allowedRoles: allRoles },
+  { path: PAGES.PROFILE, component: ProfilePage, allowedRoles: allRoles },
 ];

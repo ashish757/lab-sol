@@ -28,10 +28,10 @@ export class OrganizationsController {
 
   @Get(apiRoutes.organizations.getOne)
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN, Role.ORG_ADMIN, Role.ORG_STAFF)
+  @Roles(Role.SUPER_ADMIN, Role.ORG_ADMIN, Role.ORG_STAFF, Role.UNIT_OPERATOR)
   async getOrganizationById(@Param('id') id: string, @Req() request: any) {
     const currentUserRole = request.user.role;
-    if ((currentUserRole === Role.ORG_ADMIN || currentUserRole === Role.ORG_STAFF) && request.user.orgId !== id) {
+    if ((currentUserRole === Role.ORG_ADMIN || currentUserRole === Role.ORG_STAFF || currentUserRole === Role.UNIT_OPERATOR) && request.user.orgId !== id) {
       throw new ForbiddenException('You can only view your own organization.');
     }
     return this.orgService.getOrganizationById(id);

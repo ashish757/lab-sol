@@ -16,6 +16,7 @@ export const PAGES = {
   UNIT_DASHBOARD: clientRoutes.unit.dashboard,
   STAFF_DASHBOARD: clientRoutes.staff.dashboard,
   STAFF_SETUP: clientRoutes.auth.staffSetup,
+  PROFILE: clientRoutes.profile,
 } as const;
 
 export const getPagePath = {
