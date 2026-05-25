@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Role } from '@prisma/client';
 import { MagicLinkService } from '../auth/magicLink.service';
 
+@Injectable()
 export class OrganizationsService {
   constructor(
     private readonly prisma: PrismaService,
