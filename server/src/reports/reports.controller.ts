@@ -14,7 +14,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { ReportsService } from './reports.service';
 import * as express from 'express';
 import { apiRoutes } from '@shared/routes.config';
-import { InsertDailyLogDto } from '../dailyLogs/dto/dailyLog.dto';
+import { UpsertDailyLogDto } from '../dailyLogs/dto/dailyLog.dto';
 
 @Controller(apiRoutes.reports.base)
 export class ReportsController {
@@ -76,7 +76,7 @@ export class ReportsController {
   @Post(apiRoutes.reports.saveAndGenerate)
   @UseGuards(AuthGuard)
   async saveAndGenerateReport(
-    @Body() dto: InsertDailyLogDto,
+    @Body() dto: UpsertDailyLogDto,
     @Res() res: express.Response,
     @Req() req: any,
   ): Promise<void> {

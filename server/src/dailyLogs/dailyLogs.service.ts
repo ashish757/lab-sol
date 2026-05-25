@@ -1,28 +1,105 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ForbiddenException, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { InsertDailyLogDto } from './dto/dailyLog.dto';
-import { Prisma, Role } from '@prisma/client';
+import { UpsertDailyLogDto } from './dto/dailyLog.dto';
+import { Prisma, Role, LogStatus } from '@prisma/client';
 
 @Injectable()
 export class DailyLogsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(dto: InsertDailyLogDto, currentUser: any) {
-    const logDate = new Date(dto.logDate);
+  // --- New Methods as per requirements ---
 
-    return this.prisma.dailyAnalysisLog.upsert({
-      where: { logDate },
-      update: {
-        metrics: dto.metrics as Prisma.InputJsonValue,
-      },
-      create: {
-        logDate,
-        metrics: dto.metrics as Prisma.InputJsonValue,
-        unitId: currentUser.unitId,
-        orgId: currentUser.orgId,
+  async getLogsForUnit(unitId: string) {
+    return this.prisma.dailyLog.findMany({
+      where: { unitId },
+      orderBy: { date: 'desc' },
+      include: {
+        unit: {
+          select: { id: true, name: true },
+        },
       },
     });
   }
+
+  async upsertLog(unitId: string, orgId: string, dto: UpsertDailyLogDto) {
+    const requestedDate = new Date(dto.date);
+
+    // Validation A: Check if log for this date already exists and is locked
+    const existingLog = await this.prisma.dailyLog.findUnique({
+      where: {
+        unitId_date: {
+          unitId,
+          date: requestedDate,
+        },
+      },
+    });
+
+    if (existingLog && existingLog.status === LogStatus.LOCKED) {
+      throw new ForbiddenException('Log is locked and cannot be edited');
+    }
+
+    // Validation B (Sequential Rule)
+    // Operators cannot create or edit a log for Date X if a past log is UNLOCKED.
+    const mostRecentPastLog = await this.prisma.dailyLog.findFirst({
+      where: {
+        unitId: unitId,
+        date: {
+          lt: requestedDate,
+        },
+      },
+      orderBy: {
+        date: 'desc',
+      },
+    });
+
+    const isPreviousLogUnlocked = mostRecentPastLog?.status === LogStatus.UNLOCKED;
+
+    if (isPreviousLogUnlocked) {
+      throw new BadRequestException("You must lock the previous day's log before starting a new one");
+    }
+
+    // Action: Upsert
+    return this.prisma.dailyLog.upsert({
+      where: {
+        unitId_date: {
+          unitId,
+          date: requestedDate,
+        },
+      },
+      update: {
+        payload: dto.payload as Prisma.InputJsonValue,
+      },
+      create: {
+        date: requestedDate,
+        payload: dto.payload as Prisma.InputJsonValue,
+        status: LogStatus.UNLOCKED,
+        unitId: unitId,
+        orgId: orgId,
+      },
+    });
+  }
+
+  async lockLog(logId: string, unitId: string) {
+    const existingLog = await this.prisma.dailyLog.findUnique({
+      where: { id: logId },
+    });
+
+    if (!existingLog) {
+      throw new NotFoundException('Log not found');
+    }
+
+    // Optional safety check to ensure users don't lock cross-unit logs
+    if (existingLog.unitId !== unitId) {
+      throw new ForbiddenException('You cannot lock a log belonging to another unit');
+    }
+
+    return this.prisma.dailyLog.update({
+      where: { id: logId },
+      data: { status: LogStatus.LOCKED },
+    });
+  }
+
+  // --- Adapted Legacy Methods ---
 
   async findAll(currentUser: any) {
     let whereClause = {};
@@ -32,9 +109,9 @@ export class DailyLogsService {
       whereClause = { unitId: currentUser.unitId };
     }
 
-    return this.prisma.dailyAnalysisLog.findMany({
+    return this.prisma.dailyLog.findMany({
       where: whereClause,
-      orderBy: { logDate: 'desc' },
+      orderBy: { date: 'desc' },
       include: {
         unit: {
           select: { id: true, name: true }
@@ -43,13 +120,13 @@ export class DailyLogsService {
     });
   }
 
-  async findByDate(date: string, currentUser: any) {
-    const start = new Date(date);
-    const end = new Date(date);
+  async findByDate(dateString: string, currentUser: any) {
+    const start = new Date(dateString);
+    const end = new Date(dateString);
     end.setDate(end.getDate() + 1);
 
     const whereClause: any = {
-      logDate: {
+      date: {
         gte: start,
         lt: end,
       },
@@ -61,7 +138,7 @@ export class DailyLogsService {
       whereClause.unitId = currentUser.unitId;
     }
 
-    return this.prisma.dailyAnalysisLog.findMany({
+    return this.prisma.dailyLog.findMany({
       where: whereClause,
       orderBy: { createdAt: 'desc' },
       include: {
@@ -81,7 +158,7 @@ export class DailyLogsService {
       whereClause.unitId = currentUser.unitId;
     }
 
-    return this.prisma.dailyAnalysisLog.findUnique({
+    return this.prisma.dailyLog.findUnique({
       where: whereClause,
     });
   }

@@ -7,7 +7,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { analysisConfig, getAllFields } from '@shared/analysisFields';
 import { populateRow } from './reports.utils';
 import { DailyLogsService } from '../dailyLogs/dailyLogs.service';
-import { InsertDailyLogDto } from '../dailyLogs/dto/dailyLog.dto';
+import { UpsertDailyLogDto } from '../dailyLogs/dto/dailyLog.dto';
 import { calculateReportData } from '../comman/calc/calculation';
 import { requiredFormulaIds } from '../comman/calc/formulas';
 
@@ -95,7 +95,7 @@ export class ReportsService {
    * Fetches a database daily log record and returns a populated Excel buffer.
    */
   async generateDailyReportById(id: string): Promise<Buffer> {
-    const log = await this.prisma.dailyAnalysisLog.findUnique({
+    const log = await this.prisma.dailyLog.findUnique({
       where: { id },
     });
 
@@ -106,33 +106,33 @@ export class ReportsService {
     }
 
     const metrics = (
-      typeof log.metrics === 'string' ? JSON.parse(log.metrics) : log.metrics
+      typeof log.payload === 'string' ? JSON.parse(log.payload) : log.payload
     ) as Record<string, any>;
 
     // Enrich with top-level date
     const data: Record<string, any> = Object.assign({}, metrics);
-    data.todayDate = log.logDate
-      ? new Date(log.logDate).toISOString().split('T')[0]
+    data.todayDate = log.date
+      ? new Date(log.date).toISOString().split('T')[0]
       : (metrics.todayDate as string | undefined);
 
     return this.generateDailyReportFromData(data);
   }
 
   async saveAndGenerateReport(
-    dto: InsertDailyLogDto,
+    dto: UpsertDailyLogDto,
     res: express.Response,
     user: any,
   ): Promise<void> {
-    const savedLog = await this.dailyLogsService.create(dto, user);
+    const savedLog = await this.dailyLogsService.upsertLog(user.unitId, user.orgId, dto);
     const metrics = (
-      typeof savedLog.metrics === 'string'
-        ? JSON.parse(savedLog.metrics)
-        : savedLog.metrics
+      typeof savedLog.payload === 'string'
+        ? JSON.parse(savedLog.payload)
+        : savedLog.payload
     ) as Record<string, any>;
 
     const data: Record<string, any> = Object.assign({}, metrics);
-    data.todayDate = savedLog.logDate
-      ? new Date(savedLog.logDate).toISOString().split('T')[0]
+    data.todayDate = savedLog.date
+      ? new Date(savedLog.date).toISOString().split('T')[0]
       : (metrics.todayDate as string | undefined);
 
     const calculatedData = calculateReportData(data, requiredFormulaIds);

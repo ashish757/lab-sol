@@ -7,13 +7,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum LogStatus {
+  UNLOCKED
+  LOCKED
+}
 
-model DailyAnalysisLog {
+model DailyLog {
   id          String    @id @default(uuid()) @unique()
   
-  logDate     DateTime   @unique @map("log_date")
+  date        DateTime  @map("log_date")
+  status      LogStatus @default(UNLOCKED)
   
-  metrics     Json
+  payload     Json      @map("metrics")
 
   unitId      String
   unit        Unit         @relation(fields: [unitId], references: [id])
@@ -24,7 +29,8 @@ model DailyAnalysisLog {
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
 
-  @@map("daily_analysis_logs")
+  @@unique([unitId, date])
+  @@map("daily_logs")
 }
 
 enum Role {
@@ -40,7 +46,7 @@ model Organization {
   status String             @default("INACTIVE")
   units  Unit[]
   users User[]
-  logs  DailyAnalysisLog[]
+  logs  DailyLog[]
 }
 
 model Unit {
@@ -49,7 +55,7 @@ model Unit {
   orgId String
   org   Organization       @relation(fields: [orgId], references: [id])
   users User[]
-  logs  DailyAnalysisLog[]
+  logs  DailyLog[]
 }
 
 model User {
