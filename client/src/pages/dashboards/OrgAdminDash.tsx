@@ -95,13 +95,15 @@ export const OrgAdminDash = () => {
               <Network size={20} className="text-indigo-600" />
               Factory Units
             </h2>
-            <button
-              onClick={() => setIsUnitModalOpen(true)}
-              className="flex items-center gap-1 px-3 py-1.5 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-semibold rounded-md text-sm transition-colors"
-            >
-              <Plus size={16} />
-              Add Unit
-            </button>
+            {user?.role === 'ORG_ADMIN' && (
+              <button
+                onClick={() => setIsUnitModalOpen(true)}
+                className="flex items-center gap-1 px-3 py-1.5 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-semibold rounded-md text-sm transition-colors"
+              >
+                <Plus size={16} />
+                Add Unit
+              </button>
+            )}
           </div>
           <div className="p-0 overflow-y-auto max-h-[600px]">
             {org.units?.length > 0 ? (
@@ -125,13 +127,15 @@ export const OrgAdminDash = () => {
               <Users size={20} className="text-emerald-600" />
               Registered Users
             </h2>
-            <button
-              onClick={() => setIsUserModalOpen(true)}
-              className="flex items-center gap-1 px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-semibold rounded-md text-sm transition-colors"
-            >
-              <Plus size={16} />
-              Invite User
-            </button>
+            {user?.role === 'ORG_ADMIN' && (
+              <button
+                onClick={() => setIsUserModalOpen(true)}
+                className="flex items-center gap-1 px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-semibold rounded-md text-sm transition-colors"
+              >
+                <Plus size={16} />
+                Invite User
+              </button>
+            )}
           </div>
           <div className="p-0 overflow-y-auto max-h-[600px]">
             {org.users?.length > 0 ? (

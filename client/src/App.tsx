@@ -6,7 +6,7 @@ import './App.css';
 import { AppLayout } from './components/layout/AppLayout';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { LoginPage } from './pages/LoginPage';
-import { OrgSetupPage } from './pages/auth/OrgSetupPage';
+import { SetupAccount } from './pages/auth/SetupAccount';
 import { UserSetupPage } from './pages/auth/UserSetupPage';
 import { UnauthorizedPage } from './pages/UnauthorizedPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -39,7 +39,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path={PAGES.LOGIN} element={<LoginPage />} />
-        <Route path={PAGES.SETUP_ORG} element={<OrgSetupPage />} />
+        <Route path={PAGES.SETUP_ORG} element={<SetupAccount />} />
         <Route path={PAGES.SETUP_USER} element={<UserSetupPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
         <Route element={<AppLayout />}>

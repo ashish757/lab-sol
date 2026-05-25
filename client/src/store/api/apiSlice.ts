@@ -51,7 +51,7 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Units', 'Organizations'],
     }),
-    setupOrg: builder.mutation({
+    setupAccount: builder.mutation({
       query: (body) => ({
         url: API_ENDPOINTS.SETUP_ORG,
         method: 'POST',
@@ -133,7 +133,7 @@ export const {
   useGetUnitByIdQuery,
   useInviteUserMutation,
   useCreateUnitMutation,
-  useSetupOrgMutation,
+  useSetupAccountMutation,
   useSetupUserMutation,
   useGetTokenDetailsQuery,
 } = apiSlice;

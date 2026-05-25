@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { InviteOrgDto } from './dto/inviteOrg.dto';
+import { InviteUserDto } from './dto/inviteUser.dto';
+import { randomBytes } from 'crypto';
+import * as bcrypt from 'bcrypt';
 import { Resend } from 'resend';
 import { v4 as uuidv4 } from 'uuid';
 import { Role } from '@prisma/client';
-import { InviteUserDto } from './dto/inviteUser.dto';
 
 @Injectable()
 export class OrganizationsService {
@@ -15,80 +17,76 @@ export class OrganizationsService {
   }
 
   async inviteOrganization(dto: InviteOrgDto) {
-    const { orgName, orgId, contactEmail } = dto;
+    const generatedOrgId = dto.orgId || uuidv4();
 
     return this.prisma.$transaction(async (tx) => {
-      const org = await tx.organization.create({
-        data: {
-          id: orgId || uuidv4(),
-          name: orgName,
+      const org = await tx.organization.upsert({
+        where: { id: generatedOrgId },
+        update: {},
+        create: {
+          id: generatedOrgId,
+          name: dto.orgName,
           status: 'INACTIVE',
         },
       });
 
-      const tok = uuidv4();
-      const expiresAt = new Date();
-      expiresAt.setHours(expiresAt.getHours() + 24);
+      const rawRandomToken = randomBytes(32).toString('hex');
+      const hashedToken = await bcrypt.hash(rawRandomToken, 10);
 
-      await tx.inviteToken.create({
+      const inviteTokenRecord = await tx.inviteToken.create({
         data: {
-          tokenString: tok,
-          email: contactEmail,
+          tokenString: hashedToken,
+          email: dto.contactEmail,
           role: Role.ORG_ADMIN,
           orgId: org.id,
-          expiresAt,
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
         },
       });
 
-      const inviteLink = `http://localhost:5173/account/setup/org?token=${tok}`;
-
-      try {
-        await this.resend.emails.send({
-          from: 'onboarding@resend.dev',
-          to: contactEmail,
-          subject: 'Organization Setup Invitation',
-          html: `<p>Click here to setup your organization: <a href="${inviteLink}">${inviteLink}</a></p>`,
-        });
-      } catch (err) {
-        console.error(err);
-      }
-
-      return { success: true, orgId: org.id };
+      return {
+        success: true,
+        message: 'Organization created and invite token generated successfully.',
+        inviteToken: `${inviteTokenRecord.id}.${rawRandomToken}`,
+        orgId: org.id,
+      };
     });
   }
 
-  async inviteUser(orgId: string, dto: InviteUserDto) {
-    const { email, role, unitId } = dto;
+  async inviteUser(orgId: string, invitePayload: InviteUserDto) {
+    if (invitePayload.role === 'SUPER_ADMIN') {
+      throw new ForbiddenException('You cannot invite Super Admins to an organization.');
+    }
 
-    const tok = uuidv4();
-    const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 24);
+    if (invitePayload.role === 'UNIT_OPERATOR' && !invitePayload.unitId) {
+      throw new BadRequestException('Unit operators must be assigned to a specific unit.');
+    }
 
-    await this.prisma.inviteToken.create({
+    if (invitePayload.unitId) {
+      const unit = await this.prisma.unit.findUnique({ where: { id: invitePayload.unitId } });
+      if (!unit || unit.orgId !== orgId) {
+        throw new BadRequestException('Invalid unit ID for this organization.');
+      }
+    }
+
+    const rawRandomToken = randomBytes(32).toString('hex');
+    const hashedToken = await bcrypt.hash(rawRandomToken, 10);
+
+    const inviteTokenRecord = await this.prisma.inviteToken.create({
       data: {
-        tokenString: tok,
-        email,
-        role,
-        orgId,
-        unitId,
-        expiresAt,
+        tokenString: hashedToken,
+        email: invitePayload.email,
+        role: invitePayload.role,
+        orgId: orgId,
+        unitId: invitePayload.unitId,
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
       },
     });
 
-    const inviteLink = `http://localhost:5173/account/setup/user?token=${tok}`;
-
-    try {
-      await this.resend.emails.send({
-        from: 'onboarding@resend.dev',
-        to: email,
-        subject: 'User Setup Invitation',
-        html: `<p>Click here to setup your user account: <a href="${inviteLink}">${inviteLink}</a></p>`,
-      });
-    } catch (err) {
-      console.error(err);
-    }
-
-    return { success: true };
+    return {
+      success: true,
+      message: 'User invited successfully.',
+      inviteToken: `${inviteTokenRecord.id}.${rawRandomToken}`,
+    };
   }
 
   async getAllOrganizations() {

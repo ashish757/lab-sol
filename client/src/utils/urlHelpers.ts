@@ -1,4 +1,4 @@
-import { getClientApiPath } from '../../../shared/routes';
+import { getClientApiPath } from '../../../shared/routes.config';
 import { API_ENDPOINTS } from '../config/routesConfig';
 
 export function getDownloadDailyReportUrl(id?: string): string {

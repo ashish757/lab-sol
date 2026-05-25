@@ -4,7 +4,7 @@ import { useInviteOrganizationMutation } from '../store/api/apiSlice';
 export const SuperAdminDashboard = () => {
   const [orgName, setOrgName] = useState('');
   const [orgId, setOrgId] = useState('');
-  const [contactEmail, setContactEmail] = useState('');
+  const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [inviteOrg, { isLoading: loading }] = useInviteOrganizationMutation();
@@ -15,17 +15,17 @@ export const SuperAdminDashboard = () => {
     setSuccess(false);
 
     try {
-      const payload: any = { orgName, contactEmail };
+      const organizationSetupPayload: any = { orgName, email };
       if (orgId.trim() !== '') {
-        payload.orgId = orgId;
+        organizationSetupPayload.orgId = orgId;
       }
-      const res = await inviteOrg(payload).unwrap();
+      const response = await inviteOrg(organizationSetupPayload).unwrap();
 
-      if (res?.success) {
+      if (response?.success) {
         setSuccess(true);
         setOrgName('');
         setOrgId('');
-        setContactEmail('');
+        setEmail('');
       }
     } catch (err: any) {
       setError(err?.data?.message || 'Failed to invite organization');
@@ -79,15 +79,15 @@ export const SuperAdminDashboard = () => {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="contactEmail" className="text-xs font-bold text-slate-700 uppercase tracking-wide">
-              Contact Email
+            <label htmlFor="email" className="text-xs font-bold text-slate-700 uppercase tracking-wide">
+              Admin Email
             </label>
             <input
-              id="contactEmail"
+              id="email"
               type="email"
               required
-              value={contactEmail}
-              onChange={(e) => setContactEmail(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
             />
           </div>

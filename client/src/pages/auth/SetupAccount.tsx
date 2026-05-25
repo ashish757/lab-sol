@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { useGetTokenDetailsQuery, useSetupOrgMutation } from '../../store/api/apiSlice';
+import { useGetTokenDetailsQuery, useSetupAccountMutation } from '../../store/api/apiSlice';
 import { Building2, ArrowRight } from 'lucide-react';
 import { PAGES } from '../../config/routesConfig';
 
-export const OrgSetupPage = () => {
+export const SetupAccount = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const navigate = useNavigate();
@@ -13,13 +13,13 @@ export const OrgSetupPage = () => {
     skip: !token,
   });
 
-  const [setupOrg] = useSetupOrgMutation();
+  const [setupAccount] = useSetupAccountMutation();
 
-  const [form, setForm] = useState({ orgName: '', name: '', password: '', confirmPassword: '' });
+  const [form, setForm] = useState({ updatedOrgName: '', adminName: '', password: '', confirmPassword: '' });
 
   useEffect(() => {
     if (tokenDetails) {
-      setForm((prev) => ({ ...prev, orgName: tokenDetails.orgName || '' }));
+      setForm((prev) => ({ ...prev, updatedOrgName: tokenDetails.orgName || '' }));
     }
   }, [tokenDetails]);
 
@@ -43,10 +43,10 @@ export const OrgSetupPage = () => {
     }
 
     try {
-      await setupOrg({
+      await setupAccount({
         token,
-        orgName: form.orgName,
-        name: form.name,
+        updatedOrgName: form.updatedOrgName,
+        adminName: form.adminName,
         password: form.password,
       }).unwrap();
       
@@ -67,7 +67,7 @@ export const OrgSetupPage = () => {
           </div>
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900 tracking-tight">
-          Complete Organization Setup
+          Confirm {tokenDetails.orgName} Registration
         </h2>
         <p className="mt-2 text-center text-sm text-slate-600">
           Organization ID: <span className="font-mono text-xs bg-slate-200 px-2 py-1 rounded">{tokenDetails.orgId}</span>
@@ -76,14 +76,15 @@ export const OrgSetupPage = () => {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-xl sm:px-10 border border-slate-100">
+          <h3 className="text-lg font-medium text-slate-900 mb-6 text-center">Register your first org admin</h3>
           <form className="space-y-5" onSubmit={handleSubmit}>
             <div>
               <label className="block text-sm font-medium text-slate-700">Organization Name</label>
               <input
                 type="text"
                 required
-                value={form.orgName}
-                onChange={(e) => setForm({ ...form, orgName: e.target.value })}
+                value={form.updatedOrgName}
+                onChange={(e) => setForm({ ...form, updatedOrgName: e.target.value })}
                 className="mt-1 block w-full border border-slate-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
             </div>
@@ -93,20 +94,9 @@ export const OrgSetupPage = () => {
               <input
                 type="text"
                 required
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="Register your first org admin"
+                value={form.adminName}
+                onChange={(e) => setForm({ ...form, adminName: e.target.value })}
                 className="mt-1 block w-full border border-slate-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700">Admin Email</label>
-              <input
-                type="email"
-                disabled
-                value={tokenDetails.email}
-                className="mt-1 block w-full border border-slate-200 bg-slate-50 text-slate-500 rounded-lg shadow-sm py-2 px-3 sm:text-sm"
               />
             </div>
 

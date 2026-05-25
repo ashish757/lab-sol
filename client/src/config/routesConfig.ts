@@ -1,19 +1,19 @@
-import { getClientApiPath } from '../../../shared/routes';
+import { getClientApiPath, clientRoutes } from '../../../shared/routes.config';
 
 export const PAGES = {
-  LOGS_LIST: '/unit/dash/logs',
-  DATA_ENTRY: '/unit/dash/entry',
-  NEW_ANALYSIS: '/unit/dash/analysis/new',
-  ANALYSIS_REPORT: '/unit/dash/analysis/:id',
-  SETTINGS: '/settings',
-  SUPER_ADMIN_INVITE: '/admin/dash/invite',
-  LOGIN: '/login',
-  SETUP_ORG: '/account/setup/org',
-  SETUP_USER: '/account/setup/user',
-  ADMIN_DASHBOARD: '/admin/dash',
-  ADMIN_ORG_DETAILS: '/admin/dash/org/:id',
-  ORG_DASHBOARD: '/org/dash',
-  UNIT_DASHBOARD: '/unit/dash',
+  LOGS_LIST: clientRoutes.analysis.logsList,
+  DATA_ENTRY: clientRoutes.analysis.dataEntry,
+  NEW_ANALYSIS: clientRoutes.analysis.dataEntry,
+  ANALYSIS_REPORT: clientRoutes.analysis.report,
+  SETTINGS: clientRoutes.settings,
+  SUPER_ADMIN_INVITE: clientRoutes.admin.invite,
+  LOGIN: clientRoutes.auth.login,
+  SETUP_ORG: clientRoutes.auth.setupAccount,
+  SETUP_USER: clientRoutes.auth.setupUser,
+  ADMIN_DASHBOARD: clientRoutes.admin.dashboard,
+  ADMIN_ORG_DETAILS: clientRoutes.admin.orgDetails,
+  ORG_DASHBOARD: clientRoutes.org.dashboard,
+  UNIT_DASHBOARD: clientRoutes.unit.dashboard,
 } as const;
 
 export const getPagePath = {
@@ -30,12 +30,12 @@ export const getPagePath = {
 export const API_ENDPOINTS = {
   // Auth API
   LOGIN: getClientApiPath.auth.login(),
-  SETUP_ORG: getClientApiPath.auth.setupOrg(),
+  SETUP_ORG: getClientApiPath.auth.setupAccount(),
   SETUP_USER: getClientApiPath.auth.setupUser(),
   GET_TOKEN: getClientApiPath.auth.getToken,
 
   // Organizations API
-  INVITE_ORGANIZATION: getClientApiPath.organizations.invite(),
+  INVITE_ORGANIZATION: getClientApiPath.organizations.inviteOrg(),
   INVITE_USER: getClientApiPath.organizations.inviteUser,
   GET_ORGANIZATIONS: getClientApiPath.organizations.getAll(),
   GET_ORGANIZATION_BY_ID: getClientApiPath.organizations.getOne,

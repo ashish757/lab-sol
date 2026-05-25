@@ -13,10 +13,10 @@ import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { ReportsService } from './reports.service';
 import * as express from 'express';
-import { API_ROUTES } from '@shared/routes';
+import { apiRoutes } from '@shared/routes.config';
 import { InsertDailyLogDto } from '../dailyLogs/dto/dailyLog.dto';
 
-@Controller(API_ROUTES.REPORTS.BASE)
+@Controller(apiRoutes.reports.base)
 export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
@@ -24,7 +24,7 @@ export class ReportsController {
    * GET /api/reports/daily-logs/download
    * Streams a blank template download of the daily report.
    */
-  @Get(API_ROUTES.REPORTS.DOWNLOAD_TEMPLATE)
+  @Get(apiRoutes.reports.downloadTemplate)
   async downloadDailyReportTemplate(
     @Res() res: express.Response,
   ): Promise<void> {
@@ -44,7 +44,7 @@ export class ReportsController {
    * GET /api/reports/daily-logs/download/:id
    * Streams a populated daily report spreadsheet by database ID.
    */
-  @Get(API_ROUTES.REPORTS.DOWNLOAD_ONE)
+  @Get(apiRoutes.reports.downloadOne)
   @UseGuards(AuthGuard)
   async downloadDailyReport(
     @Param('id') id: string,
@@ -73,7 +73,7 @@ export class ReportsController {
     }
   }
 
-  @Post(API_ROUTES.REPORTS.SAVE_AND_GENERATE)
+  @Post(apiRoutes.reports.saveAndGenerate)
   @UseGuards(AuthGuard)
   async saveAndGenerateReport(
     @Body() dto: InsertDailyLogDto,

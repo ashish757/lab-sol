@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
-import { SetupOrgDto } from './dto/setupOrg.dto';
+import { SetupAccountDto } from './dto/setupAccount.dto';
 import { SetupUserDto } from './dto/setupUser.dto';
 
 @Injectable()
@@ -58,12 +58,23 @@ export class AuthService {
     };
   }
 
-  async setupOrg(dto: SetupOrgDto) {
+  async setupAccount(setupPayload: SetupAccountDto) {
+    const [tokenId, rawRandomToken] = setupPayload.token.split('.');
+
+    if (!tokenId || !rawRandomToken) {
+      throw new UnauthorizedException('Malformed invite token.');
+    }
+
     const tokenRecord = await this.prisma.inviteToken.findUnique({
-      where: { tokenString: dto.token },
+      where: { id: tokenId },
     });
 
     if (!tokenRecord || tokenRecord.isUsed) {
+      throw new UnauthorizedException('Invalid or expired token.');
+    }
+
+    const isTokenValid = await bcrypt.compare(rawRandomToken, tokenRecord.tokenString);
+    if (!isTokenValid) {
       throw new UnauthorizedException('Invalid or expired token.');
     }
 
@@ -72,41 +83,52 @@ export class AuthService {
     }
 
     return this.prisma.$transaction(async (tx) => {
-      // Mark token as used
-      await tx.inviteToken.update({
-        where: { id: tokenRecord.id },
-        data: { isUsed: true },
-      });
-
-      // Activate Org and update name
+      // Transaction Step 1: Update the Organization record
       await tx.organization.update({
         where: { id: tokenRecord.orgId },
-        data: { name: dto.orgName, status: 'ACTIVE' },
+        data: { name: setupPayload.updatedOrgName, status: 'ACTIVE' },
       });
 
-      // Create Admin User
-      const hashedPassword = await bcrypt.hash(dto.password, 10);
+      // Transaction Step 2: Hash the password and Create the User record
+      const hashedPassword = await bcrypt.hash(setupPayload.password, 10);
       const user = await tx.user.create({
         data: {
           email: tokenRecord.email,
-          name: dto.name,
+          name: setupPayload.adminName,
           password: hashedPassword,
-          role: tokenRecord.role,
+          role: 'ORG_ADMIN',
           orgId: tokenRecord.orgId,
           status: 'ACTIVE',
         },
+      });
+
+      // Transaction Step 3: Mark the InviteToken as used
+      await tx.inviteToken.update({
+        where: { id: tokenRecord.id },
+        data: { isUsed: true },
       });
 
       return { success: true, userId: user.id };
     });
   }
 
-  async setupUser(dto: SetupUserDto) {
+  async setupUser(setupPayload: SetupUserDto) {
+    const [tokenId, rawRandomToken] = setupPayload.token.split('.');
+
+    if (!tokenId || !rawRandomToken) {
+      throw new UnauthorizedException('Malformed invite token.');
+    }
+
     const tokenRecord = await this.prisma.inviteToken.findUnique({
-      where: { tokenString: dto.token },
+      where: { id: tokenId },
     });
 
     if (!tokenRecord || tokenRecord.isUsed) {
+      throw new UnauthorizedException('Invalid or expired token.');
+    }
+
+    const isTokenValid = await bcrypt.compare(rawRandomToken, tokenRecord.tokenString);
+    if (!isTokenValid) {
       throw new UnauthorizedException('Invalid or expired token.');
     }
 
@@ -122,11 +144,11 @@ export class AuthService {
       });
 
       // Create User
-      const hashedPassword = await bcrypt.hash(dto.password, 10);
+      const hashedPassword = await bcrypt.hash(setupPayload.password, 10);
       const user = await tx.user.create({
         data: {
           email: tokenRecord.email,
-          name: dto.name,
+          name: setupPayload.name,
           password: hashedPassword,
           role: tokenRecord.role,
           orgId: tokenRecord.orgId,
@@ -140,11 +162,22 @@ export class AuthService {
   }
 
   async getTokenDetails(token: string) {
+    const [tokenId, rawRandomToken] = token.split('.');
+
+    if (!tokenId || !rawRandomToken) {
+      throw new UnauthorizedException('Malformed invite token.');
+    }
+
     const tokenRecord = await this.prisma.inviteToken.findUnique({
-      where: { tokenString: token },
+      where: { id: tokenId },
     });
 
     if (!tokenRecord || tokenRecord.isUsed) {
+      throw new UnauthorizedException('Invalid or expired token.');
+    }
+
+    const isTokenValid = await bcrypt.compare(rawRandomToken, tokenRecord.tokenString);
+    if (!isTokenValid) {
       throw new UnauthorizedException('Invalid or expired token.');
     }
 

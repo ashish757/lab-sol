@@ -2,45 +2,45 @@ import { Body, Controller, Get, Param, Post, UseGuards, Req, ForbiddenException,
 import { OrganizationsService } from './organizations.service';
 import { InviteOrgDto } from './dto/inviteOrg.dto';
 import { InviteUserDto } from './dto/inviteUser.dto';
-import { API_ROUTES } from '@shared/routes';
+import { apiRoutes } from '@shared/routes.config';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
-@Controller(API_ROUTES.ORGANIZATIONS.BASE)
+@Controller(apiRoutes.organizations.base)
 export class OrganizationsController {
   constructor(private readonly orgService: OrganizationsService) {}
 
-  @Post(API_ROUTES.ORGANIZATIONS.INVITE)
+  @Post(apiRoutes.organizations.inviteOrg)
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
-  async invite(@Body() dto: InviteOrgDto) {
-    return this.orgService.inviteOrganization(dto);
+  async invite(@Body() invitePayload: InviteOrgDto) {
+    return this.orgService.inviteOrganization(invitePayload);
   }
 
-  @Post(API_ROUTES.ORGANIZATIONS.INVITE_USER)
+  @Post(apiRoutes.organizations.inviteUser)
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.ORG_ADMIN)
   async inviteUser(
     @Param('id', ParseUUIDPipe) orgId: string,
-    @Body() dto: InviteUserDto,
+    @Body() invitePayload: InviteUserDto,
     @Req() request: any,
   ) {
     if (request.user.orgId !== orgId) {
       throw new ForbiddenException('You can only invite users to your own organization.');
     }
-    return this.orgService.inviteUser(orgId, dto);
+    return this.orgService.inviteUser(orgId, invitePayload);
   }
 
-  @Get(API_ROUTES.ORGANIZATIONS.GET_ALL)
+  @Get(apiRoutes.organizations.getAll)
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
   async getAllOrganizations() {
     return this.orgService.getAllOrganizations();
   }
 
-  @Get(API_ROUTES.ORGANIZATIONS.GET_ONE)
+  @Get(apiRoutes.organizations.getOne)
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.ORG_ADMIN, Role.ORG_STAFF)
   async getOrganizationById(@Param('id') id: string, @Req() request: any) {
