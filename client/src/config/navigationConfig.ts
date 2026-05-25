@@ -1,11 +1,11 @@
-import { List, Settings, LayoutDashboard, UserPlus, Building, FileText } from 'lucide-react';
+import { List, Settings, LayoutDashboard, Building, FileText } from 'lucide-react';
 import { PAGES } from './routesConfig';
 import { Role } from '../types/auth';
 
 export const navigationConfig = {
   [Role.SUPER_ADMIN]: [
     { to: PAGES.ADMIN_DASHBOARD, icon: LayoutDashboard, label: 'Dashboard', end: true },
-    { to: PAGES.SUPER_ADMIN_INVITE, icon: UserPlus, label: 'Invite Admin', end: true },
+    { to: PAGES.SUPER_ADMIN_INVITE, icon: Building, label: 'Invite Organization', end: true },
     { to: PAGES.SETTINGS, icon: Settings, label: 'Settings', end: false },
   ],
   [Role.ORG_ADMIN]: [

@@ -3,6 +3,7 @@ import { useInviteOrganizationMutation } from '../store/api/apiSlice';
 
 export const SuperAdminDashboard = () => {
   const [orgName, setOrgName] = useState('');
+  const [orgId, setOrgId] = useState('');
   const [contactEmail, setContactEmail] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -14,11 +15,16 @@ export const SuperAdminDashboard = () => {
     setSuccess(false);
 
     try {
-      const res = await inviteOrg({ orgName, contactEmail }).unwrap();
+      const payload: any = { orgName, contactEmail };
+      if (orgId.trim() !== '') {
+        payload.orgId = orgId;
+      }
+      const res = await inviteOrg(payload).unwrap();
 
       if (res?.success) {
         setSuccess(true);
         setOrgName('');
+        setOrgId('');
         setContactEmail('');
       }
     } catch (err: any) {
@@ -29,7 +35,7 @@ export const SuperAdminDashboard = () => {
   return (
     <div className="flex-1 flex flex-col bg-slate-50 overflow-y-auto p-8">
       <div className="max-w-md mx-auto w-full bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-        <h1 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-tight">Super Admin Dashboard</h1>
+        <h1 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-tight">Invite Organization</h1>
         
         {success && (
           <div className="mb-6 p-4 bg-emerald-50 text-emerald-700 rounded-lg border border-emerald-200 text-sm font-semibold">
@@ -54,6 +60,20 @@ export const SuperAdminDashboard = () => {
               required
               value={orgName}
               onChange={(e) => setOrgName(e.target.value)}
+              className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="orgId" className="text-xs font-bold text-slate-700 uppercase tracking-wide">
+              Organization ID (Optional)
+            </label>
+            <input
+              id="orgId"
+              type="text"
+              value={orgId}
+              onChange={(e) => setOrgId(e.target.value)}
+              placeholder="Leave empty to auto-generate"
               className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
             />
           </div>
