@@ -5,12 +5,14 @@ import { InviteUserDto } from './dto/inviteUser.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { Role } from '@prisma/client';
 import { MagicLinkService } from '../auth/magicLink.service';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class OrganizationsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly magicLinkService: MagicLinkService,
+    private readonly mailService: MailService,
   ) {}
 
   async inviteOrganization(dto: InviteOrgDto) {
@@ -33,6 +35,8 @@ export class OrganizationsService {
         orgId: org.id,
         role: Role.ORG_ADMIN,
       });
+
+      await this.mailService.sendOrgAdminInvite(dto.contactEmail, dto.orgName, rawToken);
 
       return {
         success: true,
