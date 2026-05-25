@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux';
-import type { RootState } from '../store/store';
-import { Role } from '../types/auth';
+import type { RootState } from '../../store/store';
+import { Role } from '../../types/auth';
 
 interface RoleGuardProps {
   allowedRoles: Role[];

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
-import { useInviteUserMutation } from '../../../store/api/apiSlice';
+import { useInviteUserMutation } from '../../store/api/apiSlice';
 
 interface InviteUserModalProps {
   isOpen: boolean;

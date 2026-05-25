@@ -2,15 +2,15 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import type { RootState } from './store/store';
 import { Role } from './types/auth';
-import './App.css';
+import './assets/App.css';
 import { AppLayout } from './components/layout/AppLayout';
 import { NotFoundPage } from './pages/NotFoundPage';
-import { LoginPage } from './pages/LoginPage';
+import { LoginPage } from './pages/auth/LoginPage';
 import { SetupAccount } from './pages/auth/SetupAccount';
 import { UserSetupPage } from './pages/auth/UserSetupPage';
 import { UnauthorizedPage } from './pages/UnauthorizedPage';
 import { StaffSetupAccount } from './pages/auth/StaffSetupAccount';
-import { ProtectedRoute } from './components/ProtectedRoute';
+import { ProtectedRoute } from './components/guards/ProtectedRoute';
 import { routeConfiguration } from './config/routeConfiguration';
 import { PAGES } from './config/routesConfig';
 

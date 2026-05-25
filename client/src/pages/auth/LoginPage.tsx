@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { getPagePath } from '../config/routesConfig';
-import { login } from '../store/slices/authSlice';
-import { useLoginMutation } from '../store/api/apiSlice';
+import { getPagePath } from '../../config/routesConfig';
+import { login } from '../../store/slices/authSlice';
+import { useLoginMutation } from '../../store/api/apiSlice';
 
 export const LoginPage = () => {
   const [email, setEmail] = useState('admin@example.com');

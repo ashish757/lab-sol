@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { Suspense } from 'react';
 import type { RootState } from '../../store/store';
 import { navigationConfig } from '../../config/navigationConfig';
-import { LoadingIndicator } from '../ui/LoadingIndicator';
+import { LoadingIndicator } from '../common/LoadingIndicator';
 import { Role } from '../../types/auth';
 
 export const AppLayout = () => {

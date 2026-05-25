@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
-import { useCreateUnitMutation } from '../../../store/api/apiSlice';
+import { useCreateUnitMutation } from '../../store/api/apiSlice';
 
 interface CreateUnitModalProps {
   isOpen: boolean;

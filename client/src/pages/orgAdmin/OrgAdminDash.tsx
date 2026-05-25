@@ -3,8 +3,8 @@ import { useGetOrganizationByIdQuery, useCancelUserInviteMutation, useInviteUser
 import { Users, Network, Mail, Building, Plus, Trash2, RefreshCw } from 'lucide-react';
 import type { RootState } from '../../store/store';
 import { useState } from 'react';
-import { CreateUnitModal } from './components/CreateUnitModal';
-import { InviteUserModal } from './components/InviteUserModal';
+import { CreateUnitModal } from '../../components/common/CreateUnitModal';
+import { InviteUserModal } from '../../components/common/InviteUserModal';
 
 export const OrgAdminDash = () => {
   const { user } = useSelector((state: RootState) => state.auth);

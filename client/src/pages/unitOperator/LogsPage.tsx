@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
 import { useMemo } from 'react';
-import { useGetDailyLogsQuery } from '../store/api/apiSlice';
-import type { DailyLogResponse } from '../types/dailyLogs';
+import { useGetDailyLogsQuery } from '../../store/api/apiSlice';
+import type { DailyLogResponse } from '../../types/dailyLogs';
 import { FileText, AlertCircle, RefreshCw, Layers } from 'lucide-react';
-import { getPagePath } from '../config/routesConfig';
+import { getPagePath } from '../../config/routesConfig';
 
 function formatDate(dateStr: string): string {
   try {

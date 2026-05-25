@@ -4,11 +4,11 @@ import {
   CheckCircle2, Calendar, ArrowLeft, 
   Plus, ShieldAlert, Database, Download
 } from 'lucide-react';
-import { useUpsertDailyLogMutation, useGetDailyLogByIdQuery } from '../store/api/apiSlice';
-import { PAGES, getPagePath } from '../config/routesConfig';
-import { getDownloadDailyReportUrl } from '../utils/urlHelpers';
-import { RoleGuard } from '../components/RoleGuard';
-import { Role } from '../types/auth';
+import { useUpsertDailyLogMutation, useGetDailyLogByIdQuery } from '../../store/api/apiSlice';
+import { PAGES, getPagePath } from '../../config/routesConfig';
+import { getDownloadDailyReportUrl } from '../../utils/urlHelpers';
+import { RoleGuard } from '../../components/guards/RoleGuard';
+import { Role } from '../../types/auth';
 
 export const AnalysisReportPage = () => {
   const { id } = useParams<{ id: string }>();

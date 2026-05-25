@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { analysisSchema, type AnalysisSchema } from '../types/analysisSchema';
-import { analysisConfig, getAllSectionIds } from '../config/analysisConfig';
-import { useScrollSpy } from '../hooks/useScrollSpy';
-import { FormSidebar } from '../components/analysis/FormSidebar';
-import { FormSection } from '../components/analysis/FormSection';
-import { useUpsertDailyLogMutation, useGetDailyLogsByDateQuery, useSaveAndGenerateReportMutation } from '../store/api/apiSlice';
+import { analysisSchema, type AnalysisSchema } from '../../types/analysisSchema';
+import { analysisConfig, getAllSectionIds } from '../../config/analysisConfig';
+import { useScrollSpy } from '../../hooks/useScrollSpy';
+import { FormSidebar } from '../../components/analysis/FormSidebar';
+import { FormSection } from '../../components/analysis/FormSection';
+import { useUpsertDailyLogMutation, useGetDailyLogsByDateQuery, useSaveAndGenerateReportMutation } from '../../store/api/apiSlice';
 
 const getInitialValues = () => {
   const today = new Date();

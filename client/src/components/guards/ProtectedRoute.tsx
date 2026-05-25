@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
-import type { RootState } from '../store/store';
-import { Role } from '../types/auth';
+import type { RootState } from '../../store/store';
+import { Role } from '../../types/auth';
 
 interface ProtectedRouteProps {
   component: React.ComponentType;

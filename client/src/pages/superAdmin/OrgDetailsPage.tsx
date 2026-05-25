@@ -3,7 +3,7 @@ import { useGetOrganizationByIdQuery } from '../../store/api/apiSlice';
 import { ArrowLeft, Users, Network, Mail } from 'lucide-react';
 import { getPagePath } from '../../config/routesConfig';
 
-export const OrgDetailsPage = () => {
+export const SuperAdminOrgDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: org, isLoading, error } = useGetOrganizationByIdQuery(id as string, {

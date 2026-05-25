@@ -13,7 +13,7 @@ export const navigationConfig = {
     { to: PAGES.SETTINGS, icon: Settings, label: 'Settings', end: false },
   ],
   [Role.ORG_STAFF]: [
-    { to: PAGES.ORG_DASHBOARD, icon: Building, label: 'Organization', end: true },
+    { to: PAGES.STAFF_DASHBOARD, icon: Building, label: 'Organization', end: true },
     { to: PAGES.SETTINGS, icon: Settings, label: 'Settings', end: false },
   ],
   [Role.UNIT_OPERATOR]: [

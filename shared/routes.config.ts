@@ -56,6 +56,9 @@ export const clientRoutes = {
   org: {
     dashboard: '/org/dash',
   },
+  staff: {
+    dashboard: '/staff/dash',
+  },
   unit: {
     dashboard: '/unit/dash',
   },

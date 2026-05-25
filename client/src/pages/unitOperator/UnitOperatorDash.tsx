@@ -5,7 +5,7 @@ import { ShieldCheck, Network, ArrowRight, Activity, TrendingUp, Calendar, Calen
 import { Link, useNavigate } from 'react-router-dom';
 import { PAGES, getPagePath } from '../../config/routesConfig';
 import type { DailyLogResponse } from '../../types/dailyLogs';
-import { RoleGuard } from '../../components/RoleGuard';
+import { RoleGuard } from '../../components/guards/RoleGuard';
 import { Role } from '../../types/auth';
 
 export const UnitOpDash = () => {

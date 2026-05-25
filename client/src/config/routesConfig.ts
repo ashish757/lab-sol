@@ -14,6 +14,7 @@ export const PAGES = {
   ADMIN_ORG_DETAILS: clientRoutes.admin.orgDetails,
   ORG_DASHBOARD: clientRoutes.org.dashboard,
   UNIT_DASHBOARD: clientRoutes.unit.dashboard,
+  STAFF_DASHBOARD: clientRoutes.staff.dashboard,
   STAFF_SETUP: clientRoutes.auth.staffSetup,
 } as const;
 
