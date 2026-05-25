@@ -10,9 +10,8 @@ const OrgAdminDash = lazy(() => import('../pages/orgAdmin/OrgAdminDash').then(m 
 const OrgStaffDash = lazy(() => import('../pages/orgStaff/OrgStaffDash').then(m => ({ default: m.OrgStaffDash })));
 
 const UnitOpDash = lazy(() => import('../pages/unitOperator/UnitOperatorDash').then(m => ({ default: m.UnitOpDash })));
-const LogsPage = lazy(() => import('../pages/unitOperator/LogsPage').then(m => ({ default: m.LogsPage })));
-const AnalysisPage = lazy(() => import('../pages/unitOperator/AnalysisPage').then(m => ({ default: m.AnalysisPage })));
-const AnalysisReportPage = lazy(() => import('../pages/unitOperator/AnalysisPage').then(m => ({ default: m.AnalysisPage })));
+const LogsPage = lazy(() => import('../pages/unitOperator/LogListPage').then(m => ({ default: m.LogsPage })));
+const NewLogPage = lazy(() => import('../pages/unitOperator/NewLogPage').then(m => ({ default: m.NewLogPage })));
 const SettingsPage = lazy(() => import('../pages/SettingsPage').then(m => ({ default: m.SettingsPage })));
 
 const allRoles = [Role.SUPER_ADMIN, Role.ORG_ADMIN, Role.ORG_STAFF, Role.UNIT_OPERATOR];
@@ -24,9 +23,7 @@ export const routeConfiguration = [
   { path: PAGES.ORG_DASHBOARD, component: OrgAdminDash, allowedRoles: [Role.ORG_ADMIN] },
   { path: PAGES.STAFF_DASHBOARD, component: OrgStaffDash, allowedRoles: [Role.ORG_STAFF] },
   { path: PAGES.UNIT_DASHBOARD, component: UnitOpDash, allowedRoles: [Role.UNIT_OPERATOR] },
-  { path: PAGES.DATA_ENTRY, component: AnalysisPage, allowedRoles: [Role.UNIT_OPERATOR] },
+  { path: PAGES.DATA_ENTRY, component: NewLogPage, allowedRoles: [Role.UNIT_OPERATOR] },
   { path: PAGES.LOGS_LIST, component: LogsPage, allowedRoles: [Role.UNIT_OPERATOR, Role.ORG_ADMIN, Role.ORG_STAFF] },
-  { path: PAGES.NEW_ANALYSIS, component: AnalysisReportPage, allowedRoles: [Role.UNIT_OPERATOR] },
-  { path: PAGES.ANALYSIS_REPORT, component: AnalysisReportPage, allowedRoles: [Role.UNIT_OPERATOR, Role.ORG_ADMIN, Role.ORG_STAFF] },
   { path: PAGES.SETTINGS, component: SettingsPage, allowedRoles: allRoles },
 ];

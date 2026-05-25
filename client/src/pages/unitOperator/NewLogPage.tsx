@@ -30,7 +30,7 @@ const getInitialValues = () => {
   };
 };
 
-export const AnalysisPage = () => {
+export const NewLogPage = () => {
   const methods = useForm<AnalysisSchema>({
     resolver: zodResolver(analysisSchema),
     mode: 'onBlur',
