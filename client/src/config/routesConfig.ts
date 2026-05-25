@@ -1,10 +1,10 @@
 import { getClientApiPath, clientRoutes } from '../../../shared/routes.config';
 
 export const PAGES = {
-  LOGS_LIST: clientRoutes.analysis.logsList,
-  DATA_ENTRY: clientRoutes.analysis.dataEntry,
-  NEW_ANALYSIS: clientRoutes.analysis.dataEntry,
-  ANALYSIS_REPORT: clientRoutes.analysis.report,
+  LOGS_LIST: clientRoutes.unit.logsList,
+  DATA_ENTRY: clientRoutes.unit.dataEntry,
+  NEW_ANALYSIS: clientRoutes.unit.dataEntry,
+  ANALYSIS_REPORT: clientRoutes.unit.report,
   SETTINGS: clientRoutes.settings,
   SUPER_ADMIN_INVITE: clientRoutes.admin.invite,
   LOGIN: clientRoutes.auth.login,
