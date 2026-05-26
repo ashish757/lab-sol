@@ -59,10 +59,16 @@ export const NewLogPage = () => {
     let sLogId = undefined;
 
     if (Array.isArray(logs) && selectedDate) {
-      const sortedLogs = [...logs].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      const sortedLogs = [...logs].sort((a, b) => {
+        const d1 = new Date(b.createdAt || (b as any).date || (b as any).logDate).getTime();
+        const d2 = new Date(a.createdAt || (a as any).date || (a as any).logDate).getTime();
+        return d1 - d2;
+      });
       
       for (const log of sortedLogs) {
-        const logDateStr = new Date(log.createdAt).toISOString().split('T')[0];
+        const logDateVal = log.createdAt || (log as any).date || (log as any).logDate;
+        if (!logDateVal) continue;
+        const logDateStr = new Date(logDateVal).toISOString().split('T')[0];
         
         if (logDateStr === selectedDate) {
           status = log.status;
@@ -82,7 +88,11 @@ export const NewLogPage = () => {
 
   useEffect(() => {
     if (Array.isArray(logs)) {
-      const log = logs.find(l => new Date(l.date).toISOString().split('T')[0] === selectedDate);
+      const log = logs.find(l => {
+        const logDateVal = l.createdAt || (l as any).date || (l as any).logDate;
+        if (!logDateVal) return false;
+        return new Date(logDateVal).toISOString().split('T')[0] === selectedDate;
+      });
       if (log) {
         const parsedMetrics = typeof log.payload === 'string' ? JSON.parse(log.payload) : log.payload;
         methods.reset({ ...initialValues, ...parsedMetrics, todayDate: selectedDate });
@@ -105,7 +115,7 @@ export const NewLogPage = () => {
     const data = methods.getValues();
     const { todayDate, ...rest } = data;
     const payload = {
-      date: todayDate as string ?? new Date().toISOString().slice(0, 10),
+      createdAt: todayDate as string ?? new Date().toISOString().slice(0, 10),
       payload: rest as Record<string, unknown>,
     };
 
@@ -163,7 +173,11 @@ export const NewLogPage = () => {
 
   const handleResetData = () => {
     if (Array.isArray(logs)) {
-      const log = logs.find(l => new Date(l.createdAt).toISOString().split('T')[0] === selectedDate);
+      const log = logs.find(l => {
+        const logDateVal = l.createdAt || (l as any).date || (l as any).logDate;
+        if (!logDateVal) return false;
+        return new Date(logDateVal).toISOString().split('T')[0] === selectedDate;
+      });
       if (log) {
         const parsedMetrics = typeof log.payload === 'string' ? JSON.parse(log.payload) : log.payload;
         methods.reset({ ...initialValues, ...parsedMetrics, todayDate: selectedDate });
@@ -175,9 +189,17 @@ export const NewLogPage = () => {
     if (!Array.isArray(logs)) return;
     
     // Find the most recent locked log BEFORE the selectedDate
-    const sortedLogs = [...logs].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    const sortedLogs = [...logs].sort((a, b) => {
+      const d1 = new Date(b.createdAt || (b as any).date || (b as any).logDate).getTime();
+      const d2 = new Date(a.createdAt || (a as any).date || (a as any).logDate).getTime();
+      return d1 - d2;
+    });
     const lastLockedLog = sortedLogs.find(
-      (log) => new Date(log.createdAt).toISOString().split('T')[0] < selectedDate && log.status === 'LOCKED'
+      (log) => {
+        const logDateVal = log.createdAt || (log as any).date || (log as any).logDate;
+        if (!logDateVal) return false;
+        return new Date(logDateVal).toISOString().split('T')[0] < selectedDate && log.status === 'LOCKED';
+      }
     );
 
     if (lastLockedLog) {

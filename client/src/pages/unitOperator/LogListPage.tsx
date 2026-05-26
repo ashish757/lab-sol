@@ -7,7 +7,8 @@ import type { DailyLogResponse } from '../../types/dailyLogs';
 import { FileText, AlertCircle, RefreshCw, Layers, Filter, Activity, TrendingUp, Clock } from 'lucide-react';
 import { getPagePath } from '../../config/routesConfig';
 
-function formatDate(dateStr: string): string {
+function formatDate(dateStr: string | null | undefined): string {
+  if (!dateStr) return '—';
   try {
     return new Intl.DateTimeFormat('en-IN', {
       day: '2-digit',
@@ -85,7 +86,7 @@ export const LogsPage = () => {
       count: logs.length,
       totalCane: Math.round(totalCane),
       totalSugar: Math.round(totalSugar),
-      latest: formatDate(logs[0].logDate)
+      latest: logs.length > 0 ? formatDate(logs[0].createdAt || (logs[0] as any).date || (logs[0] as any).logDate) : '—'
     };
   }, [logs]);
 
