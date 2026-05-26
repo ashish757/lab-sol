@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux';
-import { useGetOrganizationByIdQuery, useCancelUserInviteMutation, useInviteUserMutation } from '../../store/api/apiSlice';
+import { useGetOrganizationByIdQuery, useCancelUserInviteMutation, useInviteUserMutation, useUpdateUnitMutation, useDeleteUnitMutation, useUpdateUserMutation } from '../../store/api/apiSlice';
 import { Users, Network, Mail, Building, Plus, Trash2, RefreshCw, MoreVertical, Search, Filter } from 'lucide-react';
 import type { RootState } from '../../store/store';
 import { useState } from 'react';
@@ -20,7 +20,7 @@ const MetricCard = ({ title, value, icon: Icon, colorClass }: { title: string, v
   );
 };
 
-const UnitListItem = ({ unit, openDropdown, setOpenDropdown }: { unit: any, openDropdown: string | null, setOpenDropdown: (id: string | null) => void }) => {
+const UnitListItem = ({ unit, openDropdown, setOpenDropdown, onUpdate, onDelete }: { unit: any, openDropdown: string | null, setOpenDropdown: (id: string | null) => void, onUpdate: (unit: any) => void, onDelete: (id: string) => void }) => {
   const isDropdownOpen = openDropdown === unit.id;
   
   return (
@@ -38,8 +38,8 @@ const UnitListItem = ({ unit, openDropdown, setOpenDropdown }: { unit: any, open
         </button>
         {isDropdownOpen && (
           <div className="absolute right-8 top-12 w-48 bg-white border border-slate-200 rounded-xl shadow-lg py-1 z-10">
-            <button className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 font-medium">Edit Name</button>
-            <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-medium">Remove</button>
+            <button onClick={() => { setOpenDropdown(null); onUpdate(unit); }} className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 font-medium">Edit Name</button>
+            <button onClick={() => { setOpenDropdown(null); onDelete(unit.id); }} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-medium">Remove</button>
           </div>
         )}
       </div>
@@ -47,7 +47,7 @@ const UnitListItem = ({ unit, openDropdown, setOpenDropdown }: { unit: any, open
   );
 };
 
-const UserListItem = ({ user, handleCancelInvite, handleResendInvite, isCancelling, isResending, openDropdown, setOpenDropdown }: any) => {
+const UserListItem = ({ user, handleCancelInvite, handleResendInvite, isCancelling, isResending, openDropdown, setOpenDropdown, onRoleChange, onUnitChange, onDeactivate }: any) => {
   const isDropdownOpen = openDropdown === user.id;
 
   return (
@@ -65,7 +65,7 @@ const UserListItem = ({ user, handleCancelInvite, handleResendInvite, isCancelli
         <p className="text-xs text-slate-500 font-medium mt-0.5">Last Login: 2 hours ago</p>
         {user.role === 'UNIT_OPERATOR' && (
           <span className="inline-block mt-1.5 px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold rounded uppercase tracking-wide">
-            Assigned: Acme Factory Alpha
+            {user.unit?.name || user.unitId || 'Unassigned'}
           </span>
         )}
       </div>
@@ -103,11 +103,11 @@ const UserListItem = ({ user, handleCancelInvite, handleResendInvite, isCancelli
             </button>
           </div>
         )}
-        {isDropdownOpen && (
+        {isDropdownOpen && !user.isInvite && (
           <div className="absolute right-8 top-12 w-48 bg-white border border-slate-200 rounded-xl shadow-lg py-1 z-10">
-            <button className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 font-medium">Change Role</button>
-            <button className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 font-medium">Reassign Unit</button>
-            <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-medium">Deactivate</button>
+            <button onClick={() => { setOpenDropdown(null); onRoleChange(user); }} className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 font-medium">Change Role</button>
+            <button onClick={() => { setOpenDropdown(null); onUnitChange(user); }} className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 font-medium">Reassign Unit</button>
+            <button onClick={() => { setOpenDropdown(null); onDeactivate(user.id); }} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-medium">Deactivate</button>
           </div>
         )}
       </div>
@@ -130,6 +130,10 @@ export const OrgAdminDash = () => {
   const [userRoleFilter, setUserRoleFilter] = useState('ALL');
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
+  const [updateUnit] = useUpdateUnitMutation();
+  const [deleteUnit] = useDeleteUnitMutation();
+  const [updateUser] = useUpdateUserMutation();
+
   const handleCancelInvite = async (tokenId: string) => {
     if (confirm('Are you sure you want to cancel this user invitation?')) {
       try {
@@ -151,6 +155,70 @@ export const OrgAdminDash = () => {
       alert('Invitation resent successfully.');
     } catch (err: any) {
       alert(err?.data?.message || 'Failed to resend invitation');
+    }
+  };
+
+  const handleUpdateUnit = async (unit: any) => {
+    const newName = prompt('Enter new name for the unit:', unit.name);
+    if (newName && newName !== unit.name) {
+      try {
+        await updateUnit({ id: unit.id, data: { name: newName } }).unwrap();
+      } catch (err: any) {
+        alert(err?.data?.message || 'Failed to update unit');
+      }
+    }
+  };
+
+  const handleDeleteUnit = async (unitId: string) => {
+    if (confirm('Are you sure you want to remove this unit?')) {
+      try {
+        await deleteUnit(unitId).unwrap();
+      } catch (err: any) {
+        alert(err?.data?.message || 'Failed to delete unit');
+      }
+    }
+  };
+
+  const handleRoleChange = async (targetUser: any) => {
+    const newRole = prompt('Enter new role (ORG_ADMIN, ORG_STAFF, UNIT_OPERATOR):', targetUser.role);
+    if (newRole && ['ORG_ADMIN', 'ORG_STAFF', 'UNIT_OPERATOR'].includes(newRole)) {
+      try {
+        await updateUser({ id: targetUser.id, data: { role: newRole } }).unwrap();
+      } catch (err: any) {
+        alert(err?.data?.message || 'Failed to update role');
+      }
+    } else if (newRole) {
+      alert('Invalid role specified.');
+    }
+  };
+
+  const handleUnitChange = async (targetUser: any) => {
+    const unitsList = org?.units?.map((u: any) => `- ${u.name}`).join('\\n') || '';
+    const unitName = prompt(`Enter new Unit Name from the list below:\\n\\n${unitsList}`, targetUser.unit?.name || '');
+    
+    if (unitName !== null) {
+      const selectedUnit = org?.units?.find((u: any) => u.name.toLowerCase() === unitName.trim().toLowerCase());
+      
+      if (!selectedUnit && unitName.trim() !== '') {
+        alert('Unit name not found in the list. Please check your spelling.');
+        return;
+      }
+      
+      try {
+        await updateUser({ id: targetUser.id, data: { unitId: selectedUnit ? selectedUnit.id : null } }).unwrap();
+      } catch (err: any) {
+        alert(err?.data?.message || 'Failed to reassign unit');
+      }
+    }
+  };
+
+  const handleDeactivate = async (targetUserId: string) => {
+    if (confirm('Are you sure you want to deactivate this user?')) {
+      try {
+        await updateUser({ id: targetUserId, data: { status: 'INACTIVE' } }).unwrap();
+      } catch (err: any) {
+        alert(err?.data?.message || 'Failed to deactivate user');
+      }
     }
   };
 
@@ -252,6 +320,8 @@ export const OrgAdminDash = () => {
                     setOpenDropdown={(id) => {
                       setTimeout(() => setOpenDropdown(id), 0);
                     }} 
+                    onUpdate={handleUpdateUnit}
+                    onDelete={handleDeleteUnit}
                   />
                 ))}
               </ul>
@@ -326,6 +396,9 @@ export const OrgAdminDash = () => {
                     setOpenDropdown={(id: string | null) => {
                       setTimeout(() => setOpenDropdown(id), 0);
                     }}
+                    onRoleChange={handleRoleChange}
+                    onUnitChange={handleUnitChange}
+                    onDeactivate={handleDeactivate}
                   />
                 ))}
               </ul>

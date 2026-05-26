@@ -41,6 +41,7 @@ export const API_ENDPOINTS = {
   // Users API
   INVITE_USER: getClientApiPath.users.invite(),
   CANCEL_USER_INVITE: (tokenId: string) => getClientApiPath.users.cancelInvite(tokenId),
+  UPDATE_USER: (id: string | number) => getClientApiPath.users.update(id),
 
   // Organizations API
   INVITE_ORGANIZATION: getClientApiPath.organizations.inviteOrg(),
@@ -51,6 +52,8 @@ export const API_ENDPOINTS = {
   // Units API
   CREATE_UNIT: getClientApiPath.units.create(),
   GET_UNIT_BY_ID: getClientApiPath.units.getOne,
+  UPDATE_UNIT: (id: string | number) => getClientApiPath.units.update(id),
+  DELETE_UNIT: (id: string | number) => getClientApiPath.units.delete(id),
   DAILY_LOGS: getClientApiPath.dailyLogs.base(),
   FETCH_UNIT_LOGS: (unitId: string) => `/api/daily-logs/unit/${unitId}`,
   UPSERT_UNIT_LOG: (unitId: string) => `/api/daily-logs/unit/${unitId}/upsert`,

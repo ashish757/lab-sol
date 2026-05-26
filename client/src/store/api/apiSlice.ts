@@ -57,11 +57,34 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Organizations'],
     }),
+    updateUser: builder.mutation({
+      query: ({ id, data }) => ({
+        url: API_ENDPOINTS.UPDATE_USER(id),
+        method: 'PATCH',
+        body: data,
+      }),
+      invalidatesTags: ['Organizations'],
+    }),
     createUnit: builder.mutation({
       query: (body) => ({
         url: API_ENDPOINTS.CREATE_UNIT,
         method: 'POST',
         body,
+      }),
+      invalidatesTags: ['Units', 'Organizations'],
+    }),
+    updateUnit: builder.mutation({
+      query: ({ id, data }) => ({
+        url: API_ENDPOINTS.UPDATE_UNIT(id),
+        method: 'PATCH',
+        body: data,
+      }),
+      invalidatesTags: ['Units', 'Organizations'],
+    }),
+    deleteUnit: builder.mutation({
+      query: (id: string) => ({
+        url: API_ENDPOINTS.DELETE_UNIT(id),
+        method: 'DELETE',
       }),
       invalidatesTags: ['Units', 'Organizations'],
     }),
@@ -177,7 +200,10 @@ export const {
   useGetUnitByIdQuery,
   useInviteUserMutation,
   useCancelUserInviteMutation,
+  useUpdateUserMutation,
   useCreateUnitMutation,
+  useUpdateUnitMutation,
+  useDeleteUnitMutation,
   useSetupAccountMutation,
   useSetupUserMutation,
   useActivateStaffMutation,

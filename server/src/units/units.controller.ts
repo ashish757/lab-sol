@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Req, UseGuards, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Req, UseGuards, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { UnitsService } from './units.service';
 import { apiRoutes } from '@shared/routes.config';
 import { AuthGuard } from '../auth/guards/auth.guard';
@@ -39,5 +39,21 @@ export class UnitsController {
     }
 
     return unit;
+  }
+
+  @Patch(apiRoutes.units.update)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ORG_ADMIN)
+  async updateUnit(@Param('id') id: string, @Body() dto: { name: string }, @Req() req: any) {
+    const orgId = req.user.orgId;
+    return this.unitsService.updateUnit(id, orgId, dto.name);
+  }
+
+  @Delete(apiRoutes.units.delete)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ORG_ADMIN)
+  async deleteUnit(@Param('id') id: string, @Req() req: any) {
+    const orgId = req.user.orgId;
+    return this.unitsService.deleteUnit(id, orgId);
   }
 }

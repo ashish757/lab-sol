@@ -55,6 +55,8 @@ model Unit {
   org   Organization       @relation(fields: [orgId], references: [id])
   users User[]
   logs  DailyLog[]
+
+  @@unique([name, orgId])
 }
 
 model User {

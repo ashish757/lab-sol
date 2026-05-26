@@ -14,6 +14,7 @@ export const apiRoutes = {
     base: 'api/users',
     invite: 'invite',
     cancelInvite: 'invite/:tokenId',
+    update: ':id',
   },
   organizations: {
     base: 'api/organizations',
@@ -26,6 +27,8 @@ export const apiRoutes = {
     base: 'api/units',
     create: '',
     getOne: ':id',
+    update: ':id',
+    delete: ':id',
   },
   dailyLogs: {
     base: 'api/daily-logs',
@@ -82,6 +85,7 @@ export const getClientApiPath = {
   users: {
     invite: () => `/${apiRoutes.users.base}/${apiRoutes.users.invite}`,
     cancelInvite: (tokenId: string) => `/${apiRoutes.users.base}/invite/${tokenId}`,
+    update: (id: string | number) => `/${apiRoutes.users.base}/${id}`,
   },
   organizations: {
     inviteOrg: () => `/${apiRoutes.organizations.base}/${apiRoutes.organizations.inviteOrg}`,
@@ -92,6 +96,8 @@ export const getClientApiPath = {
   units: {
     create: () => `/${apiRoutes.units.base}`,
     getOne: (id: string | number) => `/${apiRoutes.units.base}/${id}`,
+    update: (id: string | number) => `/${apiRoutes.units.base}/${id}`,
+    delete: (id: string | number) => `/${apiRoutes.units.base}/${id}`,
   },
   dailyLogs: {
     base: () => `/${apiRoutes.dailyLogs.base}`,
