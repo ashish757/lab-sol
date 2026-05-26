@@ -8,6 +8,7 @@ export interface FieldConfig {
   unit?: string;
   subLabel?: string;
   required?: boolean;
+  isCalculated?: boolean;
 }
 
 export interface SubGroupConfig {
@@ -56,7 +57,7 @@ export const analysisConfig: GroupConfig[] = [
       { id: "seasonOffDate", label: "Season Off Date", type: "date" },
       { id: "seasonOffTime", label: "Season Off Time", type: "time" },
       { id: "todayDate", label: "Today Date", type: "date", required: true },
-      { id: "cropDay", label: "Crop day", type: "number", unit: "Nos" },
+      { id: "cropDay", label: "Crop day", type: "number", unit: "Nos", isCalculated: true },
     ]
   },
   {
@@ -79,7 +80,7 @@ export const analysisConfig: GroupConfig[] = [
       { id: "road", label: "Road", type: "number", unit: "Qtls" },
       { id: "closingBal", label: "Closing Balance", type: "number", unit: "Qtls" },
       { id: "earlyVariety", label: "Early Variety", type: "number", unit: "Qtls" },
-      { id: "totalCaneCrushed", label: "Total Cane Crushed", type: "number", unit: "Qtls" },
+      { id: "totalCaneCrushed", label: "Total Cane Crushed", type: "number", unit: "Qtls", isCalculated: true },
       { id: "divertedSyrup", label: "Diverted Syrup", type: "number", unit: "Qtls" },
       { id: "molassesSentOut", label: "Molasses Sent Out", type: "number", unit: "Qtls" },
       { id: "imbibition", label: "Imbibition", type: "number", unit: "Qtls" },
@@ -93,7 +94,7 @@ export const analysisConfig: GroupConfig[] = [
       { id: "rawSugar", label: "Raw Sugar", type: "number", unit: "Qtls" },
       { id: "llBold", label: "LL Bold", type: "number", unit: "Qtls" },
       { id: "brownSugar", label: "Brown Sugar", type: "number", unit: "Qtls" },
-      { id: "totalSugarBagged", label: "Total Sugar Bagged", type: "number", unit: "Qtls" }
+      { id: "totalSugarBagged", label: "Total Sugar Bagged", type: "number", unit: "Qtls", isCalculated: true }
     ]
   },
   {

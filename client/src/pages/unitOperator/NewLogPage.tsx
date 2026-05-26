@@ -9,6 +9,7 @@ import { useScrollSpy } from '../../hooks/useScrollSpy';
 import { FormSidebar } from '../../components/analysis/FormSidebar';
 import { FormSection } from '../../components/analysis/FormSection';
 import { useUpsertUnitLogMutation, useLockUnitLogMutation, useFetchUnitLogsQuery, useSaveAndGenerateReportMutation } from '../../store/api/apiSlice';
+import { useDailyLogCalculations } from '../../hooks/useDailyLogCalculations';
 
 const getInitialValues = () => {
   const today = new Date();
@@ -36,6 +37,8 @@ export const NewLogPage = () => {
     mode: 'onBlur',
     defaultValues: getInitialValues(),
   });
+
+  useDailyLogCalculations(methods.control, methods.setValue);
 
   const { user } = useSelector((state: RootState) => state.auth);
   const [upsertUnitLog, { isLoading: isUpserting }] = useUpsertUnitLogMutation();
@@ -109,7 +112,7 @@ export const NewLogPage = () => {
     try {
       await upsertUnitLog({ unitId: user?.unitId, data: payload }).unwrap();
     } catch (err: any) {
-      alert(err?.data?.message || 'Failed to save draft');
+      alert(err?.data?.message || 'Failed to save Data');
     }
   };
 

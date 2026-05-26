@@ -62,7 +62,7 @@ export const FormSidebar = ({ config, activeSection, onScrollTo, onUploadData, o
                 disabled={isLocked || isSequentialBlocked || isSubmitting}
                 className="px-2 py-2 bg-white hover:bg-slate-50 active:scale-[0.97] text-slate-700 text-xs font-bold rounded-lg border border-slate-400 transition-all text-center select-none cursor-pointer uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Save Draft
+                Save Data
               </button>
             )}
             {onLockData && (
