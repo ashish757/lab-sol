@@ -89,7 +89,7 @@ export const FormSidebar = ({ config, activeSection, onScrollTo, onUploadData, o
                 onClick={() => onScrollTo(group.groupId)}
                 className={`text-left px-5 py-2.5 text-xs font-medium transition-colors relative ${
                   activeSection === group.groupId
-                    ? 'bg-indigo-100 text-indigo-700 font-extrabold'
+                    ? 'bg-slate-700 text-indigo-100 font-extrabold'
                     : 'text-slate-700 hover:bg-slate-50 hover:text-slate-950'
                 }`}
               >

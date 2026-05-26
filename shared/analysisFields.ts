@@ -62,7 +62,7 @@ export const analysisConfig: GroupConfig[] = [
   },
   {
     groupId: "WeatherData",
-    title: "WHEATHER STATUS",
+    title: "WEATHER STATUS",
     fields: [
       { id: "rain", label: "Rain", type: "number", unit: "Inch" },
       { id: "tempMax", label: "Temperature Max", type: "number", unit: "Deg C" },
