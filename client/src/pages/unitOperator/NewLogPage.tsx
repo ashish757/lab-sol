@@ -10,6 +10,7 @@ import { FormSidebar } from '../../components/analysis/FormSidebar';
 import { FormSection } from '../../components/analysis/FormSection';
 import { useUpsertUnitLogMutation, useLockUnitLogMutation, useFetchUnitLogsQuery, useSaveAndGenerateReportMutation } from '../../store/api/apiSlice';
 import { useDailyLogCalculations, CALCULATIONS_CONFIG } from '../../hooks/useDailyLogCalculations';
+import { useModal } from '../../hooks/useModal';
 
 const getInitialValues = () => {
   const today = new Date();
@@ -44,6 +45,7 @@ export const NewLogPage = () => {
   const [upsertUnitLog, { isLoading: isUpserting }] = useUpsertUnitLogMutation();
   const [lockUnitLog, { isLoading: isLocking }] = useLockUnitLogMutation();
   const [saveReport] = useSaveAndGenerateReportMutation();
+  const { showModal, ModalComponent } = useModal();
   const initialValues = getInitialValues();
   
   const { data: logs = [] } = useFetchUnitLogsQuery(user?.unitId as string, {
@@ -122,23 +124,32 @@ export const NewLogPage = () => {
     try {
       await upsertUnitLog({ unitId: user?.unitId, data: payload }).unwrap();
     } catch (err: any) {
-      alert(err?.data?.message || 'Failed to save Data');
+      await showModal({ type: 'alert', title: 'Error', message: err?.data?.message || 'Failed to save Data' });
     }
   };
 
   const handleLockData = async () => {
     if (selectedLogStatus === 'LOCKED' || isSequentialBlocked) return;
+    
+    const confirmLock = await showModal({
+      type: 'confirm',
+      title: 'Lock Data',
+      message: 'Are you sure you want to lock this daily log?\\nOnce locked, you will not be able to edit this data anymore.',
+      confirmText: 'Lock Log'
+    });
+    
+    if (!confirmLock) return;
+
     await handleUploadData();
     if (selectedLogId) {
       try {
         await lockUnitLog(selectedLogId).unwrap();
+        await showModal({ type: 'alert', title: 'Success', message: 'Data locked successfully.' });
       } catch (err: any) {
-        alert(err?.data?.message || 'Failed to lock data');
+        await showModal({ type: 'alert', title: 'Error', message: err?.data?.message || 'Failed to lock data' });
       }
     } else {
-      // It's a new log, it needs to be saved first to get ID. The hook re-fetches logs, so the ID will be available next render.
-      // We can show a message to save first.
-      alert('Please save the draft first before locking the data.');
+      await showModal({ type: 'alert', title: 'Notice', message: 'Please save the draft first before locking the data.' });
     }
   };
 
@@ -165,7 +176,7 @@ export const NewLogPage = () => {
       methods.reset(methods.getValues());
     } catch (error) {
       console.error("Failed to generate report", error);
-      alert("Failed to generate report");
+      await showModal({ type: 'alert', title: 'Error', message: "Failed to generate report" });
     } finally {
       setIsGenerating(false);
     }
@@ -223,7 +234,7 @@ export const NewLogPage = () => {
         todayDate: selectedDate,
       });
     } else {
-      alert("No previously locked log found to copy from.");
+      showModal({ type: 'alert', title: 'Notice', message: "No previously locked log found to copy from." });
     }
   };
 
@@ -302,6 +313,7 @@ export const NewLogPage = () => {
           </div>
         </form>
       </FormProvider>
+      <ModalComponent />
     </div>
   );
 };

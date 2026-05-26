@@ -5,6 +5,7 @@ import type { RootState } from '../../store/store';
 import { useState } from 'react';
 import { CreateUnitModal } from '../../components/common/CreateUnitModal';
 import { InviteUserModal } from '../../components/common/InviteUserModal';
+import { useModal } from '../../hooks/useModal';
 
 const MetricCard = ({ title, value, icon: Icon, colorClass }: { title: string, value: string | number, icon: any, colorClass: string }) => {
   return (
@@ -133,14 +134,21 @@ export const OrgAdminDash = () => {
   const [updateUnit] = useUpdateUnitMutation();
   const [deleteUnit] = useDeleteUnitMutation();
   const [updateUser] = useUpdateUserMutation();
+  const { showModal, ModalComponent } = useModal();
 
   const handleCancelInvite = async (tokenId: string) => {
-    if (confirm('Are you sure you want to cancel this user invitation?')) {
+    const confirmDelete = await showModal({
+      type: 'confirm',
+      title: 'Cancel Invitation',
+      message: 'Are you sure you want to cancel this user invitation?',
+      confirmText: 'Cancel Invite'
+    });
+    if (confirmDelete) {
       try {
         await cancelInvite(tokenId).unwrap();
-        alert('Invitation cancelled successfully.');
+        await showModal({ type: 'alert', title: 'Success', message: 'Invitation cancelled successfully.' });
       } catch (err: any) {
-        alert(err?.data?.message || 'Failed to cancel invitation');
+        await showModal({ type: 'alert', title: 'Error', message: err?.data?.message || 'Failed to cancel invitation' });
       }
     }
   };
@@ -152,72 +160,108 @@ export const OrgAdminDash = () => {
         payload.unitId = invite.unitId;
       }
       await resendInvite(payload).unwrap();
-      alert('Invitation resent successfully.');
+      await showModal({ type: 'alert', title: 'Success', message: 'Invitation resent successfully.' });
     } catch (err: any) {
-      alert(err?.data?.message || 'Failed to resend invitation');
+      await showModal({ type: 'alert', title: 'Error', message: err?.data?.message || 'Failed to resend invitation' });
     }
   };
 
   const handleUpdateUnit = async (unit: any) => {
-    const newName = prompt('Enter new name for the unit:', unit.name);
+    const newName = await showModal({
+      type: 'prompt',
+      inputType: 'text',
+      title: 'Rename Unit',
+      message: 'Enter a new name for the factory unit:',
+      inputLabel: 'Unit Name',
+      defaultValue: unit.name,
+      confirmText: 'Save Name'
+    });
+    
     if (newName && newName !== unit.name) {
       try {
         await updateUnit({ id: unit.id, data: { name: newName } }).unwrap();
       } catch (err: any) {
-        alert(err?.data?.message || 'Failed to update unit');
+        await showModal({ type: 'alert', title: 'Error', message: err?.data?.message || 'Failed to update unit' });
       }
     }
   };
 
   const handleDeleteUnit = async (unitId: string) => {
-    if (confirm('Are you sure you want to remove this unit?')) {
+    const confirmDelete = await showModal({
+      type: 'confirm',
+      title: 'Remove Unit',
+      message: 'Are you sure you want to permanently remove this unit?\\nAll associated data will be affected.',
+      confirmText: 'Delete'
+    });
+    if (confirmDelete) {
       try {
         await deleteUnit(unitId).unwrap();
       } catch (err: any) {
-        alert(err?.data?.message || 'Failed to delete unit');
+        await showModal({ type: 'alert', title: 'Error', message: err?.data?.message || 'Failed to delete unit' });
       }
     }
   };
 
   const handleRoleChange = async (targetUser: any) => {
-    const newRole = prompt('Enter new role (ORG_ADMIN, ORG_STAFF, UNIT_OPERATOR):', targetUser.role);
-    if (newRole && ['ORG_ADMIN', 'ORG_STAFF', 'UNIT_OPERATOR'].includes(newRole)) {
+    const newRole = await showModal({
+      type: 'prompt',
+      inputType: 'select',
+      title: 'Change Role',
+      message: 'Select a new access role for this user.',
+      inputLabel: 'Role',
+      defaultValue: targetUser.role,
+      options: [
+        { value: 'ORG_ADMIN', label: 'Organization Admin' },
+        { value: 'ORG_STAFF', label: 'Organization Staff' },
+        { value: 'UNIT_OPERATOR', label: 'Unit Operator' }
+      ],
+      confirmText: 'Save Role'
+    });
+    
+    if (newRole && newRole !== targetUser.role) {
       try {
         await updateUser({ id: targetUser.id, data: { role: newRole } }).unwrap();
       } catch (err: any) {
-        alert(err?.data?.message || 'Failed to update role');
+        await showModal({ type: 'alert', title: 'Error', message: err?.data?.message || 'Failed to update role' });
       }
-    } else if (newRole) {
-      alert('Invalid role specified.');
     }
   };
 
   const handleUnitChange = async (targetUser: any) => {
-    const unitsList = org?.units?.map((u: any) => `- ${u.name}`).join('\\n') || '';
-    const unitName = prompt(`Enter new Unit Name from the list below:\\n\\n${unitsList}`, targetUser.unit?.name || '');
+    const unitOptions = org?.units?.map((u: any) => ({ value: u.id, label: u.name })) || [];
     
-    if (unitName !== null) {
-      const selectedUnit = org?.units?.find((u: any) => u.name.toLowerCase() === unitName.trim().toLowerCase());
-      
-      if (!selectedUnit && unitName.trim() !== '') {
-        alert('Unit name not found in the list. Please check your spelling.');
-        return;
-      }
-      
+    const newUnitId = await showModal({
+      type: 'prompt',
+      inputType: 'select',
+      title: 'Reassign Unit',
+      message: 'Select the new factory unit for this operator.',
+      inputLabel: 'Factory Unit',
+      defaultValue: targetUser.unitId || '',
+      options: unitOptions,
+      confirmText: 'Reassign'
+    });
+    
+    if (newUnitId !== null && newUnitId !== targetUser.unitId) {
       try {
-        await updateUser({ id: targetUser.id, data: { unitId: selectedUnit ? selectedUnit.id : null } }).unwrap();
+        await updateUser({ id: targetUser.id, data: { unitId: newUnitId } }).unwrap();
       } catch (err: any) {
-        alert(err?.data?.message || 'Failed to reassign unit');
+        await showModal({ type: 'alert', title: 'Error', message: err?.data?.message || 'Failed to reassign unit' });
       }
     }
   };
 
   const handleDeactivate = async (targetUserId: string) => {
-    if (confirm('Are you sure you want to deactivate this user?')) {
+    const confirmDeactivate = await showModal({
+      type: 'confirm',
+      title: 'Deactivate User',
+      message: 'Are you sure you want to deactivate this user account?\\nThey will lose access to the system immediately.',
+      confirmText: 'Deactivate'
+    });
+    if (confirmDeactivate) {
       try {
         await updateUser({ id: targetUserId, data: { status: 'INACTIVE' } }).unwrap();
       } catch (err: any) {
-        alert(err?.data?.message || 'Failed to deactivate user');
+        await showModal({ type: 'alert', title: 'Error', message: err?.data?.message || 'Failed to deactivate user' });
       }
     }
   };
@@ -411,6 +455,7 @@ export const OrgAdminDash = () => {
 
       <CreateUnitModal isOpen={isUnitModalOpen} onClose={() => setIsUnitModalOpen(false)} />
       <InviteUserModal isOpen={isUserModalOpen} onClose={() => setIsUserModalOpen(false)} units={org.units || []} />
+      <ModalComponent />
     </div>
   );
 };

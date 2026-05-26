@@ -3,11 +3,13 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useInvitePreviewQuery, useSetupAccountMutation } from '../../store/api/apiSlice';
 import { Building2, ArrowRight } from 'lucide-react';
 import { PAGES } from '../../config/routesConfig';
+import { useModal } from '../../hooks/useModal';
 
 export const SetupAccount = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const navigate = useNavigate();
+  const { showModal, ModalComponent } = useModal();
 
   const { data: tokenDetails, isLoading, error } = useInvitePreviewQuery(token as string, {
     skip: !token,
@@ -38,7 +40,7 @@ export const SetupAccount = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (form.password !== form.confirmPassword) {
-      alert("Passwords don't match");
+      await showModal({ type: 'alert', title: 'Error', message: "Passwords don't match" });
       return;
     }
 
@@ -50,10 +52,10 @@ export const SetupAccount = () => {
         password: form.password,
       }).unwrap();
       
-      alert('Organization successfully registered! Please login.');
+      await showModal({ type: 'alert', title: 'Success', message: 'Organization successfully registered! Please login.' });
       navigate(PAGES.LOGIN);
     } catch (err) {
-      alert('Failed to complete setup. Please try again.');
+      await showModal({ type: 'alert', title: 'Error', message: 'Failed to complete setup. Please try again.' });
       console.error(err);
     }
   };
@@ -136,6 +138,7 @@ export const SetupAccount = () => {
           </form>
         </div>
       </div>
+      <ModalComponent />
     </div>
   );
 };

@@ -3,11 +3,13 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useInvitePreviewQuery, useActivateStaffMutation } from '../../store/api/apiSlice';
 import { Building, Shield, ChevronRight, Lock, User, Key } from 'lucide-react';
 import { getPagePath } from '../../config/routesConfig';
+import { useModal } from '../../hooks/useModal';
 
 export const StaffSetupAccount = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const navigate = useNavigate();
+  const { showModal, ModalComponent } = useModal();
 
   const { data: previewData, isLoading, error } = useInvitePreviewQuery(token as string, {
     skip: !token,
@@ -30,7 +32,7 @@ export const StaffSetupAccount = () => {
     e.preventDefault();
     
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+      await showModal({ type: 'alert', title: 'Error', message: "Passwords do not match!" });
       return;
     }
 
@@ -41,10 +43,10 @@ export const StaffSetupAccount = () => {
         password: formData.password,
       }).unwrap();
 
-      alert("Account successfully activated! Please log in.");
+      await showModal({ type: 'alert', title: 'Success', message: "Account successfully activated! Please log in." });
       navigate(getPagePath.login());
     } catch (err) {
-      alert("Failed to activate account. The link might be expired or invalid.");
+      await showModal({ type: 'alert', title: 'Error', message: "Failed to activate account. The link might be expired or invalid." });
       console.error(err);
     }
   };
@@ -203,6 +205,7 @@ export const StaffSetupAccount = () => {
           </form>
         </div>
       </div>
+      <ModalComponent />
     </div>
   );
 };

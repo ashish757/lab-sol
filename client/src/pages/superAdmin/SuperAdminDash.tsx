@@ -2,23 +2,32 @@ import { useNavigate } from 'react-router-dom';
 import { useGetOrganizationsQuery, useCancelOrganizationInviteMutation } from '../../store/api/apiSlice';
 import { getPagePath, PAGES } from '../../config/routesConfig';
 import { Building2, Users, Network, Plus, Trash2, Mail } from 'lucide-react';
+import { useModal } from '../../hooks/useModal';
 
 export const SuperAdminDash = () => {
   const { data: orgs, isLoading } = useGetOrganizationsQuery({});
   const [cancelInvite, { isLoading: isCancelling }] = useCancelOrganizationInviteMutation();
   const navigate = useNavigate();
+  const { showModal, ModalComponent } = useModal();
 
   const addOrg = () => {
     navigate(PAGES.SUPER_ADMIN_INVITE);
   }
 
   const handleCancelInvite = async (id: string) => {
-    if (confirm('Are you sure you want to cancel this organization invitation?')) {
+    const isConfirmed = await showModal({
+      type: 'confirm',
+      title: 'Cancel Invitation',
+      message: 'Are you sure you want to cancel this organization invitation?',
+      confirmText: 'Cancel Invite'
+    });
+    
+    if (isConfirmed) {
       try {
         await cancelInvite(id).unwrap();
-        alert('Invitation cancelled successfully.');
+        await showModal({ type: 'alert', title: 'Success', message: 'Invitation cancelled successfully.' });
       } catch (err: any) {
-        alert(err?.data?.message || 'Failed to cancel invitation');
+        await showModal({ type: 'alert', title: 'Error', message: err?.data?.message || 'Failed to cancel invitation' });
       }
     }
   }
@@ -108,6 +117,7 @@ export const SuperAdminDash = () => {
           ))}
         </div>
       )}
+      <ModalComponent />
     </div>
   );
 };
