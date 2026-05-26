@@ -48,8 +48,9 @@ const UnitListItem = ({ unit, openDropdown, setOpenDropdown, onUpdate, onDelete 
   );
 };
 
-const UserListItem = ({ user, handleCancelInvite, handleResendInvite, isCancelling, isResending, openDropdown, setOpenDropdown, onRoleChange, onUnitChange, onDeactivate }: any) => {
+const UserListItem = ({ user, currentUser, handleCancelInvite, handleResendInvite, isCancelling, isResending, openDropdown, setOpenDropdown, onRoleChange, onUnitChange, onDeactivate }: any) => {
   const isDropdownOpen = openDropdown === user.id;
+  const isSelf = user.id === currentUser?.id;
 
   return (
     <li className="p-5 hover:bg-slate-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 last:border-0 relative">
@@ -57,11 +58,15 @@ const UserListItem = ({ user, handleCancelInvite, handleResendInvite, isCancelli
         <div className="flex items-center gap-2 mb-1">
           <Mail size={16} className="text-slate-400" />
           <h3 className="text-sm font-bold text-slate-900">{user.email}</h3>
-          <span className={`px-2 py-0.5 text-[10px] font-bold rounded-md uppercase tracking-wide ${
-            user.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
-          }`}>
-            {user.status}
-          </span>
+          
+          {user.status !== "ACTIVE" && (
+            <span className={`px-2 py-0.5 text-[10px] font-bold rounded-md uppercase tracking-wide ${
+              user.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+            }`}>
+              {user.status}
+            </span>
+          )}
+         
         </div>
         <p className="text-xs text-slate-500 font-medium mt-0.5">Last Login: 2 hours ago</p>
         {user.role === 'UNIT_OPERATOR' && (
@@ -79,14 +84,16 @@ const UserListItem = ({ user, handleCancelInvite, handleResendInvite, isCancelli
           }`}>
             {user.role.replace('_', ' ')}
           </span>
-          <button 
-            onClick={() => setOpenDropdown(isDropdownOpen ? null : user.id)}
-            className="p-2 hover:bg-slate-200 rounded-full text-slate-500 transition-colors"
-          >
-            <MoreVertical size={16} />
-          </button>
+          {!isSelf && (
+            <button 
+              onClick={() => setOpenDropdown(isDropdownOpen ? null : user.id)}
+              className="p-2 hover:bg-slate-200 rounded-full text-slate-500 transition-colors"
+            >
+              <MoreVertical size={16} />
+            </button>
+          )}
         </div>
-        {user.isInvite && (
+        {user.isInvite && !isSelf && (
           <div className="flex items-center gap-2 mt-1">
             <button
               onClick={() => handleCancelInvite(user.id)}
@@ -104,10 +111,12 @@ const UserListItem = ({ user, handleCancelInvite, handleResendInvite, isCancelli
             </button>
           </div>
         )}
-        {isDropdownOpen && !user.isInvite && (
+        {isDropdownOpen && !user.isInvite && !isSelf && (
           <div className="absolute right-8 top-12 w-48 bg-white border border-slate-200 rounded-xl shadow-lg py-1 z-10">
             <button onClick={() => { setOpenDropdown(null); onRoleChange(user); }} className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 font-medium">Change Role</button>
-            <button onClick={() => { setOpenDropdown(null); onUnitChange(user); }} className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 font-medium">Reassign Unit</button>
+            {user.role === 'UNIT_OPERATOR' && (
+              <button onClick={() => { setOpenDropdown(null); onUnitChange(user); }} className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 font-medium">Reassign Unit</button>
+            )}
             <button onClick={() => { setOpenDropdown(null); onDeactivate(user.id); }} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-medium">Deactivate</button>
           </div>
         )}
@@ -117,9 +126,9 @@ const UserListItem = ({ user, handleCancelInvite, handleResendInvite, isCancelli
 };
 
 export const OrgAdminDash = () => {
-  const { user } = useSelector((state: RootState) => state.auth);
-  const { data: org, isLoading, error } = useGetOrganizationByIdQuery(user?.orgId as string, {
-    skip: !user?.orgId,
+  const { user: currentUser } = useSelector((state: RootState) => state.auth);
+  const { data: org, isLoading, error } = useGetOrganizationByIdQuery(currentUser?.orgId as string, {
+    skip: !currentUser?.orgId,
   });
   const [isUnitModalOpen, setIsUnitModalOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
@@ -330,7 +339,7 @@ export const OrgAdminDash = () => {
                 <Network size={20} className="text-indigo-600" />
                 Factory Units
               </h2>
-              {user?.role === 'ORG_ADMIN' && (
+              {currentUser?.role === 'ORG_ADMIN' && (
                 <button
                   onClick={() => setIsUnitModalOpen(true)}
                   className="flex items-center gap-1 px-3 py-1.5 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-semibold rounded-md text-sm transition-colors"
@@ -382,7 +391,7 @@ export const OrgAdminDash = () => {
                 <Users size={20} className="text-emerald-600" />
                 Registered Users
               </h2>
-              {user?.role === 'ORG_ADMIN' && (
+              {currentUser?.role === 'ORG_ADMIN' && (
                 <button
                   onClick={() => setIsUserModalOpen(true)}
                   className="flex items-center gap-1 px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-semibold rounded-md text-sm transition-colors"
@@ -432,7 +441,8 @@ export const OrgAdminDash = () => {
                   <UserListItem 
                     key={user.id} 
                     user={user} 
-                    handleCancelInvite={handleCancelInvite} 
+                    currentUser={currentUser}
+                    handleCancelInvite={handleCancelInvite}  
                     handleResendInvite={handleResendInvite} 
                     isCancelling={isCancelling} 
                     isResending={isResending} 
