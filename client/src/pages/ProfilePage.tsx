@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
 import type { RootState } from '../store/store';
 import { useGetOrganizationByIdQuery, useGetUnitByIdQuery } from '../store/api/apiSlice';
-import { User, Mail, Shield, Building2, Factory, Calendar } from 'lucide-react';
+import { User, Mail, Shield, Building2, Factory } from 'lucide-react';
 import { Role } from '../types/auth';
 
 export const ProfilePage = () => {
