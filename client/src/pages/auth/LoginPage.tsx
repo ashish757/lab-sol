@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import { PAGES } from '../../config/routesConfig';
 import { login } from '../../store/slices/authSlice';
 import { useLoginMutation } from '../../store/api/apiSlice';
+import { ServerStatus } from '../../components/common/ServerStatus';
 
 export const LoginPage = () => {
   const [email, setEmail] = useState('admin@example.com');
@@ -47,6 +48,7 @@ export const LoginPage = () => {
     <div className="flex-1 flex flex-col items-center justify-center bg-slate-50 min-h-screen">
       <div className="max-w-sm w-full bg-white rounded-xl shadow-sm border border-slate-200 p-8">
         <h1 className="text-2xl font-bold text-slate-900 mb-6 text-center tracking-tight">Login</h1>
+        <ServerStatus />
         
         {error && (
           <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-200 text-sm font-semibold">
