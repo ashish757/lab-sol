@@ -5,7 +5,7 @@ import { API_ENDPOINTS } from '../../config/routesConfig';
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:3000',
+    baseUrl: import.meta.env.VITE_ENV == "production" ? import.meta.env.VITE_API_URL : 'http://localhost:3000',
     /**
      * Replaces the legacy Axios interceptor requirement.
      * Automatically extracts the JWT authentication token from the Redux RootState
