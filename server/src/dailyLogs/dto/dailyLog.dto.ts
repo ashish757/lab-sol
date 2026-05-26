@@ -3,7 +3,7 @@ import { IsDateString, IsNotEmpty, IsObject } from 'class-validator';
 export class UpsertDailyLogDto {
   @IsNotEmpty()
   @IsDateString()
-  date: string;
+  createdAt: string;
 
   @IsNotEmpty()
   @IsObject()

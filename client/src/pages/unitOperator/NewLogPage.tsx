@@ -9,7 +9,7 @@ import { useScrollSpy } from '../../hooks/useScrollSpy';
 import { FormSidebar } from '../../components/analysis/FormSidebar';
 import { FormSection } from '../../components/analysis/FormSection';
 import { useUpsertUnitLogMutation, useLockUnitLogMutation, useFetchUnitLogsQuery, useSaveAndGenerateReportMutation } from '../../store/api/apiSlice';
-import { useDailyLogCalculations } from '../../hooks/useDailyLogCalculations';
+import { useDailyLogCalculations, CALCULATIONS_CONFIG } from '../../hooks/useDailyLogCalculations';
 
 const getInitialValues = () => {
   const today = new Date();
@@ -58,11 +58,11 @@ export const NewLogPage = () => {
     let status = 'NEW';
     let sLogId = undefined;
 
-    if (Array.isArray(logs)) {
-      const sortedLogs = [...logs].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    if (Array.isArray(logs) && selectedDate) {
+      const sortedLogs = [...logs].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       
       for (const log of sortedLogs) {
-        const logDateStr = new Date(log.date).toISOString().split('T')[0];
+        const logDateStr = new Date(log.createdAt).toISOString().split('T')[0];
         
         if (logDateStr === selectedDate) {
           status = log.status;
@@ -135,7 +135,7 @@ export const NewLogPage = () => {
   const onSubmit = async (data: AnalysisSchema) => {
     const { todayDate, ...rest } = data;
     const payload = {
-      date: todayDate as string ?? new Date().toISOString().slice(0, 10),
+      createdAt: todayDate as string ?? new Date().toISOString().slice(0, 10),
       payload: rest as Record<string, unknown>,
     };
 
@@ -158,6 +158,50 @@ export const NewLogPage = () => {
       alert("Failed to generate report");
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const handleResetData = () => {
+    if (Array.isArray(logs)) {
+      const log = logs.find(l => new Date(l.createdAt).toISOString().split('T')[0] === selectedDate);
+      if (log) {
+        const parsedMetrics = typeof log.payload === 'string' ? JSON.parse(log.payload) : log.payload;
+        methods.reset({ ...initialValues, ...parsedMetrics, todayDate: selectedDate });
+      }
+    }
+  };
+
+  const handleCopyLastLocked = () => {
+    if (!Array.isArray(logs)) return;
+    
+    // Find the most recent locked log BEFORE the selectedDate
+    const sortedLogs = [...logs].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    const lastLockedLog = sortedLogs.find(
+      (log) => new Date(log.createdAt).toISOString().split('T')[0] < selectedDate && log.status === 'LOCKED'
+    );
+
+    if (lastLockedLog) {
+      const parsedMetrics = typeof lastLockedLog.payload === 'string' 
+        ? JSON.parse(lastLockedLog.payload) 
+        : lastLockedLog.payload;
+        
+      const currentValues = methods.getValues();
+      const calculatedFields = CALCULATIONS_CONFIG.map(c => c.targetField);
+
+      // Filter out auto-calculated fields from the copied data
+      const filteredMetrics = { ...parsedMetrics };
+      calculatedFields.forEach((field) => {
+        delete filteredMetrics[field];
+      });
+
+      // Merge avoiding overwrite of todayDate
+      methods.reset({
+        ...currentValues,
+        ...filteredMetrics,
+        todayDate: selectedDate,
+      });
+    } else {
+      alert("No previously locked log found to copy from.");
     }
   };
 
@@ -202,17 +246,32 @@ export const NewLogPage = () => {
             onScrollTo={handleScrollTo}
             onUploadData={handleUploadData}
             onLockData={handleLockData}
+            onResetData={handleResetData}
             isSubmitting={isGenerating || isUpserting || isLocking}
             hasUnsavedChanges={methods.formState.isDirty}
+            hasUploadedData={!!selectedLogId}
             isLocked={selectedLogStatus === 'LOCKED'}
             isSequentialBlocked={isSequentialBlocked}
             blockingDate={blockingDate}
           />
 
-          <div className="flex-1 overflow-y-auto p-6 lg:p-8 bg-slate-50 relative scroll-smooth">
+          <div className="flex-1 overflow-y-auto p-6 lg:p-8 bg-slate-50 relative scroll-smooth flex flex-col items-center">
+            
+            {!isSequentialBlocked && selectedLogStatus !== 'LOCKED' && (
+              <div className="max-w-5xl w-full flex justify-end mb-4">
+                <button
+                  type="button"
+                  onClick={handleCopyLastLocked}
+                  className="px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-lg border border-indigo-200 transition-all shadow-sm active:scale-[0.98] uppercase tracking-wider"
+                >
+                  Copy Yesterday's Data
+                </button>
+              </div>
+            )}
+
             <fieldset 
               disabled={selectedLogStatus === 'LOCKED' || isSequentialBlocked} 
-              className="max-w-5xl mx-auto pb-24 border-none p-0 m-0 disabled:opacity-60"
+              className="max-w-5xl w-full pb-24 border-none p-0 m-0 disabled:opacity-60"
             >
               {analysisConfig.map((group) => (
                 <FormSection key={group.groupId} group={group} />

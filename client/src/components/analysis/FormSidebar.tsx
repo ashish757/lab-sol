@@ -6,17 +6,18 @@ interface FormSidebarProps {
   config: GroupConfig[];
   activeSection: string;
   onScrollTo: (id: string) => void;
-  onReset?: () => void;
+  onResetData?: () => void;
   onUploadData?: () => void;
   onLockData?: () => void;
   isSubmitting?: boolean;
   hasUnsavedChanges?: boolean;
+  hasUploadedData?: boolean;
   isLocked?: boolean;
   isSequentialBlocked?: boolean;
   blockingDate?: string;
 }
 
-export const FormSidebar = ({ config, activeSection, onScrollTo, onUploadData, onLockData, isSubmitting = false, hasUnsavedChanges = false, isLocked = false, isSequentialBlocked = false, blockingDate }: FormSidebarProps) => {
+export const FormSidebar = ({ config, activeSection, onScrollTo, onResetData, onUploadData, onLockData, isSubmitting = false, hasUnsavedChanges = false, hasUploadedData = false, isLocked = false, isSequentialBlocked = false, blockingDate }: FormSidebarProps) => {
   return (
     <nav className="w-full md:w-72 bg-white border-r border-slate-200 overflow-y-auto z-0 flex-shrink-0 flex flex-col shadow-sm">
       <div className="px-5 py-5 border-b border-slate-200 shrink-0 bg-slate-50/40">
@@ -54,7 +55,18 @@ export const FormSidebar = ({ config, activeSection, onScrollTo, onUploadData, o
             {isSubmitting ? 'Saving…' : 'Generate Report'}
           </button>
 
-          <div className="grid grid-cols-2 gap-2">
+          {onResetData && (
+            <button
+              type="button"
+              onClick={onResetData}
+              disabled={!hasUploadedData || isLocked || isSubmitting}
+              className="w-full px-4 py-2 bg-slate-100 hover:bg-slate-200 active:scale-[0.98] text-slate-700 text-[10px] font-black rounded-lg border border-slate-300 transition-all text-center select-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 uppercase tracking-widest"
+            >
+              Reset to last uploaded data
+            </button>
+          )}
+
+          <div className="grid grid-cols-2 gap-2 mt-2">
             {onUploadData && (
               <button
                 type="button"

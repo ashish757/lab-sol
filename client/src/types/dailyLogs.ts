@@ -1,9 +1,9 @@
 export interface DailyLogResponse {
   id: string;
-  logDate: string;
-  metrics: Record<string, unknown>;
   createdAt: string;
+  metrics: Record<string, unknown>;
   updatedAt: string;
+  lockedAt: string | null;
   createdBy: string;
   status: string;
 }

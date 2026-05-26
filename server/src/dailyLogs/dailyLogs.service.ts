@@ -12,7 +12,7 @@ export class DailyLogsService {
   async getLogsForUnit(unitId: string) {
     return this.prisma.dailyLog.findMany({
       where: { unitId },
-      orderBy: { date: 'desc' },
+      orderBy: { createdAt: 'desc' },
       include: {
         unit: {
           select: { id: true, name: true },
@@ -22,14 +22,14 @@ export class DailyLogsService {
   }
 
   async upsertLog(unitId: string, orgId: string, dto: UpsertDailyLogDto) {
-    const requestedDate = new Date(dto.date);
+    const requestedDate = new Date(dto.createdAt);
 
     // Validation A: Check if log for this date already exists and is locked
     const existingLog = await this.prisma.dailyLog.findUnique({
       where: {
-        unitId_date: {
+        unitId_createdAt: {
           unitId,
-          date: requestedDate,
+          createdAt: requestedDate,
         },
       },
     });
@@ -43,12 +43,12 @@ export class DailyLogsService {
     const mostRecentPastLog = await this.prisma.dailyLog.findFirst({
       where: {
         unitId: unitId,
-        date: {
+        createdAt: {
           lt: requestedDate,
         },
       },
       orderBy: {
-        date: 'desc',
+        createdAt: 'desc',
       },
     });
 
@@ -61,16 +61,16 @@ export class DailyLogsService {
     // Action: Upsert
     return this.prisma.dailyLog.upsert({
       where: {
-        unitId_date: {
+        unitId_createdAt: {
           unitId,
-          date: requestedDate,
+          createdAt: requestedDate,
         },
       },
       update: {
         payload: dto.payload as Prisma.InputJsonValue,
       },
       create: {
-        date: requestedDate,
+        createdAt: requestedDate,
         payload: dto.payload as Prisma.InputJsonValue,
         status: LogStatus.UNLOCKED,
         unitId: unitId,
@@ -95,7 +95,10 @@ export class DailyLogsService {
 
     return this.prisma.dailyLog.update({
       where: { id: logId },
-      data: { status: LogStatus.LOCKED },
+      data: { 
+        status: LogStatus.LOCKED,
+        lockedAt: new Date(),
+      },
     });
   }
 
@@ -111,7 +114,7 @@ export class DailyLogsService {
 
     return this.prisma.dailyLog.findMany({
       where: whereClause,
-      orderBy: { date: 'desc' },
+      orderBy: { createdAt: 'desc' },
       include: {
         unit: {
           select: { id: true, name: true }
@@ -126,7 +129,7 @@ export class DailyLogsService {
     end.setDate(end.getDate() + 1);
 
     const whereClause: any = {
-      date: {
+      createdAt: {
         gte: start,
         lt: end,
       },

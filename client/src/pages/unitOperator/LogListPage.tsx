@@ -31,12 +31,11 @@ function getMetric(
 function StatusBadge({ status }: { status: string }) {
   const base = 'inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest border shadow-sm';
   const variants: Record<string, string> = {
-    COMPLETED: 'bg-emerald-50 text-emerald-700 border-emerald-200 shadow-emerald-500/10',
-    DRAFT: 'bg-amber-50 text-amber-700 border-amber-200 shadow-amber-500/10',
-    PENDING: 'bg-slate-50 text-slate-700 border-slate-200 shadow-slate-500/10',
+    LOCKED: 'bg-emerald-50 text-emerald-700 border-emerald-200 shadow-emerald-500/10',
+    UNLOCKED: 'bg-amber-50 text-amber-700 border-amber-200 shadow-amber-500/10',
   };
-  const cls = variants[status?.toUpperCase()] ?? variants.PENDING;
-  return <span className={`${base} ${cls}`}>{status ?? 'Unknown'}</span>;
+  const cls = variants[status?.toUpperCase()];
+  return <span className={`${base} ${cls}`}>{status  == "UNLOCKED" ? 'DRAFT' : status}</span>;
 }
 
 function SkeletonRow({ isAdminOrStaff }: { isAdminOrStaff: boolean }) {
@@ -91,8 +90,8 @@ export const LogsPage = () => {
   }, [logs]);
 
   const columns = isAdminOrStaff
-    ? ['Date', 'Unit', 'Status', 'Cane Crushed (Qtls)', 'Sugar Bagged (Qtls)', 'Created', 'Action']
-    : ['Date', 'Status', 'Cane Crushed (Qtls)', 'Sugar Bagged (Qtls)', 'Created', 'Action'];
+    ? ['Date', 'Unit', 'Status', 'Cane Crushed (Qtls)', 'Sugar Bagged (Qtls)', 'Locked', 'Action']
+    : ['Date', 'Status', 'Cane Crushed (Qtls)', 'Sugar Bagged (Qtls)', 'Locked', 'Action'];
 
   return (
     <div className="flex-1 overflow-y-auto bg-[#F8FAFC] flex flex-col">
@@ -234,7 +233,7 @@ export const LogsPage = () => {
                           className="hover:bg-indigo-50/30 transition-colors group"
                         >
                           <td className="px-6 py-5 font-bold text-slate-900 whitespace-nowrap">
-                            {formatDate(log.logDate)}
+                            {formatDate(log.createdAt)}
                           </td>
                           {isAdminOrStaff && (
                             <td className="px-6 py-5 font-bold text-indigo-700 whitespace-nowrap">
@@ -251,7 +250,7 @@ export const LogsPage = () => {
                             {getMetric(log.metrics, 'totalSugarBagged')}
                           </td>
                           <td className="px-6 py-5 text-slate-500 font-medium whitespace-nowrap text-xs">
-                            {formatDate(log.createdAt)}
+                            {formatDate(log.lockedAt)}
                           </td>
                           <td className="px-6 py-5 whitespace-nowrap">
                             <Link

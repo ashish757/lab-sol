@@ -14,9 +14,9 @@ enum LogStatus {
 
 model DailyLog {
   id          String    @id @default(uuid()) @unique()
-  
-  date        DateTime  @map("log_date")
+  createdAt   DateTime  @map("created_at")
   status      LogStatus @default(UNLOCKED)
+  lockedAt    DateTime? @map("locked_at")
   
   payload     Json      @map("metrics")
 
@@ -26,10 +26,9 @@ model DailyLog {
   orgId       String
   org         Organization @relation(fields: [orgId], references: [id])
 
-  createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
 
-  @@unique([unitId, date])
+  @@unique([unitId, createdAt])
   @@map("daily_logs")
 }
 

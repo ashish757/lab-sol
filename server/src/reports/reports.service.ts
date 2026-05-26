@@ -111,8 +111,8 @@ export class ReportsService {
 
     // Enrich with top-level date
     const data: Record<string, any> = Object.assign({}, metrics);
-    data.todayDate = log.date
-      ? new Date(log.date).toISOString().split('T')[0]
+    data.todayDate = log.createdAt
+      ? new Date(log.createdAt).toISOString().split('T')[0]
       : (metrics.todayDate as string | undefined);
 
     return this.generateDailyReportFromData(data);
@@ -128,9 +128,9 @@ export class ReportsService {
       savedLog = await this.dailyLogsService.upsertLog(user.unitId, user.orgId, dto);
     } catch (error) {
       if (error instanceof ForbiddenException && error.message === 'Log is locked and cannot be edited') {
-        const requestedDate = new Date(dto.date);
+        const requestedDate = new Date(dto.createdAt);
         savedLog = await this.prisma.dailyLog.findUnique({
-          where: { unitId_date: { unitId: user.unitId, date: requestedDate } },
+          where: { unitId_createdAt: { unitId: user.unitId, createdAt: requestedDate } },
         });
         if (!savedLog) throw new NotFoundException('Log not found');
       } else {
@@ -144,8 +144,8 @@ export class ReportsService {
     ) as Record<string, any>;
 
     const data: Record<string, any> = Object.assign({}, metrics);
-    data.todayDate = savedLog.date
-      ? new Date(savedLog.date).toISOString().split('T')[0]
+    data.todayDate = savedLog.createdAt
+      ? new Date(savedLog.createdAt).toISOString().split('T')[0]
       : (metrics.todayDate as string | undefined);
 
     const calculatedData = calculateReportData(data, requiredFormulaIds);

@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
 import { useGetUnitByIdQuery, useGetDailyLogsQuery } from '../../store/api/apiSlice';
 import type { RootState } from '../../store/store';
-import { ShieldCheck, Network, ArrowRight, Activity, TrendingUp, Calendar, CalendarDays, RefreshCw, Plus } from 'lucide-react';
+import { ShieldCheck, Network, ArrowRight, Activity, TrendingUp, Calendar, CalendarDays, RefreshCw, Plus, CheckCircle, Edit, XCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { PAGES, getPagePath } from '../../config/routesConfig';
 import type { DailyLogResponse } from '../../types/dailyLogs';
@@ -15,24 +15,24 @@ export const UnitOpDash = () => {
     skip: !user?.unitId,
   });
   
-  const { data: logs = [], isLoading: logsLoading, isError, refetch } = useGetDailyLogsQuery({});
+  const { data: logs = [], isLoading: logsLoading, isError, refetch } = useGetDailyLogsQuery(undefined);
 
   const totalCane = logs.reduce((acc: number, log: DailyLogResponse) => {
     const metrics = typeof log.metrics === 'string' ? JSON.parse(log.metrics) : log.metrics;
-    return acc + (parseFloat(metrics?.caneCrushed) || 0);
+    return acc + (parseFloat((metrics as any)?.totalCaneCrushed) || 0);
   }, 0);
 
   const totalSugar = logs.reduce((acc: number, log: DailyLogResponse) => {
     const metrics = typeof log.metrics === 'string' ? JSON.parse(log.metrics) : log.metrics;
-    return acc + (parseFloat(metrics?.totalSugarBagged) || 0);
+    return acc + (parseFloat((metrics as any)?.totalSugarBagged) || 0);
   }, 0);
 
   let puritySum = 0;
   let purityCount = 0;
   logs.forEach((log: DailyLogResponse) => {
     const metrics = typeof log.metrics === 'string' ? JSON.parse(log.metrics) : log.metrics;
-    const brix = parseFloat(metrics?.primaryJuiceBrix) || 0;
-    const pol = parseFloat(metrics?.primaryJuicePol) || 0;
+    const brix = parseFloat((metrics as any)?.primaryJuiceBrix) || 0;
+    const pol = parseFloat((metrics as any)?.primaryJuicePol) || 0;
     if (brix > 0) {
       puritySum += (pol / brix) * 100;
       purityCount++;
@@ -48,6 +48,30 @@ export const UnitOpDash = () => {
       year: 'numeric',
     });
   };
+
+  const getLogStatusForDateOffset = (offsetDays: number) => {
+    const d = new Date();
+    d.setDate(d.getDate() - offsetDays);
+    const dateStr = d.toISOString().split('T')[0];
+    const log = logs.find((l: DailyLogResponse) => {
+      const logDate = l.createdAt || (l as any).date || (l as any).logDate; 
+      if (!logDate) return false;
+      return new Date(logDate).toISOString().split('T')[0] === dateStr;
+    });
+    
+    return {
+      date: d,
+      dateStr,
+      status: log ? log.status : 'MISSING',
+      isToday: offsetDays === 0
+    };
+  };
+
+  const timeline = [
+    getLogStatusForDateOffset(0),
+    getLogStatusForDateOffset(1),
+    getLogStatusForDateOffset(2)
+  ];
 
   return (
     <div className="flex flex-col h-full overflow-hidden w-full bg-slate-50">
@@ -146,6 +170,70 @@ export const UnitOpDash = () => {
           </div>
 
           <div className="grid lg:grid-cols-3 gap-6 items-start">
+            <div className="flex flex-col gap-6">
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                <div className="border-b border-slate-150 px-5 py-4 select-none">
+                  <h3 className="text-xs font-black uppercase tracking-wider text-slate-900">Log Timeline</h3>
+                </div>
+                
+                <div className="p-5 flex flex-col gap-4">
+                  {timeline.map((item, index) => {
+                    const isLocked = item.status === 'LOCKED';
+                    const isUnlocked = item.status === 'UNLOCKED';
+                    
+                    return (
+                      <div key={item.dateStr} className="relative flex items-start gap-4">
+                        {index !== timeline.length - 1 && (
+                          <div className="absolute left-4 top-8 bottom-[-16px] w-0.5 bg-slate-150" />
+                        )}
+                        <div className={`relative z-10 shrink-0 w-8 h-8 rounded-full flex items-center justify-center border-2 ${
+                          isLocked ? 'bg-emerald-50 border-emerald-200 text-emerald-600' :
+                          isUnlocked ? 'bg-amber-50 border-amber-200 text-amber-600' :
+                          'bg-red-50 border-red-200 text-red-500'
+                        }`}>
+                          {isLocked ? <CheckCircle size={14} /> : 
+                           isUnlocked ? <Edit size={14} /> : 
+                           <XCircle size={14} />}
+                        </div>
+                        <div className="flex flex-col pt-1.5">
+                          <span className="text-xs font-bold text-slate-800">
+                            {item.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                            <span className="text-slate-500 font-normal ml-2">{item.date.toLocaleDateString('en-GB', { weekday: 'long' })}</span>
+                          </span>
+                          <span className={`text-[10px] font-black uppercase tracking-widest mt-0.5 ${
+                            isLocked ? 'text-emerald-600' :
+                            isUnlocked ? 'text-amber-600' :
+                            'text-red-500'
+                          }`}>
+                            {isLocked ? 'Locked' :
+                             isUnlocked ? 'Draft' :
+                             'No Entry Found'}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                <div className="border-b border-slate-150 px-5 py-4 select-none">
+                  <h3 className="text-xs font-black uppercase tracking-wider text-slate-900">System Information</h3>
+                </div>
+                
+                <div className="p-4 bg-slate-50  flex flex-col gap-4 text-xs">
+                  <div className="flex flex-col gap-2">
+                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block">System Diagnostics</span>
+                    
+                    <div className="flex justify-between items-center py-0.5">
+                      <span className="font-semibold text-slate-650 uppercase">System Status</span>
+                      <span className="font-bold text-emerald-600 uppercase">Operational</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden lg:col-span-2 flex flex-col">
               <div className="border-b border-slate-150 px-5 py-4 flex items-center justify-between gap-4 select-none">
                 <div className="flex items-center gap-2">
@@ -154,10 +242,10 @@ export const UnitOpDash = () => {
                 </div>
                 <button
                   onClick={() => refetch()}
-                  className="text-slate-400 hover:text-slate-600 hover:rotate-18 transition-all"
+                  className="text-slate-400 hover:text-slate-800 hover:rotate-30 transition-all cursor-pointer"
                   title="Refresh logs ledger"
                 >
-                  <RefreshCw size={13} />
+                  <RefreshCw size={13} /> 
                 </button>
               </div>
 
@@ -178,7 +266,7 @@ export const UnitOpDash = () => {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse text-xs">
                     <thead>
-                      <tr className="bg-slate-50/50 border-b border-slate-400 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                      <tr className="bg-slate-50/50 border-b border-slate-150 text-[10px] font-black text-slate-500 uppercase tracking-widest">
                         <th className="px-5 py-3">Log Date</th>
                         <th className="px-5 py-3">Cane Crushed</th>
                         <th className="px-5 py-3">Sugar Output</th>
@@ -186,23 +274,23 @@ export const UnitOpDash = () => {
                         <th className="px-5 py-3 text-right">Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody>
                       {logs.slice(0, 4).map((log: DailyLogResponse) => {
-                        const metrics = typeof log.metrics === 'string' ? JSON.parse(log.metrics) : log.metrics;
-                        const brix = parseFloat(metrics?.primaryJuiceBrix) || 0;
-                        const pol = parseFloat(metrics?.primaryJuicePol) || 0;
+                        const metrics = typeof log.metrics === 'string' ? JSON.parse(log.metrics) : (log.metrics || (log as any).payload);
+                        const brix = parseFloat((metrics as any)?.primaryJuiceBrix) || 0;
+                        const pol = parseFloat((metrics as any)?.primaryJuicePol) || 0;
                         const purity = brix > 0 ? ((pol / brix) * 100).toFixed(2) : '—';
                         
                         return (
-                          <tr key={log.id} className="hover:bg-slate-50/40 transition-colors">
+                          <tr key={log.id} className="hover:bg-slate-50/40 transition-colors border-b border-slate-300">
                             <td className="px-5 py-3.5 font-bold text-slate-800">
-                              {formatDate(log.logDate)}
+                              {formatDate(log.createdAt || (log as any).date || (log as any).logDate)}
                             </td>
                             <td className="px-5 py-3.5 font-semibold text-slate-650">
-                              {Number(metrics?.caneCrushed || 0).toLocaleString()} Qtls
+                              {Number((metrics as any)?.totalCaneCrushed || 0).toLocaleString()} Qtls
                             </td>
                             <td className="px-5 py-3.5 font-semibold text-indigo-650">
-                              {Number(metrics?.totalSugarBagged || 0).toLocaleString()} Qtls
+                              {Number((metrics as any)?.totalSugarBagged || 0).toLocaleString()} Qtls
                             </td>
                             <td className="px-5 py-3.5 font-bold text-emerald-650">
                               {purity}
@@ -224,7 +312,7 @@ export const UnitOpDash = () => {
                 </div>
               )}
               
-              <div className="border-t border-slate-150 px-5 py-3 bg-slate-50/50 flex justify-end">
+              <div className="px-5 py-3 bg-slate-50/50 flex justify-end">
                 <Link 
                   to={PAGES.LOGS_LIST} 
                   className="text-[10px] font-black text-indigo-600 hover:text-indigo-700 uppercase tracking-widest inline-flex items-center gap-1"
@@ -234,22 +322,8 @@ export const UnitOpDash = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
-              <div className="border-b border-slate-150 px-5 py-4 select-none">
-                <h3 className="text-xs font-black uppercase tracking-wider text-slate-900">System Information</h3>
-              </div>
-              
-              <div className="p-5 flex flex-col gap-4 text-xs">
-                <div className="p-3.5 bg-slate-50 border border-slate-150 rounded-lg flex flex-col gap-2">
-                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block">System Diagnostics</span>
-                  
-                  <div className="flex justify-between items-center py-0.5">
-                    <span className="font-semibold text-slate-650">System Status</span>
-                    <span className="font-bold text-emerald-600 uppercase">Operational</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            
+
           </div>
         </main>
       </div>
