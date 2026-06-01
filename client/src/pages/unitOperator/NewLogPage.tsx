@@ -303,7 +303,7 @@ export const NewLogPage = () => {
             )}
 
             <fieldset 
-              // disabled={selectedLogStatus === 'LOCKED' || isSequentialBlocked} 
+              disabled={selectedLogStatus === 'LOCKED' || isSequentialBlocked} 
               className="max-w-5xl w-full pb-24 border-none p-0 m-0 disabled:opacity-60"
             >
               {analysisConfig.map((group) => (
