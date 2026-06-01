@@ -56,7 +56,7 @@ const BasePrimitiveInputRow = React.memo(({ label, fields, children }: BaseInput
                 }`
                 : `px-3 py-1.5 border rounded-md text-sm transition-all duration-200 w-full ${
                   field.isCalculated
-                    ? 'bg-slate-200 cursor-not-allowed opacity-80 border-slate-300 font-bold text-slate-700'
+                    ? 'bg-slate-200 opacity-80 border-slate-300 font-bold text-slate-700'
                     : error
                       ? 'bg-slate-50/50 hover:bg-white border-red-500 focus:bg-white focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 bg-red-50/20'
                       : 'bg-slate-50/50 hover:bg-white border-slate-200 hover:border-blue-400 focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100'
