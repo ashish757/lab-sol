@@ -76,7 +76,7 @@ const BasePrimitiveInputRow = React.memo(({ label, fields, children }: BaseInput
                       id={field.id}
                       type={getInputType(field.type)}
                       step={field.type === 'number' ? 'any' : undefined}
-                      placeholder={field.id}
+                      value={field.id}
                       readOnly={field.isCalculated}
                       {...register(field.id, getRegisterOptions(field.type))}
                       className={inputClassName}
