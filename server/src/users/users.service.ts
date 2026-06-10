@@ -75,7 +75,6 @@ export class UsersService {
     return this.prisma.user.update({
       where: { id: targetUserId },
       data: {
-        role: dto.role,
         unitId: dto.unitId,
         status: dto.status,
       },

@@ -52,7 +52,7 @@ const UnitListItem = ({ unit, openDropdown, setOpenDropdown, onUpdate, onDelete,
   );
 };
 
-const UserListItem = ({ user, currentUser, handleCancelInvite, handleResendInvite, isCancelling, isResending, openDropdown, setOpenDropdown, onRoleChange, onUnitChange, onDeactivate }: any) => {
+const UserListItem = ({ user, currentUser, handleCancelInvite, handleResendInvite, isCancelling, isResending, openDropdown, setOpenDropdown, onUnitChange, onDeactivate }: any) => {
   const isDropdownOpen = openDropdown === user.id;
   const isSelf = user.id === currentUser?.id;
 
@@ -117,7 +117,6 @@ const UserListItem = ({ user, currentUser, handleCancelInvite, handleResendInvit
         )}
         {isDropdownOpen && !user.isInvite && !isSelf && (
           <div className="absolute right-8 top-12 w-48 bg-white border border-slate-200 rounded-xl shadow-lg py-1 z-10">
-            <button onClick={() => { setOpenDropdown(null); onRoleChange(user); }} className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 font-medium">Change Role</button>
             {user.role === 'UNIT_OPERATOR' && (
               <button onClick={() => { setOpenDropdown(null); onUnitChange(user); }} className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 font-medium">Reassign Unit</button>
             )}
@@ -218,30 +217,7 @@ export const OrgAdminDash = () => {
     }
   };
 
-  const handleRoleChange = async (targetUser: any) => {
-    const newRole = await showModal({
-      type: 'prompt',
-      inputType: 'select',
-      title: 'Change Role',
-      message: 'Select a new access role for this user.',
-      inputLabel: 'Role',
-      defaultValue: targetUser.role,
-      options: [
-        { value: 'ORG_ADMIN', label: 'Organization Admin' },
-        { value: 'ORG_STAFF', label: 'Organization Staff' },
-        { value: 'UNIT_OPERATOR', label: 'Unit Operator' }
-      ],
-      confirmText: 'Save Role'
-    });
-    
-    if (newRole && newRole !== targetUser.role) {
-      try {
-        await updateUser({ id: targetUser.id, data: { role: newRole } }).unwrap();
-      } catch (err: any) {
-        await showModal({ type: 'alert', title: 'Error', message: err?.data?.message || 'Failed to update role' });
-      }
-    }
-  };
+
 
   const handleUnitChange = async (targetUser: any) => {
     const unitOptions = org?.units?.map((u: any) => ({ value: u.id, label: u.name })) || [];
@@ -458,7 +434,6 @@ export const OrgAdminDash = () => {
                     setOpenDropdown={(id: string | null) => {
                       setTimeout(() => setOpenDropdown(id), 0);
                     }}
-                    onRoleChange={handleRoleChange}
                     onUnitChange={handleUnitChange}
                     onDeactivate={handleDeactivate}
                   />
