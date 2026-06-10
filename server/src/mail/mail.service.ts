@@ -7,7 +7,7 @@ import { inviteStaffTemplate } from './templates/inviteStaff';
 export class MailService {
   private readonly resend: Resend;
   private readonly logger = new Logger(MailService.name);
-  private readonly frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+  private readonly frontendUrl = process.env.ENV === "production" ? process.env.FRONTEND_URL : 'http://localhost:5173';
   private readonly defaultFrom = process.env.MAIL_FROM || 'onboarding@resend.dev'; // Use resend's default dev sandbox email
 
   constructor() {

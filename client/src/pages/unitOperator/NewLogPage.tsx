@@ -61,13 +61,7 @@ export const NewLogPage = () => {
     let sLogId = undefined;
 
     if (Array.isArray(logs) && selectedDate) {
-      const sortedLogs = [...logs].sort((a, b) => {
-        const d1 = new Date(b.createdAt || (b as any).date || (b as any).logDate).getTime();
-        const d2 = new Date(a.createdAt || (a as any).date || (a as any).logDate).getTime();
-        return d1 - d2;
-      });
-      
-      for (const log of sortedLogs) {
+      for (const log of logs) {
         const logDateVal = log.createdAt || (log as any).date || (log as any).logDate;
         if (!logDateVal) continue;
         const logDateStr = new Date(logDateVal).toISOString().split('T')[0];
@@ -76,11 +70,53 @@ export const NewLogPage = () => {
           status = log.status;
           sLogId = log.id;
         }
+      }
 
-        if (logDateStr < selectedDate && log.status === 'UNLOCKED') {
-          blocked = true;
-          blockingD = logDateStr;
+      let nextExpectedDate: string | null = null;
+      let missingOrUnlocked = false;
+
+      if (logs.length > 0) {
+        const sortedLogsAsc = [...logs].sort((a, b) => {
+          const d1 = new Date(a.createdAt || (a as any).date || (a as any).logDate).getTime();
+          const d2 = new Date(b.createdAt || (b as any).date || (b as any).logDate).getTime();
+          return d1 - d2;
+        });
+
+        const earliestDateStr = new Date(
+          sortedLogsAsc[0].createdAt || (sortedLogsAsc[0] as any).date || (sortedLogsAsc[0] as any).logDate
+        ).toISOString().split('T')[0];
+        
+        const currentDate = new Date(`${earliestDateStr}T00:00:00Z`);
+        
+        for (const log of sortedLogsAsc) {
+          const logDateVal = log.createdAt || (log as any).date || (log as any).logDate;
+          if (!logDateVal) continue;
+          const logDateStr = new Date(logDateVal).toISOString().split('T')[0];
+          const currentDateStr = currentDate.toISOString().split('T')[0];
+          
+          if (logDateStr > currentDateStr) {
+            nextExpectedDate = currentDateStr;
+            missingOrUnlocked = true;
+            break;
+          }
+          
+          if (log.status === 'UNLOCKED') {
+            nextExpectedDate = logDateStr;
+            missingOrUnlocked = true;
+            break;
+          }
+          
+          currentDate.setUTCDate(currentDate.getUTCDate() + 1);
         }
+        
+        if (!missingOrUnlocked) {
+          nextExpectedDate = currentDate.toISOString().split('T')[0];
+        }
+      }
+
+      if (nextExpectedDate && selectedDate > nextExpectedDate) {
+        blocked = true;
+        blockingD = nextExpectedDate;
       }
     }
     return { isSequentialBlocked: blocked, blockingDate: blockingD, selectedLogStatus: status, selectedLogId: sLogId };
@@ -303,7 +339,7 @@ export const NewLogPage = () => {
             )}
 
             <fieldset 
-              // disabled={selectedLogStatus === 'LOCKED' || isSequentialBlocked} 
+              disabled={selectedLogStatus === 'LOCKED' || isSequentialBlocked} 
               className="max-w-5xl w-full pb-24 border-none p-0 m-0 disabled:opacity-60"
             >
               {analysisConfig.map((group) => (

@@ -17,26 +17,22 @@ const getFieldUnit = (field: FieldConfig): string => {
   return field.unit || '-';
 };
 
-// const getInputType = (type: string): string => {
-//   if (type === 'number') return 'number';
-//   if (type === 'date') return 'date';
-//   if (type === 'time') return 'time';
-//   return 'text';
-// };
+const getInputType = (type: string): string => {
+  if (type === 'number') return 'number';
+  if (type === 'date') return 'date';
+  if (type === 'time') return 'time';
+  return 'text';
+};
 
-// const getRegisterOptions = (type: string) => {
-//   if (type === 'number') return { valueAsNumber: true };
-//   return {};
-// };
+const getRegisterOptions = (type: string) => {
+  if (type === 'number') return { valueAsNumber: true };
+  return {};
+};
 
 const BasePrimitiveInputRow = React.memo(({ label, fields, children }: BaseInputProps & { children?: React.ReactNode }) => {
-  // const { register, formState: { errors } } = useFormContext();
+  const { register, formState: { errors } } = useFormContext();
 
   const hasRequiredField = fields.some(field => field.required);
-
-  const copyToClip: React.EventHandler<any> = async (e) => {
-          await navigator.clipboard.writeText(e.currentTarget.innerText);
-  }
 
   return (
     <tr className="border-b border-slate-200 hover:bg-slate-50/40 transition-colors relative group">
@@ -53,50 +49,45 @@ const BasePrimitiveInputRow = React.memo(({ label, fields, children }: BaseInput
         <div className="flex items-center w-full">
           <div className={`grid gap-4 ${fields.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} flex-1 w-full`}>
             {fields.map(field => {
-              // const error = errors[field.id];
-              // const isDateTime = field.type === 'date' || field.type === 'time';
-              // const inputClassName = isDateTime
-              //   ? `p-0 border-none bg-transparent font-bold text-base shadow-none focus:ring-0 focus:outline-none appearance-none m-0 ${error ? 'text-red-650' : 'text-blue-600'
-              //   }`
-              //   : `px-3 py-1.5 border rounded-md text-sm transition-all duration-200 w-full ${
-              //     field.isCalculated
-              //       ? 'bg-slate-200 cursor-not-allowed opacity-80 border-slate-300 font-bold text-slate-700'
-              //       : error
-              //         ? 'bg-slate-50/50 hover:bg-white border-red-500 focus:bg-white focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 bg-red-50/20'
-              //         : 'bg-slate-50/50 hover:bg-white border-slate-200 hover:border-blue-400 focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100'
-              //   }`;
+              const error = errors[field.id];
+              const isDateTime = field.type === 'date' || field.type === 'time';
+              const inputClassName = isDateTime
+                ? `p-0 border-none bg-transparent font-bold text-base shadow-none focus:ring-0 focus:outline-none appearance-none m-0 ${error ? 'text-red-650' : 'text-blue-600'
+                }`
+                : `px-3 py-1.5 border rounded-md text-sm transition-all duration-200 w-full ${
+                  field.isCalculated
+                    ? 'bg-slate-200 cursor-not-allowed opacity-80 border-slate-300 font-bold text-slate-700'
+                    : error
+                      ? 'bg-slate-50/50 hover:bg-white border-red-500 focus:bg-white focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 bg-red-50/20'
+                      : 'bg-slate-50/50 hover:bg-white border-slate-200 hover:border-blue-400 focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100'
+                }`;
 
-              // const subLabel = fields.length > 1 ? field.subLabel : '';
+              const subLabel = fields.length > 1 ? field.subLabel : '';
 
               return (
-                  <td className="py-3 pl-4 text-lg font-semibold text-slate-700 tracking-wide align-middle w-1/3 md:w-1/4 lg:w-1/3">
-                    <label className="cursor-pointer block" onClick={copyToClip}>
-                      {field.id}
-                    </label>
-                  </td>
-                // <div key={field.id} className="relative w-full flex flex-col gap-1">
-                //   <div className="flex items-center w-full">
-                //     {subLabel && (
-                //       <span className="text-[10px] font-black text-slate-500 mr-3 uppercase tracking-wider w-14 text-right select-none">
-                //         {subLabel}
-                //       </span>
-                //     )}
-                //     <input
-                //       id={field.id}
-                //       type={getInputType(field.type)}
-                //       step={field.type === 'number' ? 'any' : undefined}
-                //       placeholder={field.type === 'time' ? 'HH:MM' : ''}
-                //       readOnly={field.isCalculated}
-                //       {...register(field.id, getRegisterOptions(field.type))}
-                //       className={inputClassName}
-                //     />
-                //   </div>
-                //   {error && (
-                //     <span className="text-[10px] font-bold text-red-500 select-none block">
-                //       {String(error.message || 'Required')}
-                //     </span>
-                //   )}
-                // </div>
+                <div key={field.id} className="relative w-full flex flex-col gap-1">
+                  <div className="flex items-center w-full">
+                    {subLabel && (
+                      <span className="text-[10px] font-black text-slate-500 mr-3 uppercase tracking-wider w-14 text-right select-none">
+                        {subLabel}
+                      </span>
+                    )}
+                    <input
+                      id={field.id}
+                      type={getInputType(field.type)}
+                      step={field.type === 'number' ? 'any' : undefined}
+                      placeholder={field.type === 'time' ? 'HH:MM' : ''}
+                      readOnly={field.isCalculated}
+                      {...register(field.id, getRegisterOptions(field.type))}
+                      className={inputClassName}
+                    />
+                  </div>
+                  {error && (
+                    <span className="text-[10px] font-bold text-red-500 select-none block">
+                      {String(error.message || 'Required')}
+                    </span>
+                  )}
+                </div>
               );
             })}
           </div>

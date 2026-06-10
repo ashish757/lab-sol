@@ -36,7 +36,7 @@ export const FormSidebar = ({ config, activeSection, onScrollTo, onResetData, on
 
         {isSequentialBlocked && (
           <div className="text-[10px] font-bold text-red-600 bg-red-50 px-2 py-2 rounded border border-red-200 text-center uppercase tracking-wider leading-relaxed">
-            Action Required: Lock log for {blockingDate} first.
+            Missing Data: Please upload & lock data for {blockingDate} first.
           </div>
         )}
 
