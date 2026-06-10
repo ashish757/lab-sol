@@ -28,7 +28,6 @@ export const getPagePath = {
   superAdminInvite: () => PAGES.SUPER_ADMIN_INVITE,
   login: () => PAGES.LOGIN,
   adminDashboard: () => PAGES.ADMIN_DASHBOARD,
-  adminDashboard: () => PAGES.ADMIN_DASHBOARD,
   adminOrgDetails: (id: string | number) => `/admin/dash/org/${id}`,
   orgUnitDetails: (id: string | number) => `/org/dash/unit/${id}`,
 };
