@@ -51,11 +51,11 @@ const BasePrimitiveInputRow = React.memo(({ label, fields, children }: BaseInput
             {fields.map(field => {
               const error = errors[field.id];
               const isDateTime = field.type === 'date' || field.type === 'time';
+              const isReadOnly = field.isCalculated || field.readonly;
               const inputClassName = isDateTime
-                ? `p-0 border-none bg-transparent font-bold text-base shadow-none focus:ring-0 focus:outline-none appearance-none m-0 ${error ? 'text-red-650' : 'text-blue-600'
-                }`
+                ? `p-0 border-none bg-transparent font-bold text-base shadow-none focus:ring-0 focus:outline-none appearance-none m-0 ${error ? 'text-red-650' : 'text-blue-600'} ${isReadOnly ? 'opacity-70 pointer-events-none' : ''}`
                 : `px-3 py-1.5 border rounded-md text-sm transition-all duration-200 w-full ${
-                  field.isCalculated
+                  isReadOnly
                     ? 'bg-slate-200 cursor-not-allowed opacity-80 border-slate-300 font-bold text-slate-700'
                     : error
                       ? 'bg-slate-50/50 hover:bg-white border-red-500 focus:bg-white focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 bg-red-50/20'
@@ -77,7 +77,8 @@ const BasePrimitiveInputRow = React.memo(({ label, fields, children }: BaseInput
                       type={getInputType(field.type)}
                       step={field.type === 'number' ? 'any' : undefined}
                       placeholder={field.type === 'time' ? 'HH:MM' : ''}
-                      readOnly={field.isCalculated}
+                      readOnly={isReadOnly}
+                      tabIndex={isReadOnly ? -1 : 0}
                       {...register(field.id, getRegisterOptions(field.type))}
                       className={inputClassName}
                     />

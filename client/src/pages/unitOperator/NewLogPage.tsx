@@ -46,99 +46,102 @@ export const NewLogPage = () => {
   const [lockUnitLog, { isLoading: isLocking }] = useLockUnitLogMutation();
   const [saveReport] = useSaveAndGenerateReportMutation();
   const { showModal, ModalComponent } = useModal();
-  const initialValues = getInitialValues();
+  const initialValues = useMemo(() => getInitialValues(), []);
   
   const { data: logs = [] } = useFetchUnitLogsQuery(user?.unitId as string, {
     skip: !user?.unitId,
   });
 
-  const selectedDate = methods.watch('todayDate') as string;
-
-  const { isSequentialBlocked, blockingDate, selectedLogStatus, selectedLogId } = useMemo(() => {
-    let blocked = false;
-    let blockingD = undefined;
+  const { activeDate, selectedLogStatus, selectedLogId, isFillingPastData } = useMemo(() => {
     let status = 'NEW';
     let sLogId = undefined;
+    let nextExpectedDate: string | null = null;
+    let missingOrUnlocked = false;
 
-    if (Array.isArray(logs) && selectedDate) {
+    if (Array.isArray(logs) && logs.length > 0) {
+      const sortedLogsAsc = [...logs].sort((a, b) => {
+        const d1 = new Date(a.createdAt || (a as any).date || (a as any).logDate).getTime();
+        const d2 = new Date(b.createdAt || (b as any).date || (b as any).logDate).getTime();
+        return d1 - d2;
+      });
+
+      const earliestDateStr = new Date(
+        sortedLogsAsc[0].createdAt || (sortedLogsAsc[0] as any).date || (sortedLogsAsc[0] as any).logDate
+      ).toISOString().split('T')[0];
+      
+      const currentDate = new Date(`${earliestDateStr}T00:00:00Z`);
+      
+      for (const log of sortedLogsAsc) {
+        const logDateVal = log.createdAt || (log as any).date || (log as any).logDate;
+        if (!logDateVal) continue;
+        const logDateStr = new Date(logDateVal).toISOString().split('T')[0];
+        const currentDateStr = currentDate.toISOString().split('T')[0];
+        
+        if (logDateStr > currentDateStr) {
+          nextExpectedDate = currentDateStr;
+          missingOrUnlocked = true;
+          break;
+        }
+        
+        if (log.status === 'UNLOCKED') {
+          nextExpectedDate = logDateStr;
+          missingOrUnlocked = true;
+          break;
+        }
+        
+        currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+      }
+      
+      if (!missingOrUnlocked) {
+        nextExpectedDate = currentDate.toISOString().split('T')[0];
+      }
+    }
+
+    const calculatedActiveDate = nextExpectedDate || initialValues.todayDate;
+
+    if (Array.isArray(logs)) {
       for (const log of logs) {
         const logDateVal = log.createdAt || (log as any).date || (log as any).logDate;
         if (!logDateVal) continue;
         const logDateStr = new Date(logDateVal).toISOString().split('T')[0];
         
-        if (logDateStr === selectedDate) {
+        if (logDateStr === calculatedActiveDate) {
           status = log.status;
           sLogId = log.id;
         }
       }
-
-      let nextExpectedDate: string | null = null;
-      let missingOrUnlocked = false;
-
-      if (logs.length > 0) {
-        const sortedLogsAsc = [...logs].sort((a, b) => {
-          const d1 = new Date(a.createdAt || (a as any).date || (a as any).logDate).getTime();
-          const d2 = new Date(b.createdAt || (b as any).date || (b as any).logDate).getTime();
-          return d1 - d2;
-        });
-
-        const earliestDateStr = new Date(
-          sortedLogsAsc[0].createdAt || (sortedLogsAsc[0] as any).date || (sortedLogsAsc[0] as any).logDate
-        ).toISOString().split('T')[0];
-        
-        const currentDate = new Date(`${earliestDateStr}T00:00:00Z`);
-        
-        for (const log of sortedLogsAsc) {
-          const logDateVal = log.createdAt || (log as any).date || (log as any).logDate;
-          if (!logDateVal) continue;
-          const logDateStr = new Date(logDateVal).toISOString().split('T')[0];
-          const currentDateStr = currentDate.toISOString().split('T')[0];
-          
-          if (logDateStr > currentDateStr) {
-            nextExpectedDate = currentDateStr;
-            missingOrUnlocked = true;
-            break;
-          }
-          
-          if (log.status === 'UNLOCKED') {
-            nextExpectedDate = logDateStr;
-            missingOrUnlocked = true;
-            break;
-          }
-          
-          currentDate.setUTCDate(currentDate.getUTCDate() + 1);
-        }
-        
-        if (!missingOrUnlocked) {
-          nextExpectedDate = currentDate.toISOString().split('T')[0];
-        }
-      }
-
-      if (nextExpectedDate && selectedDate > nextExpectedDate) {
-        blocked = true;
-        blockingD = nextExpectedDate;
-      }
     }
-    return { isSequentialBlocked: blocked, blockingDate: blockingD, selectedLogStatus: status, selectedLogId: sLogId };
-  }, [logs, selectedDate]);
+
+    const isFillingPastData = calculatedActiveDate < initialValues.todayDate;
+
+    return { 
+      activeDate: calculatedActiveDate, 
+      selectedLogStatus: status, 
+      selectedLogId: sLogId,
+      isFillingPastData
+    };
+  }, [logs, initialValues.todayDate]);
 
   const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
+    // Force the form todayDate to always be the activeDate
+    methods.setValue('todayDate', activeDate);
+
     if (Array.isArray(logs)) {
       const log = logs.find(l => {
         const logDateVal = l.createdAt || (l as any).date || (l as any).logDate;
         if (!logDateVal) return false;
-        return new Date(logDateVal).toISOString().split('T')[0] === selectedDate;
+        return new Date(logDateVal).toISOString().split('T')[0] === activeDate;
       });
       if (log) {
         const parsedMetrics = typeof log.payload === 'string' ? JSON.parse(log.payload) : log.payload;
-        methods.reset({ ...initialValues, ...parsedMetrics, todayDate: selectedDate });
+        methods.reset({ ...initialValues, ...parsedMetrics, todayDate: activeDate });
       } else {
-        methods.reset({ ...initialValues, todayDate: selectedDate });
+        methods.reset({ ...initialValues, todayDate: activeDate });
       }
     }
-  }, [logs, selectedDate, methods]);
+  }, [logs, activeDate, methods, initialValues]);
 
   const sectionIds = getAllSectionIds(analysisConfig);
   const defaultSection = sectionIds[0] ?? '';
@@ -149,11 +152,11 @@ export const NewLogPage = () => {
 
 
   const handleUploadData = async () => {
-    if (selectedLogStatus === 'LOCKED' || isSequentialBlocked) return;
+    if (selectedLogStatus === 'LOCKED') return;
     const data = methods.getValues();
     const { todayDate, ...rest } = data;
     const payload = {
-      createdAt: todayDate as string ?? new Date().toISOString().slice(0, 10),
+      createdAt: activeDate,
       payload: rest as Record<string, unknown>,
     };
 
@@ -165,7 +168,7 @@ export const NewLogPage = () => {
   };
 
   const handleLockData = async () => {
-    if (selectedLogStatus === 'LOCKED' || isSequentialBlocked) return;
+    if (selectedLogStatus === 'LOCKED') return;
     
     const confirmLock = await showModal({
       type: 'confirm',
@@ -192,7 +195,7 @@ export const NewLogPage = () => {
   const onSubmit = async (data: AnalysisSchema) => {
     const { todayDate, ...rest } = data;
     const payload = {
-      createdAt: todayDate as string ?? new Date().toISOString().slice(0, 10),
+      createdAt: activeDate,
       payload: rest as Record<string, unknown>,
     };
 
@@ -218,24 +221,10 @@ export const NewLogPage = () => {
     }
   };
 
-  const handleResetData = () => {
-    if (Array.isArray(logs)) {
-      const log = logs.find(l => {
-        const logDateVal = l.createdAt || (l as any).date || (l as any).logDate;
-        if (!logDateVal) return false;
-        return new Date(logDateVal).toISOString().split('T')[0] === selectedDate;
-      });
-      if (log) {
-        const parsedMetrics = typeof log.payload === 'string' ? JSON.parse(log.payload) : log.payload;
-        methods.reset({ ...initialValues, ...parsedMetrics, todayDate: selectedDate });
-      }
-    }
-  };
-
   const handleCopyLastLocked = () => {
     if (!Array.isArray(logs)) return;
     
-    // Find the most recent locked log BEFORE the selectedDate
+    // Find the most recent locked log BEFORE the activeDate
     const sortedLogs = [...logs].sort((a, b) => {
       const d1 = new Date(b.createdAt || (b as any).date || (b as any).logDate).getTime();
       const d2 = new Date(a.createdAt || (a as any).date || (a as any).logDate).getTime();
@@ -245,7 +234,7 @@ export const NewLogPage = () => {
       (log) => {
         const logDateVal = log.createdAt || (log as any).date || (log as any).logDate;
         if (!logDateVal) return false;
-        return new Date(logDateVal).toISOString().split('T')[0] < selectedDate && log.status === 'LOCKED';
+        return new Date(logDateVal).toISOString().split('T')[0] < activeDate && log.status === 'LOCKED';
       }
     );
 
@@ -267,7 +256,7 @@ export const NewLogPage = () => {
       methods.reset({
         ...currentValues,
         ...filteredMetrics,
-        todayDate: selectedDate,
+        todayDate: activeDate,
       });
     } else {
       showModal({ type: 'alert', title: 'Notice', message: "No previously locked log found to copy from." });
@@ -315,18 +304,18 @@ export const NewLogPage = () => {
             onScrollTo={handleScrollTo}
             onUploadData={handleUploadData}
             onLockData={handleLockData}
-            onResetData={handleResetData}
             isSubmitting={isGenerating || isUpserting || isLocking}
             hasUnsavedChanges={methods.formState.isDirty}
             hasUploadedData={!!selectedLogId}
             isLocked={selectedLogStatus === 'LOCKED'}
-            isSequentialBlocked={isSequentialBlocked}
-            blockingDate={blockingDate}
+            isSequentialBlocked={false}
+            blockingDate={activeDate}
+            isFillingPastData={isFillingPastData}
           />
 
           <div className="flex-1 overflow-y-auto p-6 lg:p-8 bg-slate-50 relative scroll-smooth flex flex-col items-center">
             
-            {!isSequentialBlocked && selectedLogStatus !== 'LOCKED' && (
+            {selectedLogStatus !== 'LOCKED' && (
               <div className="max-w-5xl w-full flex justify-end mb-4">
                 <button
                   type="button"
@@ -339,7 +328,7 @@ export const NewLogPage = () => {
             )}
 
             <fieldset 
-              disabled={selectedLogStatus === 'LOCKED' || isSequentialBlocked} 
+              disabled={selectedLogStatus === 'LOCKED'} 
               className="max-w-5xl w-full pb-24 border-none p-0 m-0 disabled:opacity-60"
             >
               {analysisConfig.map((group) => (

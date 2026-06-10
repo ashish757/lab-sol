@@ -39,23 +39,47 @@ export class DailyLogsService {
     }
 
     // Validation B (Sequential Rule)
-    // Operators cannot create or edit a log for Date X if a past log is UNLOCKED.
-    const mostRecentPastLog = await this.prisma.dailyLog.findFirst({
-      where: {
-        unitId: unitId,
-        createdAt: {
-          lt: requestedDate,
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
+    // Operators cannot create or edit a log for Date X if a day before Date X is missing or unlocked.
+    const allLogs = await this.prisma.dailyLog.findMany({
+      where: { unitId },
+      orderBy: { createdAt: 'asc' },
     });
 
-    const isPreviousLogUnlocked = mostRecentPastLog?.status === LogStatus.UNLOCKED;
+    let nextExpectedDate: string | null = null;
+    let missingOrUnlocked = false;
 
-    if (isPreviousLogUnlocked) {
-      throw new BadRequestException("You must lock the previous day's log before starting a new one");
+    if (allLogs.length > 0) {
+      const earliestDateStr = allLogs[0].createdAt.toISOString().split('T')[0];
+      const currentDate = new Date(`${earliestDateStr}T00:00:00Z`);
+
+      for (const log of allLogs) {
+        const logDateStr = log.createdAt.toISOString().split('T')[0];
+        const currentDateStr = currentDate.toISOString().split('T')[0];
+
+        if (logDateStr > currentDateStr) {
+          nextExpectedDate = currentDateStr;
+          missingOrUnlocked = true;
+          break;
+        }
+
+        if (log.status === LogStatus.UNLOCKED) {
+          nextExpectedDate = logDateStr;
+          missingOrUnlocked = true;
+          break;
+        }
+
+        currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+      }
+
+      if (!missingOrUnlocked) {
+        nextExpectedDate = currentDate.toISOString().split('T')[0];
+      }
+    }
+
+    const requestedDateStr = requestedDate.toISOString().split('T')[0];
+
+    if (nextExpectedDate && requestedDateStr > nextExpectedDate) {
+      throw new BadRequestException(`Sequential upload required. You must complete data for ${nextExpectedDate} first.`);
     }
 
     // Action: Upsert
