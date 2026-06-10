@@ -1,27 +1,29 @@
 # Client Documentation
 
-The frontend of the Enterprise Analysis Tool is built to prioritize performant data entry and clear visualization.
+The frontend of the Enterprise Analysis Tool is built to prioritize performant data entry, robust state management, and clear visualization.
 
 ## Tech Stack
 
 - **Framework**: React 19
-- **Build Tool**: Vite
+- **Build Tool**: Vite (Configured with `server.fs.allow: ['..']` to permit shared imports)
 - **Styling**: Tailwind CSS v4
+- **State & Data Fetching**: Redux Toolkit & RTK Query
 - **Form Handling**: React Hook Form
 - **Validation**: Zod & `@hookform/resolvers`
 - **Routing**: React Router DOM
 
-## Core Requirements
+## Core Architecture
 
-- **Zero Lag Data Entry**: The form contains ~30 complex inputs. Typing must be instantaneous. We achieve this by using uncontrolled components via `react-hook-form` rather than relying on standard React state (`useState`) for every keystroke.
-- **Validation**: Inputs are strictly validated on the client side using Zod before submission to minimize server load and provide immediate feedback to the analyst.
+### State Management: RTK Query
+We have successfully eradicated legacy Axios interceptors and TanStack query dependencies. The frontend utilizes `@reduxjs/toolkit/query/react` exclusively for all data fetching and mutation pipelines. RTK Query handles intelligent caching, automatic `Authorization` header injection via Redux state, and dynamic cache invalidation (e.g., automatically refreshing lists when a mutation fires).
 
-## Structure
+### Zero Lag Data Entry & Validation
+The daily log form contains ~30 complex inputs. Typing must be instantaneous. 
+- We achieve zero lag by utilizing uncontrolled components via `react-hook-form` rather than relying on standard `useState` re-renders for every keystroke.
+- The client-side validation schema (`analysisSchema.ts`) is generated dynamically from the primary UI configuration (`analysisConfig.ts`). This avoids duplicate mapping definitions. 
+- By default, form fields are optional (converting empty inputs to `undefined`), allowing partial saves. Strict requirement validation is toggled using `required: true` in the configuration arrays.
 
-- `src/features/analysis/`: Contains the core analysis forms and views (e.g., `AnalysisForm.tsx`).
-- `src/pages/`: Contains the top-level route pages (e.g., `AnalysisPage.tsx`).
-- `src/types/`: Contains shared TypeScript types and Zod schemas (e.g., `analysisSchema.ts`).
-
-## Styling Guidelines
-
-We use Tailwind CSS v4. Ensure all new components utilize Tailwind utility classes to maintain a consistent, modern, and responsive design.
+### Strict Dash Namespace Taxonomy
+All protected internal routes are hard-sandboxed under the `/dash/` namespace (e.g., `/org/dash`, `/admin/dash`, `/unit/dash`).
+- Unauthenticated endpoints violently redirect unauthorized requests to `/login`.
+- The root `/` intelligently redirects authenticated users directly to their designated dashboard context, preventing unprotected entry points.
