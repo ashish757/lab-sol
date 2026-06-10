@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { useGetOrganizationByIdQuery, useCancelUserInviteMutation, useInviteUserMutation, useUpdateUnitMutation, useDeleteUnitMutation, useUpdateUserMutation } from '../../store/api/apiSlice';
 import { Users, Network, Mail, Building, Plus, Trash2, RefreshCw, MoreVertical, Search, Filter } from 'lucide-react';
 import type { RootState } from '../../store/store';
@@ -21,24 +22,27 @@ const MetricCard = ({ title, value, icon: Icon, colorClass }: { title: string, v
   );
 };
 
-const UnitListItem = ({ unit, openDropdown, setOpenDropdown, onUpdate, onDelete }: { unit: any, openDropdown: string | null, setOpenDropdown: (id: string | null) => void, onUpdate: (unit: any) => void, onDelete: (id: string) => void }) => {
+const UnitListItem = ({ unit, openDropdown, setOpenDropdown, onUpdate, onDelete, onNavigate }: { unit: any, openDropdown: string | null, setOpenDropdown: (id: string | null) => void, onUpdate: (unit: any) => void, onDelete: (id: string) => void, onNavigate: (id: string) => void }) => {
   const isDropdownOpen = openDropdown === unit.id;
   
   return (
-    <li className="p-5 hover:bg-slate-50 transition-colors flex items-center justify-between gap-4 border-b border-slate-100 last:border-0 relative">
+    <li 
+      onClick={() => onNavigate(unit.id)}
+      className="p-5 hover:bg-slate-50 transition-colors flex items-center justify-between gap-4 border-b border-slate-100 last:border-0 relative cursor-pointer"
+    >
       <div>
-        <h3 className="text-base font-bold text-slate-900">{unit.name}</h3>
-        <p className="text-xs text-slate-500 font-medium mt-0.5">Last Log: Today</p>
+        <h3 className="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">{unit.name}</h3>
+        <p className="text-xs text-slate-500 font-medium mt-0.5">Click to view details and season settings</p>
       </div>
       <div className="flex items-center gap-2">
         <button 
-          onClick={() => setOpenDropdown(isDropdownOpen ? null : unit.id)}
+          onClick={(e) => { e.stopPropagation(); setOpenDropdown(isDropdownOpen ? null : unit.id); }}
           className="p-2 hover:bg-slate-200 rounded-full text-slate-500 transition-colors"
         >
           <MoreVertical size={16} />
         </button>
         {isDropdownOpen && (
-          <div className="absolute right-8 top-12 w-48 bg-white border border-slate-200 rounded-xl shadow-lg py-1 z-10">
+          <div className="absolute right-8 top-12 w-48 bg-white border border-slate-200 rounded-xl shadow-lg py-1 z-10" onClick={(e) => e.stopPropagation()}>
             <button onClick={() => { setOpenDropdown(null); onUpdate(unit); }} className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 font-medium">Edit Name</button>
             <button onClick={() => { setOpenDropdown(null); onDelete(unit.id); }} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-medium">Remove</button>
           </div>
@@ -126,6 +130,7 @@ const UserListItem = ({ user, currentUser, handleCancelInvite, handleResendInvit
 };
 
 export const OrgAdminDash = () => {
+  const navigate = useNavigate();
   const { user: currentUser } = useSelector((state: RootState) => state.auth);
   const { data: org, isLoading, error } = useGetOrganizationByIdQuery(currentUser?.orgId as string, {
     skip: !currentUser?.orgId,
@@ -194,6 +199,8 @@ export const OrgAdminDash = () => {
       }
     }
   };
+
+
 
   const handleDeleteUnit = async (unitId: string) => {
     const confirmDelete = await showModal({
@@ -375,6 +382,7 @@ export const OrgAdminDash = () => {
                     }} 
                     onUpdate={handleUpdateUnit}
                     onDelete={handleDeleteUnit}
+                    onNavigate={(id) => navigate(`/org/dash/unit/${id}`)}
                   />
                 ))}
               </ul>

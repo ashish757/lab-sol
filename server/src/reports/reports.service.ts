@@ -125,7 +125,7 @@ export class ReportsService {
   ): Promise<void> {
     let savedLog;
     try {
-      savedLog = await this.dailyLogsService.upsertLog(user.unitId, user.orgId, dto);
+      savedLog = await this.dailyLogsService.upsertLog(user.unitId, user.orgId, user, dto);
     } catch (error) {
       if (error instanceof ForbiddenException && error.message === 'Log is locked and cannot be edited') {
         const requestedDate = new Date(dto.createdAt);

@@ -38,7 +38,7 @@ export class DailyLogsController {
     const currentUser = request.user;
     // ensure currentUser has access to this unitId handled in guards/service normally, 
     // but we use their orgId
-    return this.dailyLogsService.upsertLog(unitId, currentUser.orgId, dto);
+    return this.dailyLogsService.upsertLog(unitId, currentUser.orgId, currentUser, dto);
   }
 
   /**
@@ -66,7 +66,7 @@ export class DailyLogsController {
   @Roles(Role.SUPER_ADMIN, Role.ORG_ADMIN, Role.UNIT_OPERATOR)
   create(@Body() dto: UpsertDailyLogDto, @Req() request: any) {
     const currentUser = request.user;
-    return this.dailyLogsService.upsertLog(currentUser.unitId, currentUser.orgId, dto);
+    return this.dailyLogsService.upsertLog(currentUser.unitId, currentUser.orgId, currentUser, dto);
   }
 
   /**

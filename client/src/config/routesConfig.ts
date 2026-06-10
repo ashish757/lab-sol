@@ -13,6 +13,7 @@ export const PAGES = {
   ADMIN_DASHBOARD: clientRoutes.admin.dashboard,
   ADMIN_ORG_DETAILS: clientRoutes.admin.orgDetails,
   ORG_DASHBOARD: clientRoutes.org.dashboard,
+  ORG_UNIT_DETAILS: clientRoutes.org.unitDetails,
   UNIT_DASHBOARD: clientRoutes.unit.dashboard,
   STAFF_DASHBOARD: clientRoutes.staff.dashboard,
   STAFF_SETUP: clientRoutes.auth.staffSetup,
@@ -27,7 +28,9 @@ export const getPagePath = {
   superAdminInvite: () => PAGES.SUPER_ADMIN_INVITE,
   login: () => PAGES.LOGIN,
   adminDashboard: () => PAGES.ADMIN_DASHBOARD,
+  adminDashboard: () => PAGES.ADMIN_DASHBOARD,
   adminOrgDetails: (id: string | number) => `/admin/dash/org/${id}`,
+  orgUnitDetails: (id: string | number) => `/org/dash/unit/${id}`,
 };
 
 export const API_ENDPOINTS = {

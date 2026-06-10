@@ -58,6 +58,7 @@ export const clientRoutes = {
   },
   org: {
     dashboard: '/org/dash',
+    unitDetails: '/org/dash/unit/:id',
   },
   staff: {
     dashboard: '/staff/dash',

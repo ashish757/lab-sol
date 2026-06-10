@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUnitDto } from './dto/createUnit.dto';
+import { UpdateUnitDto } from './dto/updateUnit.dto';
 
 @Injectable()
 export class UnitsService {
@@ -32,7 +33,7 @@ export class UnitsService {
     });
   }
 
-  async updateUnit(id: string, orgId: string, name: string) {
+  async updateUnit(id: string, orgId: string, dto: UpdateUnitDto) {
     const unit = await this.prisma.unit.findUnique({ where: { id } });
     if (!unit || unit.orgId !== orgId) {
       throw new NotFoundException('Unit not found in your organization');
@@ -41,7 +42,7 @@ export class UnitsService {
     try {
       return await this.prisma.unit.update({
         where: { id },
-        data: { name },
+        data: dto,
       });
     } catch (error: any) {
       if (error.code === 'P2002') {

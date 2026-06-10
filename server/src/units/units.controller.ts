@@ -5,6 +5,7 @@ import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CreateUnitDto } from './dto/createUnit.dto';
+import { UpdateUnitDto } from './dto/updateUnit.dto';
 import { Role } from '@prisma/client';
 
 @Controller(apiRoutes.units.base)
@@ -44,9 +45,9 @@ export class UnitsController {
   @Patch(apiRoutes.units.update)
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.ORG_ADMIN)
-  async updateUnit(@Param('id') id: string, @Body() dto: { name: string }, @Req() req: any) {
+  async updateUnit(@Param('id') id: string, @Body() dto: UpdateUnitDto, @Req() req: any) {
     const orgId = req.user.orgId;
-    return this.unitsService.updateUnit(id, orgId, dto.name);
+    return this.unitsService.updateUnit(id, orgId, dto);
   }
 
   @Delete(apiRoutes.units.delete)

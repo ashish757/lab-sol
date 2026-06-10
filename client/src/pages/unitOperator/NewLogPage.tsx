@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { CalendarX } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../store/store';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -8,7 +9,7 @@ import { analysisConfig, getAllSectionIds } from '../../config/analysisConfig';
 import { useScrollSpy } from '../../hooks/useScrollSpy';
 import { FormSidebar } from '../../components/analysis/FormSidebar';
 import { FormSection } from '../../components/analysis/FormSection';
-import { useUpsertUnitLogMutation, useLockUnitLogMutation, useFetchUnitLogsQuery, useSaveAndGenerateReportMutation } from '../../store/api/apiSlice';
+import { useUpsertUnitLogMutation, useLockUnitLogMutation, useFetchUnitLogsQuery, useSaveAndGenerateReportMutation, useGetUnitByIdQuery } from '../../store/api/apiSlice';
 import { useDailyLogCalculations, CALCULATIONS_CONFIG } from '../../hooks/useDailyLogCalculations';
 import { useModal } from '../../hooks/useModal';
 
@@ -48,7 +49,11 @@ export const NewLogPage = () => {
   const { showModal, ModalComponent } = useModal();
   const initialValues = useMemo(() => getInitialValues(), []);
   
-  const { data: logs = [] } = useFetchUnitLogsQuery(user?.unitId as string, {
+  const { data: unit, isLoading: isUnitLoading } = useGetUnitByIdQuery(user?.unitId as string, {
+    skip: !user?.unitId,
+  });
+  
+  const { data: logs = [], isLoading: isLogsLoading } = useFetchUnitLogsQuery(user?.unitId as string, {
     skip: !user?.unitId,
   });
 
@@ -58,42 +63,48 @@ export const NewLogPage = () => {
     let nextExpectedDate: string | null = null;
     let missingOrUnlocked = false;
 
-    if (Array.isArray(logs) && logs.length > 0) {
-      const sortedLogsAsc = [...logs].sort((a, b) => {
-        const d1 = new Date(a.createdAt || (a as any).date || (a as any).logDate).getTime();
-        const d2 = new Date(b.createdAt || (b as any).date || (b as any).logDate).getTime();
-        return d1 - d2;
-      });
+    if (unit?.seasonStartDate) {
+      nextExpectedDate = unit.seasonStartDate;
 
-      const earliestDateStr = new Date(
-        sortedLogsAsc[0].createdAt || (sortedLogsAsc[0] as any).date || (sortedLogsAsc[0] as any).logDate
-      ).toISOString().split('T')[0];
-      
-      const currentDate = new Date(`${earliestDateStr}T00:00:00Z`);
-      
-      for (const log of sortedLogsAsc) {
-        const logDateVal = log.createdAt || (log as any).date || (log as any).logDate;
-        if (!logDateVal) continue;
-        const logDateStr = new Date(logDateVal).toISOString().split('T')[0];
-        const currentDateStr = currentDate.toISOString().split('T')[0];
+      if (Array.isArray(logs) && logs.length > 0) {
+        const sortedLogsAsc = [...logs]
+          .filter(log => {
+             const logDateVal = log.createdAt || (log as any).date || (log as any).logDate;
+             if (!logDateVal) return false;
+             return new Date(logDateVal).toISOString().split('T')[0] >= unit.seasonStartDate;
+          })
+          .sort((a, b) => {
+            const d1 = new Date(a.createdAt || (a as any).date || (a as any).logDate).getTime();
+            const d2 = new Date(b.createdAt || (b as any).date || (b as any).logDate).getTime();
+            return d1 - d2;
+          });
+
+        const currentDate = new Date(`${unit.seasonStartDate}T00:00:00Z`);
         
-        if (logDateStr > currentDateStr) {
-          nextExpectedDate = currentDateStr;
-          missingOrUnlocked = true;
-          break;
+        for (const log of sortedLogsAsc) {
+          const logDateVal = log.createdAt || (log as any).date || (log as any).logDate;
+          if (!logDateVal) continue;
+          const logDateStr = new Date(logDateVal).toISOString().split('T')[0];
+          const currentDateStr = currentDate.toISOString().split('T')[0];
+          
+          if (logDateStr > currentDateStr) {
+            nextExpectedDate = currentDateStr;
+            missingOrUnlocked = true;
+            break;
+          }
+          
+          if (log.status === 'UNLOCKED') {
+            nextExpectedDate = logDateStr;
+            missingOrUnlocked = true;
+            break;
+          }
+          
+          currentDate.setUTCDate(currentDate.getUTCDate() + 1);
         }
         
-        if (log.status === 'UNLOCKED') {
-          nextExpectedDate = logDateStr;
-          missingOrUnlocked = true;
-          break;
+        if (!missingOrUnlocked) {
+          nextExpectedDate = currentDate.toISOString().split('T')[0];
         }
-        
-        currentDate.setUTCDate(currentDate.getUTCDate() + 1);
-      }
-      
-      if (!missingOrUnlocked) {
-        nextExpectedDate = currentDate.toISOString().split('T')[0];
       }
     }
 
@@ -120,12 +131,11 @@ export const NewLogPage = () => {
       selectedLogId: sLogId,
       isFillingPastData
     };
-  }, [logs, initialValues.todayDate]);
+  }, [logs, initialValues.todayDate, unit?.seasonStartDate]);
 
   const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
-    // Force the form todayDate to always be the activeDate
     methods.setValue('todayDate', activeDate);
 
     if (Array.isArray(logs)) {
@@ -136,12 +146,27 @@ export const NewLogPage = () => {
       });
       if (log) {
         const parsedMetrics = typeof log.payload === 'string' ? JSON.parse(log.payload) : log.payload;
-        methods.reset({ ...initialValues, ...parsedMetrics, todayDate: activeDate });
+        methods.reset({ 
+          ...initialValues, 
+          ...parsedMetrics, 
+          todayDate: activeDate,
+          seasonStartDate: unit?.seasonStartDate || '',
+          seasonStartTime: unit?.seasonStartTime || '',
+          seasonOffDate: unit?.seasonEndDate || '',
+          seasonOffTime: unit?.seasonEndTime || ''
+        });
       } else {
-        methods.reset({ ...initialValues, todayDate: activeDate });
+        methods.reset({ 
+          ...initialValues, 
+          todayDate: activeDate,
+          seasonStartDate: unit?.seasonStartDate || '',
+          seasonStartTime: unit?.seasonStartTime || '',
+          seasonOffDate: unit?.seasonEndDate || '',
+          seasonOffTime: unit?.seasonEndTime || ''
+        });
       }
     }
-  }, [logs, activeDate, methods, initialValues]);
+  }, [logs, unit, activeDate, methods, initialValues]);
 
   const sectionIds = getAllSectionIds(analysisConfig);
   const defaultSection = sectionIds[0] ?? '';
@@ -173,7 +198,7 @@ export const NewLogPage = () => {
     const confirmLock = await showModal({
       type: 'confirm',
       title: 'Lock Data',
-      message: 'Are you sure you want to lock this daily log?\\nOnce locked, you will not be able to edit this data anymore.',
+      message: 'Are you sure you want to lock this daily log?\nOnce locked, you will not be able to edit this data anymore.',
       confirmText: 'Lock Log'
     });
     
@@ -224,7 +249,6 @@ export const NewLogPage = () => {
   const handleCopyLastLocked = () => {
     if (!Array.isArray(logs)) return;
     
-    // Find the most recent locked log BEFORE the activeDate
     const sortedLogs = [...logs].sort((a, b) => {
       const d1 = new Date(b.createdAt || (b as any).date || (b as any).logDate).getTime();
       const d2 = new Date(a.createdAt || (a as any).date || (a as any).logDate).getTime();
@@ -246,13 +270,11 @@ export const NewLogPage = () => {
       const currentValues = methods.getValues();
       const calculatedFields = CALCULATIONS_CONFIG.map(c => c.targetField);
 
-      // Filter out auto-calculated fields from the copied data
       const filteredMetrics = { ...parsedMetrics };
       calculatedFields.forEach((field) => {
         delete filteredMetrics[field];
       });
 
-      // Merge avoiding overwrite of todayDate
       methods.reset({
         ...currentValues,
         ...filteredMetrics,
@@ -288,6 +310,39 @@ export const NewLogPage = () => {
       }
     }
   };
+
+  if (isUnitLoading || isLogsLoading) {
+    return (
+      <div className="flex flex-col h-full bg-slate-50 items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-200 border-t-indigo-600 shadow-md"></div>
+      </div>
+    );
+  }
+
+  if (!unit?.seasonStartDate) {
+    return (
+      <div className="flex flex-col h-full bg-slate-50 items-center justify-center p-8 relative overflow-hidden">
+        {/* Subtle animated background shapes */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-100/50 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/3 left-1/3 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-amber-100/50 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        
+        <div className="relative z-10 bg-white/80 backdrop-blur-xl border border-white/50 shadow-2xl shadow-indigo-900/5 rounded-3xl p-10 max-w-lg text-center transform transition-all duration-500 hover:scale-[1.02]">
+          <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-orange-500/30 transform -rotate-6 transition-transform hover:rotate-0 duration-300">
+            <CalendarX size={40} className="text-white" />
+          </div>
+          <h2 className="text-3xl font-black text-slate-900 mb-4 tracking-tight">Season Not Started</h2>
+          <p className="text-slate-600 text-lg leading-relaxed mb-8 font-medium">
+            Your organization administrator has not set a start date for the current crushing season. 
+          </p>
+          <div className="bg-amber-50 rounded-xl p-4 border border-amber-100/50">
+            <p className="text-amber-800 text-sm font-bold tracking-wide">
+              Please contact your administrator to configure the season settings before uploading data.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 flex overflow-hidden flex-col bg-white">

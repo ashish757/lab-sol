@@ -7,6 +7,7 @@ const SuperAdminOrgDetailsPage = lazy(() => import('../pages/superAdmin/OrgDetai
 const SuperAdminOrgInvitation = lazy(() => import('../pages/superAdmin/OrgInvitation').then(m => ({ default: m.SuperAdminOrgInvitation })));
 
 const OrgAdminDash = lazy(() => import('../pages/orgAdmin/OrgAdminDash').then(m => ({ default: m.OrgAdminDash })));
+const OrgAdminUnitDetailsPage = lazy(() => import('../pages/orgAdmin/OrgAdminUnitDetailsPage').then(m => ({ default: m.OrgAdminUnitDetailsPage })));
 const OrgStaffDash = lazy(() => import('../pages/orgStaff/OrgStaffDash').then(m => ({ default: m.OrgStaffDash })));
 
 const UnitOpDash = lazy(() => import('../pages/unitOperator/UnitOperatorDash').then(m => ({ default: m.UnitOpDash })));
@@ -22,6 +23,7 @@ export const routeConfiguration = [
   { path: PAGES.ADMIN_ORG_DETAILS, component: SuperAdminOrgDetailsPage, allowedRoles: [Role.SUPER_ADMIN] },
   { path: PAGES.SUPER_ADMIN_INVITE, component: SuperAdminOrgInvitation, allowedRoles: [Role.SUPER_ADMIN] },
   { path: PAGES.ORG_DASHBOARD, component: OrgAdminDash, allowedRoles: [Role.ORG_ADMIN] },
+  { path: PAGES.ORG_UNIT_DETAILS, component: OrgAdminUnitDetailsPage, allowedRoles: [Role.ORG_ADMIN] },
   { path: PAGES.STAFF_DASHBOARD, component: OrgStaffDash, allowedRoles: [Role.ORG_STAFF] },
   { path: PAGES.UNIT_DASHBOARD, component: UnitOpDash, allowedRoles: [Role.UNIT_OPERATOR] },
   { path: PAGES.DATA_ENTRY, component: NewLogPage, allowedRoles: [Role.UNIT_OPERATOR] },

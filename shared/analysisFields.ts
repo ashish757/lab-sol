@@ -53,10 +53,10 @@ export const analysisConfig: GroupConfig[] = [
     groupId: "seasonStartAndOff",
     title: "SEASON TIME ACCOUNT",
     fields: [
-      { id: "seasonStartDate", label: "Season Start Date", type: "date" },
-      { id: "seasonStartTime", label: "Season Start Time", type: "time" },
-      { id: "seasonOffDate", label: "Season Off Date", type: "date" },
-      { id: "seasonOffTime", label: "Season Off Time", type: "time" },
+      { id: "seasonStartDate", label: "Season Start Date", type: "date", readonly: true },
+      { id: "seasonStartTime", label: "Season Start Time", type: "time", readonly: true },
+      { id: "seasonOffDate", label: "Season Off Date", type: "date", readonly: true },
+      { id: "seasonOffTime", label: "Season Off Time", type: "time", readonly: true },
       { id: "todayDate", label: "Today Date", type: "date", required: true, readonly: true },
       { id: "cropDay", label: "Crop day", type: "number", unit: "Nos", isCalculated: true },
     ]
