@@ -41,20 +41,6 @@ export class DailyLogsController {
     return this.dailyLogsService.upsertLog(unitId, currentUser.orgId, currentUser, dto);
   }
 
-  /**
-   * PATCH /api/daily-logs/:logId/lock
-   */
-  @Patch(':logId/lock')
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.UNIT_OPERATOR, Role.ORG_ADMIN)
-  lockLog(
-    @Param('logId') logId: string,
-    @Req() request: any
-  ) {
-    const currentUser = request.user;
-    return this.dailyLogsService.lockLog(logId, currentUser.unitId);
-  }
-
   // --- Adapted Legacy Endpoints ---
 
   /**

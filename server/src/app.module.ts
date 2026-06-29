@@ -9,9 +9,10 @@ import { OrganizationsModule } from './organizations/organizations.module';
 import { UnitsModule } from './units/units.module';
 import { UsersModule } from './users/users.module';
 import { MailModule } from './mail/mail.module';
+import { SessionsModule } from './sessions/sessions.module';
 
 @Module({
-  imports: [AuthModule, DailyLogsModule, ReportsModule, PrismaModule, OrganizationsModule, UnitsModule, UsersModule, MailModule],
+  imports: [AuthModule, DailyLogsModule, ReportsModule, PrismaModule, OrganizationsModule, UnitsModule, UsersModule, MailModule, SessionsModule],
   controllers: [AppController],
   providers: [AppService],
 })

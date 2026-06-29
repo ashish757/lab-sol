@@ -9,24 +9,58 @@ const seedConfig = {
     { id: 'global-tech-id', name: 'Global Tech Industries' },
   ],
   units: [
-    { id: 'dummy-unit-alpha', name: 'Acme Factory Alpha', orgId: 'dummy-org-id' },
+    {
+      id: 'dummy-unit-alpha',
+      name: 'Acme Factory Alpha',
+      orgId: 'dummy-org-id',
+    },
     { id: 'dummy-unit-beta', name: 'Acme Factory Beta', orgId: 'dummy-org-id' },
     { id: 'global-unit-alpha', name: 'GT Alpha Site', orgId: 'global-tech-id' },
     { id: 'global-unit-beta', name: 'GT Beta Site', orgId: 'global-tech-id' },
   ],
   users: [
     // Super Admins
-    { email: 'admin@example.com', role: Role.SUPER_ADMIN },
-    
+    {
+      email: 'admin@example.com',
+      role: Role.SUPER_ADMIN,
+    },
+
     // Acme Corporation Users
-    { email: 'orgadmin@example.com', role: Role.ORG_ADMIN, orgId: 'dummy-org-id' },
-    { email: 'staff@example.com', role: Role.ORG_STAFF, orgId: 'dummy-org-id' },
-    { email: 'operator@example.com', role: Role.UNIT_OPERATOR, orgId: 'dummy-org-id', unitId: 'dummy-unit-alpha' },
+    {
+      email: 'orgadmin@example.com',
+      role: Role.ORG_ADMIN,
+      orgId: 'dummy-org-id',
+    },
+    {
+      email: 'staff@example.com',
+      role: Role.ORG_STAFF,
+      orgId: 'dummy-org-id',
+    },
+    {
+      email: 'operator@example.com',
+      role: Role.UNIT_OPERATOR,
+      orgId: 'dummy-org-id',
+      unitId: 'dummy-unit-alpha',
+    },
 
     // Global Tech Industries Users
-    { email: 'ceo@globaltech.com', role: Role.ORG_ADMIN, orgId: 'global-tech-id' },
-    { email: 'worker1@globaltech.com', role: Role.UNIT_OPERATOR, orgId: 'global-tech-id', unitId: 'global-unit-alpha' },
-    { email: 'worker2@globaltech.com', role: Role.UNIT_OPERATOR, orgId: 'global-tech-id', unitId: 'global-unit-beta' },
+    {
+      email: 'ceo@globaltech.com',
+      role: Role.ORG_ADMIN,
+      orgId: 'global-tech-id',
+    },
+    {
+      email: 'worker1@globaltech.com',
+      role: Role.UNIT_OPERATOR,
+      orgId: 'global-tech-id',
+      unitId: 'global-unit-alpha',
+    },
+    {
+      email: 'worker2@globaltech.com',
+      role: Role.UNIT_OPERATOR,
+      orgId: 'global-tech-id',
+      unitId: 'global-unit-beta',
+    },
   ],
 };
 
@@ -55,10 +89,10 @@ async function main() {
   for (const user of seedConfig.users) {
     await prisma.user.upsert({
       where: { email: user.email },
-      update: { 
-        password, 
-        role: user.role, 
-        orgId: user.orgId || null, 
+      update: {
+        password,
+        role: user.role,
+        orgId: user.orgId || null,
         unitId: user.unitId || null,
         status: 'ACTIVE',
         name: user.email.split('@')[0],

@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
 import { useGetUnitByIdQuery, useGetDailyLogsQuery } from '../../store/api/apiSlice';
 import type { RootState } from '../../store/store';
-import { ShieldCheck, Network, ArrowRight, Activity, TrendingUp, Calendar, CalendarDays, RefreshCw, Plus, CheckCircle, Edit, XCircle } from 'lucide-react';
+import { ShieldCheck, Network, ArrowRight, Activity, TrendingUp, Calendar, CalendarDays, RefreshCw, Plus, CheckCircle, Edit, XCircle, Settings } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { PAGES, getPagePath } from '../../config/routesConfig';
 import type { DailyLogResponse } from '../../types/dailyLogs';
@@ -101,7 +101,7 @@ export const UnitOpDash = () => {
                 </p>
               </div>
 
-              <div className="shrink-0">
+              <div className="shrink-0 flex items-center gap-3">
                 <RoleGuard allowedRoles={[Role.SUPER_ADMIN, Role.ORG_ADMIN, Role.UNIT_OPERATOR]}>
                   <button
                     onClick={() => navigate(PAGES.DATA_ENTRY)}
@@ -109,6 +109,13 @@ export const UnitOpDash = () => {
                   >
                     <Plus size={14} />
                     New entry
+                  </button>
+                  <button
+                    onClick={() => navigate(PAGES.UNIT_SETTINGS)}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl border border-slate-700 transition-all uppercase tracking-wider active:scale-[0.98]"
+                  >
+                    <Settings size={14} />
+                    Settings
                   </button>
                 </RoleGuard>
               </div>

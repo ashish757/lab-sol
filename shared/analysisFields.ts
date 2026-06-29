@@ -57,6 +57,7 @@ export const analysisConfig: GroupConfig[] = [
       { id: "seasonStartTime", label: "Season Start Time", type: "time", readonly: true },
       { id: "seasonOffDate", label: "Season Off Date", type: "date", readonly: true },
       { id: "seasonOffTime", label: "Season Off Time", type: "time", readonly: true },
+      { id: "dayStartTime", label: "Day Start Time", type: "time", readonly: true },
       { id: "todayDate", label: "Today Date", type: "date", required: true, readonly: true },
       { id: "cropDay", label: "Crop day", type: "number", unit: "Nos", isCalculated: true },
     ]

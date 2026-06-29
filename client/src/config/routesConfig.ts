@@ -18,6 +18,8 @@ export const PAGES = {
   STAFF_DASHBOARD: clientRoutes.staff.dashboard,
   STAFF_SETUP: clientRoutes.auth.staffSetup,
   PROFILE: clientRoutes.profile,
+  ORG_UNIT_SETTINGS: clientRoutes.org.unitSettings,
+  UNIT_SETTINGS: clientRoutes.unit.settings,
 } as const;
 
 export const getPagePath = {
@@ -63,4 +65,9 @@ export const API_ENDPOINTS = {
   DAILY_LOG_BY_ID: (id: string | number) => getClientApiPath.dailyLogs.one(id),
   DOWNLOAD_DAILY_REPORT: getClientApiPath.reports.downloadTemplate(),
   SAVE_AND_GENERATE: getClientApiPath.reports.saveAndGenerate(),
+
+  // Sessions API
+  GET_ACTIVE_SESSION: (unitId: string) => getClientApiPath.sessions.getActive(unitId),
+  UPSERT_SESSION: getClientApiPath.sessions.upsert(),
+  LOCK_SESSION: (id: string) => getClientApiPath.sessions.lock(id),
 } as const;

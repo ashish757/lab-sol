@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useGetOrganizationByIdQuery, useCancelUserInviteMutation, useInviteUserMutation, useUpdateUnitMutation, useDeleteUnitMutation, useUpdateUserMutation } from '../../store/api/apiSlice';
-import { Users, Network, Mail, Building, Plus, Trash2, RefreshCw, MoreVertical, Search, Filter } from 'lucide-react';
+import { Users, Network, Mail, Building, Plus, Trash2, RefreshCw, MoreVertical, Search, Filter, Settings } from 'lucide-react';
 import type { RootState } from '../../store/store';
 import { useState } from 'react';
 import { CreateUnitModal } from '../../components/common/CreateUnitModal';
@@ -22,13 +22,11 @@ const MetricCard = ({ title, value, icon: Icon, colorClass }: { title: string, v
   );
 };
 
-const UnitListItem = ({ unit, openDropdown, setOpenDropdown, onUpdate, onDelete, onNavigate }: { unit: any, openDropdown: string | null, setOpenDropdown: (id: string | null) => void, onUpdate: (unit: any) => void, onDelete: (id: string) => void, onNavigate: (id: string) => void }) => {
-  const isDropdownOpen = openDropdown === unit.id;
-  
+const UnitListItem = ({ unit, onNavigate }: { unit: any, onNavigate: (id: string) => void }) => {
   return (
     <li 
       onClick={() => onNavigate(unit.id)}
-      className="p-5 hover:bg-slate-50 transition-colors flex items-center justify-between gap-4 border-b border-slate-100 last:border-0 relative cursor-pointer"
+      className="p-5 hover:bg-slate-50 transition-colors flex items-center justify-between gap-4 border-b border-slate-100 last:border-0 relative cursor-pointer group"
     >
       <div>
         <h3 className="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">{unit.name}</h3>
@@ -36,17 +34,12 @@ const UnitListItem = ({ unit, openDropdown, setOpenDropdown, onUpdate, onDelete,
       </div>
       <div className="flex items-center gap-2">
         <button 
-          onClick={(e) => { e.stopPropagation(); setOpenDropdown(isDropdownOpen ? null : unit.id); }}
+          onClick={(e) => { e.stopPropagation(); onNavigate(unit.id); }}
           className="p-2 hover:bg-slate-200 rounded-full text-slate-500 transition-colors"
+          title="Unit Settings"
         >
-          <MoreVertical size={16} />
+          <Settings size={18} className="group-hover:text-indigo-600 transition-colors" />
         </button>
-        {isDropdownOpen && (
-          <div className="absolute right-8 top-12 w-48 bg-white border border-slate-200 rounded-xl shadow-lg py-1 z-10" onClick={(e) => e.stopPropagation()}>
-            <button onClick={() => { setOpenDropdown(null); onUpdate(unit); }} className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 font-medium">Edit Name</button>
-            <button onClick={() => { setOpenDropdown(null); onDelete(unit.id); }} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-medium">Remove</button>
-          </div>
-        )}
       </div>
     </li>
   );
@@ -144,8 +137,6 @@ export const OrgAdminDash = () => {
   const [userRoleFilter, setUserRoleFilter] = useState('ALL');
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
-  const [updateUnit] = useUpdateUnitMutation();
-  const [deleteUnit] = useDeleteUnitMutation();
   const [updateUser] = useUpdateUserMutation();
   const { showModal, ModalComponent } = useModal();
 
@@ -179,43 +170,7 @@ export const OrgAdminDash = () => {
     }
   };
 
-  const handleUpdateUnit = async (unit: any) => {
-    const newName = await showModal({
-      type: 'prompt',
-      inputType: 'text',
-      title: 'Rename Unit',
-      message: 'Enter a new name for the factory unit:',
-      inputLabel: 'Unit Name',
-      defaultValue: unit.name,
-      confirmText: 'Save Name'
-    });
-    
-    if (newName && newName !== unit.name) {
-      try {
-        await updateUnit({ id: unit.id, data: { name: newName } }).unwrap();
-      } catch (err: any) {
-        await showModal({ type: 'alert', title: 'Error', message: err?.data?.message || 'Failed to update unit' });
-      }
-    }
-  };
 
-
-
-  const handleDeleteUnit = async (unitId: string) => {
-    const confirmDelete = await showModal({
-      type: 'confirm',
-      title: 'Remove Unit',
-      message: 'Are you sure you want to permanently remove this unit?\\nAll associated data will be affected.',
-      confirmText: 'Delete'
-    });
-    if (confirmDelete) {
-      try {
-        await deleteUnit(unitId).unwrap();
-      } catch (err: any) {
-        await showModal({ type: 'alert', title: 'Error', message: err?.data?.message || 'Failed to delete unit' });
-      }
-    }
-  };
 
 
 
@@ -352,12 +307,6 @@ export const OrgAdminDash = () => {
                   <UnitListItem 
                     key={unit.id} 
                     unit={unit} 
-                    openDropdown={openDropdown} 
-                    setOpenDropdown={(id) => {
-                      setTimeout(() => setOpenDropdown(id), 0);
-                    }} 
-                    onUpdate={handleUpdateUnit}
-                    onDelete={handleDeleteUnit}
                     onNavigate={(id) => navigate(`/org/dash/unit/${id}`)}
                   />
                 ))}

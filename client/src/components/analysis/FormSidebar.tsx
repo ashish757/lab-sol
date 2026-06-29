@@ -15,9 +15,10 @@ interface FormSidebarProps {
   isSequentialBlocked?: boolean;
   blockingDate?: string;
   isFillingPastData?: boolean;
+  hideLockDataButton?: boolean;
 }
 
-export const FormSidebar = ({ config, activeSection, onScrollTo, onUploadData, onLockData, isSubmitting = false, hasUnsavedChanges = false, isLocked = false, blockingDate, isFillingPastData = false }: FormSidebarProps) => {
+export const FormSidebar = ({ config, activeSection, hasUploadedData, onScrollTo, onUploadData, onLockData, isSubmitting = false, hasUnsavedChanges = false, isLocked = false, blockingDate, isFillingPastData = false, hideLockDataButton = false }: FormSidebarProps) => {
   return (
     <nav className="w-full md:w-72 bg-white border-r border-slate-200 overflow-y-auto z-0 flex-shrink-0 flex flex-col shadow-sm">
       <div className="px-5 py-5 border-b border-slate-200 shrink-0 bg-slate-50/40">
@@ -34,9 +35,15 @@ export const FormSidebar = ({ config, activeSection, onScrollTo, onUploadData, o
           </div>
         )}
 
-        {isFillingPastData && !isLocked && (
-          <div className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-2 rounded border border-amber-300 text-center uppercase tracking-wider leading-relaxed shadow-sm">
-            Warning: Filling missing data for {blockingDate}
+        {!isLocked && !hasUploadedData && (
+          <div className="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2 py-2 rounded border border-indigo-200 text-center uppercase tracking-wider leading-relaxed shadow-sm">
+            Filling data for {blockingDate}
+          </div>
+        )}
+
+        {!isLocked && hasUploadedData && (
+          <div className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-2 rounded border border-emerald-200 text-center uppercase tracking-wider leading-relaxed shadow-sm">
+            Draft saved for {blockingDate}
           </div>
         )}
 
@@ -55,7 +62,7 @@ export const FormSidebar = ({ config, activeSection, onScrollTo, onUploadData, o
             {isSubmitting ? 'Saving…' : 'Generate Report'}
           </button>
 
-          <div className="grid grid-cols-2 gap-2 mt-2">
+          <div className={`grid ${hideLockDataButton ? 'grid-cols-1' : 'grid-cols-2'} gap-2 mt-2`}>
             {onUploadData && (
               <button
                 type="button"
@@ -66,7 +73,7 @@ export const FormSidebar = ({ config, activeSection, onScrollTo, onUploadData, o
                 Save Data
               </button>
             )}
-            {onLockData && (
+            {onLockData && !hideLockDataButton && (
               <button
                 type="button"
                 onClick={onLockData}

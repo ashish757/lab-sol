@@ -91,8 +91,8 @@ export const LogsPage = () => {
   }, [logs]);
 
   const columns = isAdminOrStaff
-    ? ['Date', 'Unit', 'Status', 'Cane Crushed (Qtls)', 'Sugar Bagged (Qtls)', 'Locked', 'Action']
-    : ['Date', 'Status', 'Cane Crushed (Qtls)', 'Sugar Bagged (Qtls)', 'Locked', 'Action'];
+    ? ['Date', 'Unit', 'Status', 'Cane Crushed (Qtls)', 'Sugar Bagged (Qtls)', 'Action']
+    : ['Date', 'Status', 'Cane Crushed (Qtls)', 'Sugar Bagged (Qtls)', 'Action'];
 
   return (
     <div className="flex-1 overflow-y-auto bg-[#F8FAFC] flex flex-col">
@@ -249,9 +249,6 @@ export const LogsPage = () => {
                           </td>
                           <td className="px-6 py-5 tabular-nums text-slate-700 font-semibold">
                             {getMetric(log.metrics, 'totalSugarBagged')}
-                          </td>
-                          <td className="px-6 py-5 text-slate-500 font-medium whitespace-nowrap text-xs">
-                            {formatDate(log.lockedAt)}
                           </td>
                           <td className="px-6 py-5 whitespace-nowrap">
                             <Link

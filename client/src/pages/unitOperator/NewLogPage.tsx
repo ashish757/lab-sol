@@ -9,9 +9,10 @@ import { analysisConfig, getAllSectionIds } from '../../config/analysisConfig';
 import { useScrollSpy } from '../../hooks/useScrollSpy';
 import { FormSidebar } from '../../components/analysis/FormSidebar';
 import { FormSection } from '../../components/analysis/FormSection';
-import { useUpsertUnitLogMutation, useLockUnitLogMutation, useFetchUnitLogsQuery, useSaveAndGenerateReportMutation, useGetUnitByIdQuery } from '../../store/api/apiSlice';
+import { useUpsertUnitLogMutation, useFetchUnitLogsQuery, useSaveAndGenerateReportMutation, useGetUnitByIdQuery, useGetActiveSessionQuery } from '../../store/api/apiSlice';
 import { useDailyLogCalculations, CALCULATIONS_CONFIG } from '../../hooks/useDailyLogCalculations';
 import { useModal } from '../../hooks/useModal';
+import { PowerOff } from 'lucide-react';
 
 const getInitialValues = () => {
   const today = new Date();
@@ -44,12 +45,11 @@ export const NewLogPage = () => {
 
   const { user } = useSelector((state: RootState) => state.auth);
   const [upsertUnitLog, { isLoading: isUpserting }] = useUpsertUnitLogMutation();
-  const [lockUnitLog, { isLoading: isLocking }] = useLockUnitLogMutation();
   const [saveReport] = useSaveAndGenerateReportMutation();
   const { showModal, ModalComponent } = useModal();
   const initialValues = useMemo(() => getInitialValues(), []);
   
-  const { data: unit, isLoading: isUnitLoading } = useGetUnitByIdQuery(user?.unitId as string, {
+  const { data: session, isLoading: isSessionLoading } = useGetActiveSessionQuery(user?.unitId as string, {
     skip: !user?.unitId,
   });
   
@@ -57,21 +57,22 @@ export const NewLogPage = () => {
     skip: !user?.unitId,
   });
 
-  const { activeDate, selectedLogStatus, selectedLogId, isFillingPastData } = useMemo(() => {
+  const { activeDate, selectedLogStatus, selectedLogId, isFillingPastData, currentDayType } = useMemo(() => {
     let status = 'NEW';
     let sLogId = undefined;
     let nextExpectedDate: string | null = null;
     let missingOrUnlocked = false;
+    let dayType = 'NORMAL';
 
-    if (unit?.seasonStartDate) {
-      nextExpectedDate = unit.seasonStartDate;
+    if (session?.sessionStartDate && session?.isLocked) {
+      nextExpectedDate = session.sessionStartDate;
 
       if (Array.isArray(logs) && logs.length > 0) {
         const sortedLogsAsc = [...logs]
           .filter(log => {
              const logDateVal = log.createdAt || (log as any).date || (log as any).logDate;
              if (!logDateVal) return false;
-             return new Date(logDateVal).toISOString().split('T')[0] >= unit.seasonStartDate;
+             return new Date(logDateVal).toISOString().split('T')[0] >= session.sessionStartDate;
           })
           .sort((a, b) => {
             const d1 = new Date(a.createdAt || (a as any).date || (a as any).logDate).getTime();
@@ -79,7 +80,7 @@ export const NewLogPage = () => {
             return d1 - d2;
           });
 
-        const currentDate = new Date(`${unit.seasonStartDate}T00:00:00Z`);
+        const currentDate = new Date(`${session.sessionStartDate}T00:00:00Z`);
         
         for (const log of sortedLogsAsc) {
           const logDateVal = log.createdAt || (log as any).date || (log as any).logDate;
@@ -119,6 +120,7 @@ export const NewLogPage = () => {
         if (logDateStr === calculatedActiveDate) {
           status = log.status;
           sLogId = log.id;
+          dayType = log.dayType || 'NORMAL';
         }
       }
     }
@@ -129,9 +131,10 @@ export const NewLogPage = () => {
       activeDate: calculatedActiveDate, 
       selectedLogStatus: status, 
       selectedLogId: sLogId,
-      isFillingPastData
+      isFillingPastData,
+      currentDayType: dayType
     };
-  }, [logs, initialValues.todayDate, unit?.seasonStartDate]);
+  }, [logs, initialValues.todayDate, session?.sessionStartDate, session?.isLocked]);
 
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -150,23 +153,25 @@ export const NewLogPage = () => {
           ...initialValues, 
           ...parsedMetrics, 
           todayDate: activeDate,
-          seasonStartDate: unit?.seasonStartDate || '',
-          seasonStartTime: unit?.seasonStartTime || '',
-          seasonOffDate: unit?.seasonEndDate || '',
-          seasonOffTime: unit?.seasonEndTime || ''
+          seasonStartDate: session?.sessionStartDate || '',
+          seasonStartTime: session?.sessionStartTime || '',
+          seasonOffDate: session?.sessionOffDate || '',
+          seasonOffTime: session?.sessionOffTime || '',
+          dayStartTime: session?.dayStartTime || '',
         });
       } else {
         methods.reset({ 
           ...initialValues, 
           todayDate: activeDate,
-          seasonStartDate: unit?.seasonStartDate || '',
-          seasonStartTime: unit?.seasonStartTime || '',
-          seasonOffDate: unit?.seasonEndDate || '',
-          seasonOffTime: unit?.seasonEndTime || ''
+          seasonStartDate: session?.sessionStartDate || '',
+          seasonStartTime: session?.sessionStartTime || '',
+          seasonOffDate: session?.sessionOffDate || '',
+          seasonOffTime: session?.sessionOffTime || '',
+          dayStartTime: session?.dayStartTime || '',
         });
       }
     }
-  }, [logs, unit, activeDate, methods, initialValues]);
+  }, [logs, session, activeDate, methods, initialValues]);
 
   const sectionIds = getAllSectionIds(analysisConfig);
   const defaultSection = sectionIds[0] ?? '';
@@ -192,28 +197,28 @@ export const NewLogPage = () => {
     }
   };
 
-  const handleLockData = async () => {
+  const handleMarkShutdown = async () => {
     if (selectedLogStatus === 'LOCKED') return;
-    
     const confirmLock = await showModal({
       type: 'confirm',
-      title: 'Lock Data',
-      message: 'Are you sure you want to lock this daily log?\nOnce locked, you will not be able to edit this data anymore.',
-      confirmText: 'Lock Log'
+      title: 'Mark Day as Shutdown',
+      message: 'Are you sure you want to mark this day as a shutdown? The log will be marked as empty.',
+      confirmText: 'Confirm Shutdown'
     });
     
     if (!confirmLock) return;
 
-    await handleUploadData();
-    if (selectedLogId) {
-      try {
-        await lockUnitLog(selectedLogId).unwrap();
-        await showModal({ type: 'alert', title: 'Success', message: 'Data locked successfully.' });
-      } catch (err: any) {
-        await showModal({ type: 'alert', title: 'Error', message: err?.data?.message || 'Failed to lock data' });
-      }
-    } else {
-      await showModal({ type: 'alert', title: 'Notice', message: 'Please save the draft first before locking the data.' });
+    const payload = {
+      createdAt: activeDate,
+      payload: {},
+      dayType: 'SHUTDOWN'
+    };
+
+    try {
+      await upsertUnitLog({ unitId: user?.unitId, data: payload }).unwrap();
+      await showModal({ type: 'alert', title: 'Success', message: 'Day marked as shutdown successfully.' });
+    } catch (err: any) {
+      await showModal({ type: 'alert', title: 'Error', message: err?.data?.message || 'Failed to mark shutdown' });
     }
   };
 
@@ -311,7 +316,7 @@ export const NewLogPage = () => {
     }
   };
 
-  if (isUnitLoading || isLogsLoading) {
+  if (isSessionLoading || isLogsLoading) {
     return (
       <div className="flex flex-col h-full bg-slate-50 items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-200 border-t-indigo-600 shadow-md"></div>
@@ -319,7 +324,7 @@ export const NewLogPage = () => {
     );
   }
 
-  if (!unit?.seasonStartDate) {
+  if (!session?.isLocked || !session?.sessionStartDate) {
     return (
       <div className="flex flex-col h-full bg-slate-50 items-center justify-center p-8 relative overflow-hidden">
         {/* Subtle animated background shapes */}
@@ -358,20 +363,29 @@ export const NewLogPage = () => {
             activeSection={expanded}
             onScrollTo={handleScrollTo}
             onUploadData={handleUploadData}
-            onLockData={handleLockData}
-            isSubmitting={isGenerating || isUpserting || isLocking}
+            onLockData={() => {}}
+            isSubmitting={isGenerating || isUpserting}
             hasUnsavedChanges={methods.formState.isDirty}
             hasUploadedData={!!selectedLogId}
-            isLocked={selectedLogStatus === 'LOCKED'}
+            isLocked={selectedLogStatus === 'LOCKED' || currentDayType === 'SHUTDOWN'}
             isSequentialBlocked={false}
             blockingDate={activeDate}
             isFillingPastData={isFillingPastData}
+            hideLockDataButton={true}
           />
 
           <div className="flex-1 overflow-y-auto p-6 lg:p-8 bg-slate-50 relative scroll-smooth flex flex-col items-center">
             
-            {selectedLogStatus !== 'LOCKED' && (
-              <div className="max-w-5xl w-full flex justify-end mb-4">
+            {selectedLogStatus !== 'LOCKED' && currentDayType !== 'SHUTDOWN' && (
+              <div className="max-w-5xl w-full flex justify-between mb-4">
+                <button
+                  type="button"
+                  onClick={handleMarkShutdown}
+                  className="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded-lg border border-rose-200 transition-all shadow-sm active:scale-[0.98] uppercase tracking-wider flex items-center gap-1.5"
+                >
+                  <PowerOff size={14} />
+                  Mark Day as Shutdown
+                </button>
                 <button
                   type="button"
                   onClick={handleCopyLastLocked}
@@ -382,8 +396,17 @@ export const NewLogPage = () => {
               </div>
             )}
 
+            {currentDayType === 'SHUTDOWN' && (
+              <div className="max-w-5xl w-full mb-6 p-4 bg-rose-50 border border-rose-200 rounded-xl text-center">
+                <p className="text-rose-700 font-bold uppercase tracking-widest text-sm flex items-center justify-center gap-2">
+                  <PowerOff size={18} />
+                  This day is marked as a Shutdown
+                </p>
+              </div>
+            )}
+
             <fieldset 
-              disabled={selectedLogStatus === 'LOCKED'} 
+              disabled={selectedLogStatus === 'LOCKED' || currentDayType === 'SHUTDOWN'} 
               className="max-w-5xl w-full pb-24 border-none p-0 m-0 disabled:opacity-60"
             >
               {analysisConfig.map((group) => (

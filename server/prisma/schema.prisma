@@ -12,16 +12,26 @@ enum LogStatus {
   LOCKED
 }
 
+enum LogDayType {
+  NORMAL
+  SHUTDOWN
+  MISSED_SHUTDOWN
+}
+
 model DailyLog {
   id          String    @id @default(uuid()) @unique()
   createdAt   DateTime  @map("created_at")
   status      LogStatus @default(UNLOCKED)
   lockedAt    DateTime? @map("locked_at")
+  dayType     LogDayType @default(NORMAL)
   
   payload     Json      @map("metrics")
 
   unitId      String
   unit        Unit         @relation(fields: [unitId], references: [id])
+
+  sessionDataId String?
+  sessionData   SessionData? @relation(fields: [sessionDataId], references: [id], onDelete: SetNull)
   
   orgId       String
   org         Organization @relation(fields: [orgId], references: [id])
@@ -42,6 +52,41 @@ model DailyLog {
   @@map("daily_logs")
 }
 
+model SessionData {
+  id              String   @id @default(uuid())
+  unitId          String
+  unit            Unit     @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  orgId           String
+  org             Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  sessionStartDate String?
+  sessionStartTime String?
+  sessionOffDate   String?
+  sessionOffTime   String?
+  dayStartTime     String?
+
+  isLocked         Boolean  @default(false)
+  lockedAt         DateTime? @map("locked_at")
+
+  createdById      String?
+  createdByEmail   String?
+  createdByName    String?
+  updatedById      String?
+  updatedByEmail   String?
+  updatedByName    String?
+
+  createdBy        User? @relation("SessionCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy        User? @relation("SessionUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  logs             DailyLog[]
+
+  @@index([unitId, isLocked])
+  @@map("session_data")
+}
+
 enum Role {
   SUPER_ADMIN
   ORG_ADMIN
@@ -56,6 +101,7 @@ model Organization {
   units  Unit[]
   users User[]
   logs  DailyLog[]
+  sessions SessionData[]
 }
 
 model Unit {
@@ -65,6 +111,7 @@ model Unit {
   org   Organization       @relation(fields: [orgId], references: [id])
   users User[]
   logs  DailyLog[]
+  sessions SessionData[]
 
   seasonStartDate String?
   seasonStartTime String?
@@ -88,6 +135,8 @@ model User {
 
   createdLogs DailyLog[] @relation("LogCreator")
   updatedLogs DailyLog[] @relation("LogUpdater")
+  createdSessions SessionData[] @relation("SessionCreator")
+  updatedSessions SessionData[] @relation("SessionUpdater")
 }
 
 model InviteToken {

@@ -42,6 +42,12 @@ export const apiRoutes = {
     downloadOne: 'daily-logs/download/:id',
     saveAndGenerate: 'save-and-generate',
   },
+  sessions: {
+    base: 'api/sessions',
+    getActive: 'active/:unitId',
+    upsert: 'upsert',
+    lock: 'lock/:id',
+  },
 } as const;
 
 export const clientRoutes = {
@@ -59,6 +65,7 @@ export const clientRoutes = {
   org: {
     dashboard: '/org/dash',
     unitDetails: '/org/dash/unit/:id',
+    unitSettings: '/org/dash/unit/:id/settings',
   },
   staff: {
     dashboard: '/staff/dash',
@@ -68,8 +75,9 @@ export const clientRoutes = {
     dataEntry: '/unit/analysis/new',
     report: '/unit/analysis/:id',
     logsList: '/unit/logs',
+    settings: '/unit/dash/settings',
   },
-  settings: '/settings',
+  settings: 'settings',
   profile: '/profile',
 };
 
@@ -108,5 +116,10 @@ export const getClientApiPath = {
     downloadTemplate: () => `/${apiRoutes.reports.base}/${apiRoutes.reports.downloadTemplate}`,
     downloadOne: (id: string | number) => `/${apiRoutes.reports.base}/daily-logs/download/${id}`,
     saveAndGenerate: () => `/${apiRoutes.reports.base}/${apiRoutes.reports.saveAndGenerate}`,
+  },
+  sessions: {
+    getActive: (unitId: string) => `/${apiRoutes.sessions.base}/active/${unitId}`,
+    upsert: () => `/${apiRoutes.sessions.base}/${apiRoutes.sessions.upsert}`,
+    lock: (id: string) => `/${apiRoutes.sessions.base}/lock/${id}`,
   },
 };

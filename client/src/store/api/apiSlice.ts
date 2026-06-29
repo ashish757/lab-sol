@@ -180,6 +180,25 @@ export const apiSlice = createApi({
       query: (id: string) => API_ENDPOINTS.DAILY_LOG_BY_ID(id),
       providesTags: ['Logs'],
     }),
+    getActiveSession: builder.query({
+      query: (unitId: string) => API_ENDPOINTS.GET_ACTIVE_SESSION(unitId),
+      providesTags: ['Units'],
+    }),
+    upsertSession: builder.mutation({
+      query: (body) => ({
+        url: API_ENDPOINTS.UPSERT_SESSION,
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Units', 'Logs'],
+    }),
+    lockSession: builder.mutation({
+      query: (id: string) => ({
+        url: API_ENDPOINTS.LOCK_SESSION(id),
+        method: 'POST',
+      }),
+      invalidatesTags: ['Units', 'Logs'],
+    }),
   }),
 });
 
@@ -208,4 +227,7 @@ export const {
   useSetupUserMutation,
   useActivateStaffMutation,
   useInvitePreviewQuery,
+  useGetActiveSessionQuery,
+  useUpsertSessionMutation,
+  useLockSessionMutation,
 } = apiSlice;

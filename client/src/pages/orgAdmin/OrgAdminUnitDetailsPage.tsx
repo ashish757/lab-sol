@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useGetUnitByIdQuery, useFetchUnitLogsQuery, useUpdateUnitMutation } from '../../store/api/apiSlice';
-import { Building, ArrowLeft, Users, Calendar, Clock, Lock, FileText, Settings, ShieldCheck, Mail } from 'lucide-react';
-import { SeasonSettingsModal } from '../../components/common/SeasonSettingsModal';
+import { useGetUnitByIdQuery, useFetchUnitLogsQuery, useUpdateUnitMutation, useDeleteUnitMutation } from '../../store/api/apiSlice';
+import { Building, ArrowLeft, Users, Calendar, Clock, Lock, FileText, Settings, ShieldCheck, Mail, Edit2, Trash2, AlertTriangle } from 'lucide-react';
 import { useModal } from '../../hooks/useModal';
 
 export const OrgAdminUnitDetailsPage = () => {
@@ -19,7 +18,7 @@ export const OrgAdminUnitDetailsPage = () => {
   });
 
   const [updateUnit] = useUpdateUnitMutation();
-  const [isSeasonModalOpen, setIsSeasonModalOpen] = useState(false);
+  const [deleteUnit] = useDeleteUnitMutation();
 
   if (isUnitLoading || isLogsLoading) {
     return (
@@ -40,16 +39,43 @@ export const OrgAdminUnitDetailsPage = () => {
     );
   }
 
-  const handleUpdateSeason = async (unitId: string, startDate: string, endDate?: string) => {
-    await updateUnit({ 
-      id: unitId, 
-      data: { 
-        name: unit.name, 
-        seasonStartDate: startDate, 
-        seasonEndDate: endDate || undefined 
-      } 
-    }).unwrap();
-    await showModal({ type: 'alert', title: 'Success', message: 'Season settings updated successfully.' });
+
+  const handleUpdateUnit = async () => {
+    const newName = await showModal({
+      type: 'prompt',
+      inputType: 'text',
+      title: 'Rename Unit',
+      message: 'Enter a new name for the factory unit:',
+      inputLabel: 'Unit Name',
+      defaultValue: unit.name,
+      confirmText: 'Save Name'
+    });
+    
+    if (newName && newName !== unit.name) {
+      try {
+        await updateUnit({ id: unit.id, data: { name: newName } }).unwrap();
+        await showModal({ type: 'alert', title: 'Success', message: 'Unit renamed successfully.' });
+      } catch (err: any) {
+        await showModal({ type: 'alert', title: 'Error', message: err?.data?.message || 'Failed to update unit' });
+      }
+    }
+  };
+
+  const handleDeleteUnit = async () => {
+    const confirmDelete = await showModal({
+      type: 'confirm',
+      title: 'Remove Unit',
+      message: 'Are you sure you want to permanently remove this unit?\\nAll associated data, including daily logs, will be permanently deleted.',
+      confirmText: 'Delete Unit'
+    });
+    if (confirmDelete) {
+      try {
+        await deleteUnit(unit.id).unwrap();
+        navigate('/org/dash');
+      } catch (err: any) {
+        await showModal({ type: 'alert', title: 'Error', message: err?.data?.message || 'Failed to delete unit' });
+      }
+    }
   };
 
   const sortedLogs = [...logs].sort((a, b) => {
@@ -77,7 +103,16 @@ export const OrgAdminUnitDetailsPage = () => {
               <Building size={20} className="text-indigo-600" />
               <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Unit Details</span>
             </div>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{unit.name}</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{unit.name}</h1>
+              <button 
+                onClick={handleUpdateUnit}
+                className="p-1.5 hover:bg-slate-200 rounded-md text-slate-400 hover:text-indigo-600 transition-colors"
+                title="Rename Unit"
+              >
+                <Edit2 size={18} />
+              </button>
+            </div>
           </div>
         </div>
         <div className="flex gap-3">
@@ -105,11 +140,12 @@ export const OrgAdminUnitDetailsPage = () => {
                 Season Settings
               </h2>
               <button
-                onClick={() => setIsSeasonModalOpen(true)}
-                className="p-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg transition-colors"
+                onClick={() => navigate(`/org/dash/unit/${unit.id}/settings`)}
+                className="p-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg transition-colors flex items-center gap-2 text-sm font-bold"
                 title="Edit Season Settings"
               >
                 <Settings size={18} />
+                Manage
               </button>
             </div>
             <div className="p-6 flex flex-col gap-6">
@@ -168,6 +204,31 @@ export const OrgAdminUnitDetailsPage = () => {
               ) : (
                 <div className="p-6 text-center text-slate-500 text-sm font-medium">No staff assigned to this unit.</div>
               )}
+            </div>
+          </div>
+
+          {/* Danger Zone Card */}
+          <div className="bg-white border border-red-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+            <div className="p-5 border-b border-red-100 bg-red-50/50 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-red-700 flex items-center gap-2">
+                <AlertTriangle size={20} className="text-red-600" />
+                Danger Zone
+              </h2>
+            </div>
+            <div className="p-6">
+              <div className="flex flex-col gap-4">
+                <div>
+                  <h3 className="text-sm font-bold text-slate-800">Delete Unit</h3>
+                  <p className="text-xs text-slate-500 mt-1">Permanently remove this unit and all its data. This action cannot be undone.</p>
+                </div>
+                <button
+                  onClick={handleDeleteUnit}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 font-bold rounded-xl transition-colors"
+                >
+                  <Trash2 size={18} />
+                  Delete Unit
+                </button>
+              </div>
             </div>
           </div>
 
@@ -248,12 +309,6 @@ export const OrgAdminUnitDetailsPage = () => {
 
       </div>
 
-      <SeasonSettingsModal 
-        isOpen={isSeasonModalOpen} 
-        onClose={() => setIsSeasonModalOpen(false)} 
-        unit={unit} 
-        onSave={handleUpdateSeason} 
-      />
       <ModalComponent />
     </div>
   );
