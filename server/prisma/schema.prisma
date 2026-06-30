@@ -19,22 +19,24 @@ enum LogDayType {
 }
 
 model DailyLog {
-  id          String    @id @default(uuid()) @unique()
-  createdAt   DateTime  @map("created_at")
-  status      LogStatus @default(UNLOCKED)
-  lockedAt    DateTime? @map("locked_at")
-  dayType     LogDayType @default(NORMAL)
-  
-  payload     Json      @map("metrics")
+  id        String     @id @unique() @default(uuid())
+  createdAt DateTime   @map("created_at")
+  status    LogStatus  @default(UNLOCKED)
+  lockedAt  DateTime?  @map("locked_at")
+  dayType   LogDayType @default(NORMAL)
 
-  unitId      String
-  unit        Unit         @relation(fields: [unitId], references: [id])
+  payload Json @map("metrics")
+
+  calculation DailyCalculation?
+
+  unitId String
+  unit   Unit   @relation(fields: [unitId], references: [id])
 
   sessionDataId String?
   sessionData   SessionData? @relation(fields: [sessionDataId], references: [id], onDelete: SetNull)
-  
-  orgId       String
-  org         Organization @relation(fields: [orgId], references: [id])
+
+  orgId String
+  org   Organization @relation(fields: [orgId], references: [id])
 
   createdById    String?
   createdByEmail String?
@@ -43,21 +45,32 @@ model DailyLog {
   updatedByEmail String?
   updatedByName  String?
 
-  createdBy      User? @relation("LogCreator", fields: [createdById], references: [id], onDelete: SetNull)
-  updatedBy      User? @relation("LogUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+  createdBy User? @relation("LogCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy User? @relation("LogUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
 
-  updatedAt   DateTime  @updatedAt @map("updated_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@unique([unitId, createdAt])
   @@map("daily_logs")
 }
 
+model DailyCalculation {
+  id                String   @id @default(uuid())
+  dailyLogId        String   @unique
+  dailyLog          DailyLog @relation(fields: [dailyLogId], references: [id], onDelete: Cascade)
+  calculatedMetrics Json     @map("calculated_metrics")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@map("daily_calculations")
+}
+
 model SessionData {
-  id              String   @id @default(uuid())
-  unitId          String
-  unit            Unit     @relation(fields: [unitId], references: [id], onDelete: Cascade)
-  orgId           String
-  org             Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  id     String       @id @default(uuid())
+  unitId String
+  unit   Unit         @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  orgId  String
+  org    Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
   sessionStartDate String?
   sessionStartTime String?
@@ -65,23 +78,23 @@ model SessionData {
   sessionOffTime   String?
   dayStartTime     String?
 
-  isLocked         Boolean  @default(false)
-  lockedAt         DateTime? @map("locked_at")
+  isLocked Boolean   @default(false)
+  lockedAt DateTime? @map("locked_at")
 
-  createdById      String?
-  createdByEmail   String?
-  createdByName    String?
-  updatedById      String?
-  updatedByEmail   String?
-  updatedByName    String?
+  createdById    String?
+  createdByEmail String?
+  createdByName  String?
+  updatedById    String?
+  updatedByEmail String?
+  updatedByName  String?
 
-  createdBy        User? @relation("SessionCreator", fields: [createdById], references: [id], onDelete: SetNull)
-  updatedBy        User? @relation("SessionUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+  createdBy User? @relation("SessionCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy User? @relation("SessionUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
 
-  createdAt        DateTime @default(now()) @map("created_at")
-  updatedAt        DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  logs             DailyLog[]
+  logs DailyLog[]
 
   @@index([unitId, isLocked])
   @@map("session_data")
@@ -95,22 +108,22 @@ enum Role {
 }
 
 model Organization {
-  id     String             @id @default(uuid())
-  name   String
-  status String             @default("INACTIVE")
-  units  Unit[]
-  users User[]
-  logs  DailyLog[]
+  id       String        @id @default(uuid())
+  name     String
+  status   String        @default("INACTIVE")
+  units    Unit[]
+  users    User[]
+  logs     DailyLog[]
   sessions SessionData[]
 }
 
 model Unit {
-  id    String             @id @default(uuid())
-  name  String
-  orgId String
-  org   Organization       @relation(fields: [orgId], references: [id])
-  users User[]
-  logs  DailyLog[]
+  id       String        @id @default(uuid())
+  name     String
+  orgId    String
+  org      Organization  @relation(fields: [orgId], references: [id])
+  users    User[]
+  logs     DailyLog[]
   sessions SessionData[]
 
   seasonStartDate String?
@@ -133,8 +146,8 @@ model User {
   unitId   String?
   unit     Unit?         @relation(fields: [unitId], references: [id])
 
-  createdLogs DailyLog[] @relation("LogCreator")
-  updatedLogs DailyLog[] @relation("LogUpdater")
+  createdLogs     DailyLog[]    @relation("LogCreator")
+  updatedLogs     DailyLog[]    @relation("LogUpdater")
   createdSessions SessionData[] @relation("SessionCreator")
   updatedSessions SessionData[] @relation("SessionUpdater")
 }

@@ -10,9 +10,10 @@ import { UnitsModule } from './units/units.module';
 import { UsersModule } from './users/users.module';
 import { MailModule } from './mail/mail.module';
 import { SessionsModule } from './sessions/sessions.module';
+import { CalculationsModule } from './calculations/calculations.module';
 
 @Module({
-  imports: [AuthModule, DailyLogsModule, ReportsModule, PrismaModule, OrganizationsModule, UnitsModule, UsersModule, MailModule, SessionsModule],
+  imports: [AuthModule, DailyLogsModule, ReportsModule, PrismaModule, OrganizationsModule, UnitsModule, UsersModule, MailModule, SessionsModule, CalculationsModule],
   controllers: [AppController],
   providers: [AppService],
 })
