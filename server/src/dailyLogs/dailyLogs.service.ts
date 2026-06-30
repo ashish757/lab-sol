@@ -114,6 +114,16 @@ export class DailyLogsService {
       }
     }
 
+    const [h, m] = (session.dayStartTime || '00:00').split(':').map(Number);
+    const dayEndDate = new Date(requestedDate);
+    dayEndDate.setUTCDate(dayEndDate.getUTCDate() + 1);
+    dayEndDate.setUTCHours(h, m, 0, 0);
+
+    const now = new Date();
+    if (now < dayEndDate) {
+      throw new BadRequestException('The day has not ended yet. You can only log data after the day is complete.');
+    }
+
     const existingLog = await this.prisma.dailyLog.findUnique({
       where: { unitId_createdAt: { unitId, createdAt: requestedDate } },
     });

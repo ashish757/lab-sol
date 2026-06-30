@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { CalendarX } from 'lucide-react';
+import { CalendarX, Clock } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../store/store';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -57,7 +57,7 @@ export const NewLogPage = () => {
     skip: !user?.unitId,
   });
 
-  const { activeDate, selectedLogStatus, selectedLogId, isFillingPastData, currentDayType } = useMemo(() => {
+  const { activeDate, selectedLogStatus, selectedLogId, isFillingPastData, currentDayType, hasDayEnded, missedDates } = useMemo(() => {
     let status = 'NEW';
     let sLogId = undefined;
     let nextExpectedDate: string | null = null;
@@ -125,16 +125,41 @@ export const NewLogPage = () => {
       }
     }
 
+    let hasDayEnded = true;
+    if (session?.dayStartTime) {
+      const [h, m] = session.dayStartTime.split(':').map(Number);
+      const dayEndDate = new Date(`${calculatedActiveDate}T00:00:00Z`);
+      dayEndDate.setUTCDate(dayEndDate.getUTCDate() + 1);
+      dayEndDate.setUTCHours(h, m, 0, 0);
+      const now = new Date();
+      if (now < dayEndDate) {
+        hasDayEnded = false;
+      }
+    }
+
     const isFillingPastData = calculatedActiveDate < initialValues.todayDate;
+
+    const missedDates = Array.isArray(logs) 
+      ? logs
+          .filter(l => l.dayType === 'MISSED_SHUTDOWN')
+          .map(l => {
+             const logDateVal = l.createdAt || (l as any).date || (l as any).logDate;
+             return logDateVal ? new Date(logDateVal).toISOString().split('T')[0] : '';
+          })
+          .filter(Boolean)
+          .sort()
+      : [];
 
     return { 
       activeDate: calculatedActiveDate, 
       selectedLogStatus: status, 
       selectedLogId: sLogId,
       isFillingPastData,
-      currentDayType: dayType
+      currentDayType: dayType,
+      hasDayEnded,
+      missedDates
     };
-  }, [logs, initialValues.todayDate, session?.sessionStartDate, session?.isLocked]);
+  }, [logs, initialValues.todayDate, session]);
 
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -367,7 +392,7 @@ export const NewLogPage = () => {
             isSubmitting={isGenerating || isUpserting}
             hasUnsavedChanges={methods.formState.isDirty}
             hasUploadedData={!!selectedLogId}
-            isLocked={selectedLogStatus === 'LOCKED' || currentDayType === 'SHUTDOWN'}
+            isLocked={selectedLogStatus === 'LOCKED' || currentDayType === 'SHUTDOWN' || !hasDayEnded}
             isSequentialBlocked={false}
             blockingDate={activeDate}
             isFillingPastData={isFillingPastData}
@@ -376,7 +401,31 @@ export const NewLogPage = () => {
 
           <div className="flex-1 overflow-y-auto p-6 lg:p-8 bg-slate-50 relative scroll-smooth flex flex-col items-center">
             
-            {selectedLogStatus !== 'LOCKED' && currentDayType !== 'SHUTDOWN' && (
+            {missedDates.length > 0 && (
+              <div className="max-w-5xl w-full mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl text-center shadow-sm">
+                <p className="text-amber-800 font-bold uppercase tracking-widest text-sm flex items-center justify-center gap-2">
+                  <CalendarX size={18} />
+                  You did not log data for {missedDates.length === 1 ? 'yesterday' : 'some days'}!
+                </p>
+                <p className="text-amber-700 text-xs mt-1 font-semibold">
+                  Missed dates: {missedDates.join(', ')}. These days have been marked as missed shutdowns.
+                </p>
+              </div>
+            )}
+
+            {!hasDayEnded && selectedLogStatus !== 'LOCKED' && currentDayType !== 'SHUTDOWN' && (
+              <div className="max-w-5xl w-full mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded-xl text-center shadow-sm">
+                <p className="text-indigo-800 font-bold uppercase tracking-widest text-sm flex items-center justify-center gap-2">
+                  <Clock size={18} />
+                  Day has not ended yet
+                </p>
+                <p className="text-indigo-700 text-xs mt-1 font-semibold">
+                  You can only upload data for {activeDate} after {session?.dayStartTime} on the next day.
+                </p>
+              </div>
+            )}
+
+            {hasDayEnded && selectedLogStatus !== 'LOCKED' && currentDayType !== 'SHUTDOWN' && (
               <div className="max-w-5xl w-full flex justify-between mb-4">
                 <button
                   type="button"
@@ -406,7 +455,7 @@ export const NewLogPage = () => {
             )}
 
             <fieldset 
-              disabled={selectedLogStatus === 'LOCKED' || currentDayType === 'SHUTDOWN'} 
+              disabled={selectedLogStatus === 'LOCKED' || currentDayType === 'SHUTDOWN' || !hasDayEnded} 
               className="max-w-5xl w-full pb-24 border-none p-0 m-0 disabled:opacity-60"
             >
               {analysisConfig.map((group) => (
