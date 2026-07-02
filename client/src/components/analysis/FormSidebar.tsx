@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { GroupConfig } from '../../config/analysisConfig';
 import { isFlatGroup } from '../../config/analysisConfig';
 import { FormProgress } from './FormProgress';
@@ -19,6 +20,14 @@ interface FormSidebarProps {
 }
 
 export const FormSidebar = ({ config, activeSection, hasUploadedData, onScrollTo, onUploadData, onLockData, isSubmitting = false, hasUnsavedChanges = false, isLocked = false, blockingDate, isFillingPastData = false, hideLockDataButton = false }: FormSidebarProps) => {
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+  
+  const toggleGroup = (groupId: string) => {
+    setExpandedGroups(prev => ({
+      ...prev,
+      [groupId]: !prev[groupId]
+    }));
+  };
   return (
     <nav className="w-full md:w-72 bg-white border-r border-slate-200 overflow-y-auto z-0 flex-shrink-0 flex flex-col shadow-sm">
       <div className="px-5 py-5 border-b border-slate-200 shrink-0 bg-slate-50/40">
@@ -54,14 +63,6 @@ export const FormSidebar = ({ config, activeSection, hasUploadedData, onScrollTo
         )}
 
         <div className="flex flex-col gap-2 mt-1">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] text-white text-xs font-bold rounded-lg transition-all text-center select-none cursor-pointer shadow-md shadow-indigo-600/10 disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100 uppercase tracking-wider"
-          >
-            {isSubmitting ? 'Saving…' : 'Generate Report'}
-          </button>
-
           <div className={`grid ${hideLockDataButton ? 'grid-cols-1' : 'grid-cols-2'} gap-2 mt-2`}>
             {onUploadData && (
               <button
@@ -107,17 +108,21 @@ export const FormSidebar = ({ config, activeSection, hasUploadedData, onScrollTo
           }
 
           const isParentActive = group.subGroups.some((sg) => sg.subGroupId === activeSection);
+          const isExpanded = expandedGroups[group.groupId] || isParentActive;
 
           return (
             <div key={group.groupId}>
-              <div
-                className={`text-left px-5 py-2.5 text-xs font-medium transition-colors relative ${
-                  isParentActive ? 'text-indigo-700' : 'text-slate-700'
+              <button
+                type="button"
+                onClick={() => toggleGroup(group.groupId)}
+                className={`w-full flex items-center justify-between text-left px-5 py-2.5 text-xs font-medium transition-colors relative cursor-pointer ${
+                  isParentActive ? 'text-indigo-700' : 'text-slate-700 hover:bg-slate-50'
                 }`}
               >
-                {group.title}
-              </div>
-              {group.subGroups.map((subGroup) => (
+                <span>{group.title}</span>
+                <svg className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+              </button>
+              {isExpanded && group.subGroups.map((subGroup) => (
                 <button
                   key={subGroup.subGroupId}
                   type="button"

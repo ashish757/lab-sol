@@ -13,6 +13,7 @@ const OrgStaffDash = lazy(() => import('../pages/orgStaff/OrgStaffDash').then(m 
 const UnitOpDash = lazy(() => import('../pages/unitOperator/UnitOperatorDash').then(m => ({ default: m.UnitOpDash })));
 const LogsPage = lazy(() => import('../pages/unitOperator/LogListPage').then(m => ({ default: m.LogsPage })));
 const NewLogPage = lazy(() => import('../pages/unitOperator/NewLogPage').then(m => ({ default: m.NewLogPage })));
+const LogDetailsPage = lazy(() => import('../pages/unitOperator/LogDetailsPage').then(m => ({ default: m.LogDetailsPage })));
 const SettingsPage = lazy(() => import('../pages/SettingsPage').then(m => ({ default: m.SettingsPage })));
 const SessionSettingsPage = lazy(() => import('../pages/settings/SessionSettingsPage').then(m => ({ default: m.SessionSettingsPage })));
 const ProfilePage = lazy(() => import('../pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
@@ -28,6 +29,7 @@ export const routeConfiguration = [
   { path: PAGES.STAFF_DASHBOARD, component: OrgStaffDash, allowedRoles: [Role.ORG_STAFF] },
   { path: PAGES.UNIT_DASHBOARD, component: UnitOpDash, allowedRoles: [Role.UNIT_OPERATOR] },
   { path: PAGES.DATA_ENTRY, component: NewLogPage, allowedRoles: [Role.UNIT_OPERATOR] },
+  { path: PAGES.ANALYSIS_REPORT, component: LogDetailsPage, allowedRoles: [Role.UNIT_OPERATOR, Role.ORG_ADMIN, Role.ORG_STAFF] },
   { path: PAGES.LOGS_LIST, component: LogsPage, allowedRoles: [Role.UNIT_OPERATOR, Role.ORG_ADMIN, Role.ORG_STAFF] },
   { path: PAGES.ORG_UNIT_SETTINGS, component: SessionSettingsPage, allowedRoles: [Role.ORG_ADMIN] },
   { path: PAGES.UNIT_SETTINGS, component: SessionSettingsPage, allowedRoles: [Role.UNIT_OPERATOR] },
