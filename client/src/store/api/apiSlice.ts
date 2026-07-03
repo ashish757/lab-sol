@@ -165,6 +165,19 @@ export const apiSlice = createApi({
         return { id, fileBlob: res };
       },
     }),
+    generateCalculatedReport: builder.mutation({
+      query: (logId: string) => ({
+        url: API_ENDPOINTS.GENERATE_CALCULATED_REPORT(logId),
+        method: 'POST',
+        responseHandler: (res) => res.blob(),
+      }),
+      transformResponse: (res: Blob, meta: any) => {
+        const contentDisposition = meta?.response?.headers.get('content-disposition') || '';
+        const match = contentDisposition.match(/Calculated_Report_([^.]+)\.xlsx/);
+        const id = match ? match[1] : 'calculated';
+        return { id, fileBlob: res };
+      },
+    }),
     getDailyLogs: builder.query({
       query: () => API_ENDPOINTS.DAILY_LOGS,
       providesTags: ['Logs'],
@@ -211,6 +224,7 @@ export const {
   useUpsertUnitLogMutation,
   useLockUnitLogMutation,
   useSaveAndGenerateReportMutation,
+  useGenerateCalculatedReportMutation,
   useGetDailyLogsQuery,
   useGetDailyLogsByDateQuery,
   useGetDailyLogByIdQuery,

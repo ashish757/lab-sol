@@ -89,4 +89,37 @@ export class ReportsController {
         .send('Internal server error generating and saving spreadsheet');
     }
   }
+
+  /**
+   * POST /api/reports/:id/calculated-excel
+   * Streams a simple 2-column Excel containing calculated metrics for a specific log.
+   */
+  @Post(':id/calculated-excel')
+  @UseGuards(AuthGuard)
+  async downloadCalculatedExcel(
+    @Param('id') id: string,
+    @Res() res: express.Response,
+  ): Promise<void> {
+    try {
+      const buffer = await this.reportsService.generateCalculatedExcelById(id);
+
+      res.setHeader(
+        'Content-Type',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      );
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="Calculated_Report_${id}.xlsx"`,
+      );
+
+      res.send(buffer);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        res.status(404).send(error.message);
+      } else {
+        console.error(error);
+        res.status(500).send('Internal server error generating calculated spreadsheet');
+      }
+    }
+  }
 }

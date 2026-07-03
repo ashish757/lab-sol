@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
-import { useGetDailyLogByIdQuery, useSaveAndGenerateReportMutation } from '../../store/api/apiSlice';
+import { useGetDailyLogByIdQuery, useGenerateCalculatedReportMutation } from '../../store/api/apiSlice';
 import { useModal } from '../../hooks/useModal';
 import { useState } from 'react';
 import { ArrowLeft, FileDown, Calendar, Hash, Activity, CheckCircle2, AlertCircle } from 'lucide-react';
@@ -11,7 +11,7 @@ export const LogDetailsPage = () => {
     skip: !id,
   });
 
-  const [saveReport] = useSaveAndGenerateReportMutation();
+  const [generateReport] = useGenerateCalculatedReportMutation();
   const { showModal, ModalComponent } = useModal();
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -21,19 +21,14 @@ export const LogDetailsPage = () => {
     const parsedMetrics = typeof log.payload === 'string' ? JSON.parse(log.payload) : log.payload;
     const logDate = log.createdAt ? new Date(log.createdAt).toISOString().split('T')[0] : '';
 
-    const payload = {
-      createdAt: logDate,
-      payload: parsedMetrics,
-    };
-
     try {
       setIsGenerating(true);
-      const { fileBlob } = await saveReport(payload).unwrap();
+      const { fileBlob } = await generateReport(id as string).unwrap();
       
       const url = URL.createObjectURL(fileBlob);
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `Daily_Report_${logDate}.xlsx`);
+      link.setAttribute('download', `Calculated_Report_${logDate}.xlsx`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

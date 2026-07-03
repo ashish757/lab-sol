@@ -111,7 +111,7 @@ export const UnitOpDash = () => {
                     New entry
                   </button>
                   <button
-                    onClick={() => navigate(PAGES.UNIT_SETTINGS)}
+                    onClick={() => navigate(PAGES.SETTINGS)}
                     className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl border border-slate-700 transition-all uppercase tracking-wider active:scale-[0.98]"
                   >
                     <Settings size={14} />

@@ -15,7 +15,7 @@ const LogsPage = lazy(() => import('../pages/unitOperator/LogListPage').then(m =
 const NewLogPage = lazy(() => import('../pages/unitOperator/NewLogPage').then(m => ({ default: m.NewLogPage })));
 const LogDetailsPage = lazy(() => import('../pages/unitOperator/LogDetailsPage').then(m => ({ default: m.LogDetailsPage })));
 const SettingsPage = lazy(() => import('../pages/SettingsPage').then(m => ({ default: m.SettingsPage })));
-const SessionSettingsPage = lazy(() => import('../pages/settings/SessionSettingsPage').then(m => ({ default: m.SessionSettingsPage })));
+const SessionSettingsPage = lazy(() => import('../pages/unitOperator/SessionSettingsPage').then(m => ({ default: m.SessionSettingsPage })));
 const ProfilePage = lazy(() => import('../pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
 
 const allRoles = [Role.SUPER_ADMIN, Role.ORG_ADMIN, Role.ORG_STAFF, Role.UNIT_OPERATOR];

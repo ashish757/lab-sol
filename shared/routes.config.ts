@@ -41,6 +41,7 @@ export const apiRoutes = {
     downloadTemplate: 'daily-logs/download',
     downloadOne: 'daily-logs/download/:id',
     saveAndGenerate: 'save-and-generate',
+    calculatedExcel: ':id/calculated-excel',
   },
   sessions: {
     base: 'api/sessions',
@@ -75,9 +76,8 @@ export const clientRoutes = {
     dataEntry: '/unit/analysis/new',
     report: '/unit/analysis/:id',
     logsList: '/unit/logs',
-    settings: '/unit/dash/settings',
   },
-  settings: 'settings',
+  settings: '/settings',
   profile: '/profile',
 };
 
@@ -116,6 +116,7 @@ export const getClientApiPath = {
     downloadTemplate: () => `/${apiRoutes.reports.base}/${apiRoutes.reports.downloadTemplate}`,
     downloadOne: (id: string | number) => `/${apiRoutes.reports.base}/daily-logs/download/${id}`,
     saveAndGenerate: () => `/${apiRoutes.reports.base}/${apiRoutes.reports.saveAndGenerate}`,
+    calculatedExcel: (id: string | number) => `/${apiRoutes.reports.base}/${id}/calculated-excel`,
   },
   sessions: {
     getActive: (unitId: string) => `/${apiRoutes.sessions.base}/active/${unitId}`,

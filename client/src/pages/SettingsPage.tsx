@@ -1,8 +1,13 @@
+import { Role } from "../types/auth";
+import { RoleGuard } from "../components/guards/RoleGuard";
+import { SessionSettingsPage } from "./unitOperator/SessionSettingsPage";
 
 export const SettingsPage = () => {
   return (
-    <div className="min-h-screen bg-slate-50 p-6 relative overflow-hidden">
-        <h1>Settings</h1>
-    </div>
+    <>
+    <RoleGuard allowedRoles={[Role.ORG_ADMIN, Role.UNIT_OPERATOR]}>
+      <SessionSettingsPage />
+    </RoleGuard>
+    </>
   );
 };

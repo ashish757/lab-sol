@@ -19,7 +19,6 @@ export const PAGES = {
   STAFF_SETUP: clientRoutes.auth.staffSetup,
   PROFILE: clientRoutes.profile,
   ORG_UNIT_SETTINGS: clientRoutes.org.unitSettings,
-  UNIT_SETTINGS: clientRoutes.unit.settings,
 } as const;
 
 export const getPagePath = {
@@ -65,6 +64,7 @@ export const API_ENDPOINTS = {
   DAILY_LOG_BY_ID: (id: string | number) => getClientApiPath.dailyLogs.one(id),
   DOWNLOAD_DAILY_REPORT: getClientApiPath.reports.downloadTemplate(),
   SAVE_AND_GENERATE: getClientApiPath.reports.saveAndGenerate(),
+  GENERATE_CALCULATED_REPORT: (id: string | number) => getClientApiPath.reports.calculatedExcel(id),
 
   // Sessions API
   GET_ACTIVE_SESSION: (unitId: string) => getClientApiPath.sessions.getActive(unitId),

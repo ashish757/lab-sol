@@ -2,10 +2,14 @@ import { Injectable, ForbiddenException, BadRequestException, NotFoundException 
 import { PrismaService } from '../prisma/prisma.service';
 import { UpsertDailyLogDto } from './dto/dailyLog.dto';
 import { Prisma, Role, LogStatus, LogDayType } from '@prisma/client';
+import { CalculationsService } from '../calculations/calculations.service';
 
 @Injectable()
 export class DailyLogsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly calculationsService: CalculationsService,
+  ) {}
 
   async autoLockAndFillMissedDays(unitId: string, orgId: string, sessionData: any) {
     if (!sessionData || !sessionData.isLocked || !sessionData.sessionStartDate) return;
@@ -180,7 +184,7 @@ export class DailyLogsService {
 
     const sanitizedPayload = { ...(dto.payload as Record<string, any>) };
 
-    return this.prisma.dailyLog.upsert({
+    const savedLog = await this.prisma.dailyLog.upsert({
       where: { unitId_createdAt: { unitId, createdAt: requestedDate } },
       update: {
         payload: sanitizedPayload as Prisma.InputJsonValue,
@@ -205,6 +209,11 @@ export class DailyLogsService {
         updatedByName: currentUser?.name,
       },
     });
+
+    // Auto-calculate required metrics and save to DailyCalculation table
+    await this.calculationsService.processCalculations(savedLog.id, sanitizedPayload);
+
+    return savedLog;
   }
 
   async findAll(currentUser: any) {

@@ -161,4 +161,54 @@ export class ReportsService {
     );
     res.send(buffer);
   }
+
+  /**
+   * Generates a simple 2-column Excel file from a JSON object.
+   */
+  async generateSimpleTwoColumnReport(data: Record<string, any>): Promise<Buffer> {
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet('Calculations');
+    
+    // Define columns
+    sheet.columns = [
+      { header: 'Metric', key: 'metric', width: 40 },
+      { header: 'Value', key: 'value', width: 25 }
+    ];
+    
+    // Style header row
+    const headerRow = sheet.getRow(1);
+    headerRow.font = { bold: true };
+    headerRow.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFE0E0E0' }
+    };
+    
+    // Add rows
+    for (const [key, value] of Object.entries(data)) {
+      sheet.addRow({ metric: key, value });
+    }
+    
+    const buffer = await workbook.xlsx.writeBuffer();
+    return Buffer.from(buffer as any);
+  }
+
+  /**
+   * Fetches pre-calculated metrics from DailyCalculation and generates a simple Excel.
+   */
+  async generateCalculatedExcelById(id: string): Promise<Buffer> {
+    const calculation = await this.prisma.dailyCalculation.findUnique({
+      where: { dailyLogId: id },
+    });
+
+    if (!calculation) {
+      throw new NotFoundException(`Calculation record not found for log ID ${id}. Please make sure the log is saved first.`);
+    }
+
+    const calculatedMetrics = typeof calculation.calculatedMetrics === 'string' 
+      ? JSON.parse(calculation.calculatedMetrics) 
+      : calculation.calculatedMetrics;
+
+    return this.generateSimpleTwoColumnReport(calculatedMetrics as Record<string, any>);
+  }
 }
