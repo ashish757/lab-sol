@@ -60,6 +60,7 @@ export const analysisConfig: GroupConfig[] = [
       { id: "dayStartTime", label: "Day Start Time", type: "time", readonly: true },
       { id: "todayDate", label: "Today Date", type: "date", required: true, readonly: true },
       { id: "cropDay", label: "Crop day", type: "number", unit: "Nos", isCalculated: true },
+      { id: "dayUnavaliableHours", label: "Day Unavaliable Hours", type: "number", unit: "HH:MM" },
     ]
   },
   {
@@ -74,21 +75,39 @@ export const analysisConfig: GroupConfig[] = [
     ]
   },
   {
-    groupId: "CaneCrush",
+    groupId: "CaneCrushing",
     title: "CANE CRUSHING DATA",
     fields: [
+      { id: "caneOpeningBalance", label: "Cane Opening Balance", type: "number", unit: "Qtls" },
       { id: "caneReceived", label: "Cane Received", type: "number", unit: "Qtls" },
       { id: "gate", label: "Gate", type: "number", unit: "Qtls" },
-      { id: "road", label: "Road", type: "number", unit: "Qtls" },
+      { id: "road", label: "Road/Center", type: "number", unit: "Qtls" },
+      { id: "caneCrushed", label: "Cane Crushed", type: "number", unit: "Qtls", isCalculated: true },
       { id: "closingBal", label: "Closing Balance", type: "number", unit: "Qtls" },
       { id: "earlyVariety", label: "Early Variety", type: "number", unit: "Qtls" },
-      { id: "totalCaneCrushed", label: "Total Cane Crushed", type: "number", unit: "Qtls", isCalculated: true },
+      { id: "yardBalance", label: "Yard Balance", type: "number", unit: "Qtls" },
       { id: "divertedSyrup", label: "Diverted Syrup", type: "number", unit: "Qtls" },
-      { id: "molassesSentOut", label: "Molasses Sent Out", type: "number", unit: "Qtls" },
-      { id: "imbibition", label: "Imbibition", type: "number", unit: "Qtls" },
-      { id: "dirtPercent", label: "Dirt %", type: "number", unit: "% Mixed Juice" },
+      { id: "molassesSentOut", label: "Final Molasses Sent Out", type: "number", unit: "Qtls" },
+      { id: "imbibitionWaterRawData", label: "Imbibition Water Raw Data", type: "number", unit: "Qtls" },
+      { id: "imbibitionWaterSpecificGavity", label: "Imbibition Water Sp. Gravity", type: "number", unit: "-" },
+      { id: "dirtPercent", label: "Dirt %", type: "number", unit: "% Cane" },
+      { id: "unknownLosses", label: "unknownLosses", type: "number", unit: "% MJ" },
+      { id: "polPercentSugar", label: "Pol Percent Sugar", type: "number", unit: "%" },
       { id: "filterCakeProduction", label: "Filter Cake Production", type: "number", unit: "Qtls" },
-      { id: "grossMixedJuice", label: "Gross Mixed Juice", type: "number", unit: "Qtls" },
+      { id: "grossMixedJuiceRawData", label: "Gross Mixed Juice Raw Data", type: "number", unit: "Qtls" },
+      { id: "mixedJuiceSpecificGravity", label: "Mixed Juice Sp. Gravity", type: "number", unit: "Qtls MJ" },
+      
+
+      
+    ]
+  },
+  {
+    groupId: "sugarProductionData",
+    title: "Sugar Production Data",
+    fields: [
+      { id: "l30", label: "L 30", type: "number", unit: "Qtls" },
+      { id: "m30", label: "M 30", type: "number", unit: "Qtls" },
+      { id: "s30", label: "S 30", type: "number", unit: "Qtls" },
       { id: "l31", label: "L 31", type: "number", unit: "Qtls" },
       { id: "m31", label: "M 31", type: "number", unit: "Qtls" },
       { id: "s31", label: "S 31", type: "number", unit: "Qtls" },
@@ -96,15 +115,32 @@ export const analysisConfig: GroupConfig[] = [
       { id: "rawSugar", label: "Raw Sugar", type: "number", unit: "Qtls" },
       { id: "llBold", label: "LL Bold", type: "number", unit: "Qtls" },
       { id: "brownSugar", label: "Brown Sugar", type: "number", unit: "Qtls" },
+      { id: "scrapingSugar", label: "Scraping Sugar", type: "number", unit: "Qtls" },
       { id: "totalSugarBagged", label: "Total Sugar Bagged", type: "number", unit: "Qtls", isCalculated: true }
     ]
   },
+
   {
-    groupId: "reprocess",
-    title: "REPROCESS",
+    groupId: "sugarReprocess",
+    title: "SUGAR REPROCESS DATA",
     fields: [
-      { id: "reprocessBrownSugar", label: "Brown Sugar", type: "number", unit: "Qtls" },
-      { id: "reprocessRawSugar", label: "Raw Sugar", type: "number", unit: "Qtls" }
+      { id: "remaltingWhiteSugar", label: "Remalting White Sugar", type: "number", unit: "Qtls" },
+      { id: "reprocessBrownSugar", label: "Reproce Brown Sugar", type: "number", unit: "Qtls" },
+      { id: "reprocessRawSugar", label: "Reproce Raw Sugar", type: "number", unit: "Qtls" },
+      { id: "reprocessScrapSugar", label: "Reproce Scraping Sugar", type: "number", unit: "Qtls" },
+      { id: "remaltingWhiteSugarBrix", label: "Remalting White Sugar Analysis", type: "number", unit: "%", subLabel: "Brix" },
+      { id: "remaltingWhiteSugarPol", label: "Remalting White Sugar Analysis", type: "number", unit: "%", subLabel: "Pol" },
+
+      { id: "reprocessBrownSugarBrix", label: "Reproce Brown Sugar Analysis", type: "number", unit: "%", subLabel: "Brix" },
+      { id: "reprocessBrownSugarPol", label: "Reroce Brown Sugar Analysis", type: "number", unit: "%", subLabel: "Pol" },
+
+      { id: "reprocessRawSugarBrix", label: "Reproce Raw Sugar Analysis", type: "number", unit: "%", subLabel: "Brix" },
+      { id: "reprocessRawSugarPol", label: "Reroce Raw Sugar Analysis", type: "number", unit: "%", subLabel: "Pol" },
+
+       { id: "reprocessScrapingSugarBrix", label: "Reproce Scraping Sugar Analysis", type: "number", unit: "%", subLabel: "Brix" },
+      { id: "reprocessScrapingSugarPol", label: "Reroce Scraping Sugar Analysis", type: "number", unit: "%", subLabel: "Pol" }
+
+      
     ]
   },
   {
@@ -130,7 +166,9 @@ export const analysisConfig: GroupConfig[] = [
       { id: "bMassecuite", label: "B - Massecuite", type: "number", unit: "Qtls" },
       { id: "b1Massecuite", label: "B1 - Massecuite", type: "number", unit: "Qtls" },
       { id: "cMassecuite", label: "C - Massecuite", type: "number", unit: "Qtls" },
+      { id: "c1Massecuite", label: "C1 - Massecuite", type: "number", unit: "Qtls" },
       { id: "r1Massecuite", label: "R1 - Massecuite", type: "number", unit: "Qtls" },
+      { id: "r2Massecuite", label: "R2 - Massecuite", type: "number", unit: "Qtls" },
       { id: "r3Massecuite", label: "R3 - Massecuite", type: "number", unit: "Qtls" },
       { id: "totalMassecuite", label: "Total Massecuite", type: "number", unit: "Qtls" }
     ]
@@ -153,36 +191,53 @@ export const analysisConfig: GroupConfig[] = [
     groupId: "sugarAnalysisLGrade",
     title: "SUGAR ANALYSIS (L Grade)",
     fields: [
-      { id: "LsugarColourGs10", label: "L Sugar Colour GS-10", type: "number", unit: "IU" },
-      { id: "LsugarColourGs8", label: "L Sugar Colour GS-8", type: "number", unit: "IU" },
-      { id: "LsugarReflectance", label: "L Sugar Reflectance", type: "number", unit: "%" },
-      { id: "Lmoisture", label: "L Sugar Moisture", type: "number", unit: "%" },
-      { id: "LparticleSizeMa", label: "L Sugar MA", type: "number", unit: "mm" },
-      { id: "LparticleSizeCv", label: "L Sugar CV", type: "number", unit: "%" }
+      { id: "l31sugarColourGs10", label: "L-31 Sugar Colour GS-10", type: "number", unit: "IU" },
+      { id: "l31sugarColourGs8", label: "L-31 Sugar Colour GS-8", type: "number", unit: "IU" },
+      { id: "l31sugarReflectance", label: "L-31 Sugar Reflectance", type: "number", unit: "%" },
+      { id: "l31moisture", label: "L-31 Sugar Moisture", type: "number", unit: "%" },
+      { id: "l31particleSizeMa", label: "L-31 Sugar MA", type: "number", unit: "mm" },
+      { id: "l31particleSizeCv", label: "L-31 Sugar CV", type: "number", unit: "%" },
+      { id: "llBoldColour", label: "LL Bold Colour", type: "number", unit: "IU" },
+       { id: "l30sugarColourGs10", label: "L-30 Sugar Colour GS-10", type: "number", unit: "IU" },
+
     ]
   },
   {
     groupId: "sugarAnalysisMGrade",
     title: "SUGAR ANALYSIS (M Grade)",
     fields: [
-      { id: "MsugarColourGs10", label: "M Sugar Colour GS-10", type: "number", unit: "IU" },
-      { id: "MsugarColourGs8", label: "M Sugar Colour GS-8", type: "number", unit: "IU" },
-      { id: "MsugarReflectance", label: "M Sugar Reflectance", type: "number", unit: "%" },
-      { id: "Mmoisture", label: "M Sugar Moisture", type: "number", unit: "%" },
-      { id: "MparticleSizeMa", label: "M Sugar MA", type: "number", unit: "mm" },
-      { id: "MparticleSizeCv", label: "M Sugar CV", type: "number", unit: "%" }
+      { id: "m31SugarColourGs10", label: "M-31 Sugar Colour GS-10", type: "number", unit: "IU" },
+      { id: "m31SugarColourGs8", label: "M-31 Sugar Colour GS-8", type: "number", unit: "IU" },
+      { id: "m31SugarReflectance", label: "M-31 Sugar Reflectance", type: "number", unit: "%" },
+      { id: "m31Moisture", label: "M-31 Sugar Moisture", type: "number", unit: "%" },
+      { id: "m31ParticleSizeMa", label: "M-31 Sugar MA", type: "number", unit: "mm" },
+      { id: "m31ParticleSizeCv", label: "M-31 Sugar CV", type: "number", unit: "%" },
+       { id: "m30SugarColourGs10", label: "M-30 Sugar Colour GS-10", type: "number", unit: "IU" },
     ]
   },
   {
     groupId: "sugarAnalysisSGrade",
     title: "SUGAR ANALYSIS (S Grade)",
     fields: [
-      { id: "SsugarColourGs10", label: "S Sugar Colour GS-10", type: "number", unit: "IU" },
-      { id: "SsugarColourGs8", label: "S Sugar Colour GS-8", type: "number", unit: "IU" },
-      { id: "SsugarReflectance", label: "S Sugar Reflectance", type: "number", unit: "%" },
-      { id: "Smoisture", label: "S Sugar Moisture", type: "number", unit: "%" },
-      { id: "SparticleSizeMa", label: "S Sugar MA", type: "number", unit: "mm" },
-      { id: "SparticleSizeCv", label: "S Sugar CV", type: "number", unit: "%" }
+      { id: "s31SugarColourGs10", label: "S-31 Sugar Colour GS-10", type: "number", unit: "IU" },
+      { id: "s31SugarColourGs8", label: "S-31 Sugar Colour GS-8", type: "number", unit: "IU" },
+      { id: "s31SugarReflectance", label: "S-31 Sugar Reflectance", type: "number", unit: "%" },
+      { id: "s31Moisture", label: "S-31 Sugar Moisture", type: "number", unit: "%" },
+      { id: "s31particleSizeMa", label: "S-31 Sugar MA", type: "number", unit: "mm" },
+      { id: "s31particleSizeCv", label: "S-31 Sugar CV", type: "number", unit: "%" },
+      { id: "s30SugarColourGs10", label: "S-30 Sugar Colour GS-10", type: "number", unit: "IU" },
+    ]
+  },
+
+  {
+    groupId: "rawSugarAnalysis",
+    title: "RAW SUGAR ANALYSIS",
+    fields: [
+      { id: "rawSugarColourGs-10", label: "Raw Sugar Colour GS-10", type: "number", unit: "IU" },
+      { id: "rawSugarMoisture", label: "Raw Sugar Moisture", type: "number", unit: "%" },
+      { id: "rawSugarMA", label: "Raw Sugar MA", type: "number", unit: "mm" },
+      { id: "rawSugarCV", label: "Raw Sugar CV", type: "number", unit: "%" },
+
     ]
   },
   {
@@ -197,7 +252,7 @@ export const analysisConfig: GroupConfig[] = [
   },
   {
     groupId: "waterUsage",
-    title: "WATER USAGE & DISCHARGE",
+    title: "STEAM, WATER USAGE & DISCHARGE",
     fields: [
       { id: "rawWaterConsumption", label: "Raw Water Consumption", type: "number", unit: "KLtr" },
       { id: "treatedWaterDischarge", label: "Treated Water Discharge", type: "number", unit: "Ltr/MTCane" },
@@ -205,6 +260,7 @@ export const analysisConfig: GroupConfig[] = [
       { id: "dmWaterConsumption", label: "DM Water Consumption", type: "number", unit: "KLtr" },
       { id: "steamGeneration", label: "Steam Generation", type: "number", unit: "MT" },
       { id: "steamFuelRatio", label: "Steam Fuel Ratio", type: "number", unit: "%" },
+      { id: "powerHouseSteamConsumption", label: "Power House Steam Consumption", type: "number", unit: "MT" },
       { id: "boilingHouseSteamConsumption", label: "Boiling House Steam Consumption", type: "number", unit: "MT" }
     ]
   },
@@ -244,6 +300,8 @@ export const analysisConfig: GroupConfig[] = [
       { id: "b1MassecuitePol", label: "B1 - Massecuite", type: "number", unit: "%", subLabel: "Pol" },
       { id: "cMassecuiteBrix", label: "C - Massecuite ", type: "number", unit: "%", subLabel: "Brix" },
       { id: "cMassecuitePol", label: "C - Massecuite", type: "number", unit: "%", subLabel: "Pol" },
+      { id: "c1MassecuiteBrix", label: "C1 - Massecuite ", type: "number", unit: "%", subLabel: "Brix" },
+      { id: "c1MassecuitePol", label: "C1 - Massecuite", type: "number", unit: "%", subLabel: "Pol" },
       { id: "aHeavyMolassesBrix", label: "A - Heavy Molasses ", type: "number", unit: "%", subLabel: "Brix" },
       { id: "aHeavyMolassesPol", label: "A - Heavy Molasses", type: "number", unit: "%", subLabel: "Pol" },
       { id: "aLightMolassesBrix", label: "A - Light Molasses ", type: "number", unit: "%", subLabel: "Brix" },
@@ -254,6 +312,8 @@ export const analysisConfig: GroupConfig[] = [
       { id: "bHeavyMolassesPol", label: "B - Heavy Molasses", type: "number", unit: "%", subLabel: "Pol" },
       { id: "b1HeavyMolassesBrix", label: "B1 - Heavy Molasses ", type: "number", unit: "%", subLabel: "Brix" },
       { id: "b1HeavyMolassesPol", label: "B1 - Heavy Molasses", type: "number", unit: "%", subLabel: "Pol" },
+       { id: "c1HeavyMolassesBrix", label: "C1 - Heavy Molasses ", type: "number", unit: "%", subLabel: "Brix" },
+      { id: "c1HeavyMolassesPol", label: "C1 - Heavy Molasses", type: "number", unit: "%", subLabel: "Pol" },
       { id: "cLightMolassesBrix", label: "C - Light Molasses ", type: "number", unit: "%", subLabel: "Brix" },
       { id: "cLightMolassesPol", label: "C - Light Molasses", type: "number", unit: "%", subLabel: "Pol" },
       { id: "finalMolassesBrix", label: "Final Molasses (CH) ", type: "number", unit: "%", subLabel: "Brix" },
@@ -264,18 +324,20 @@ export const analysisConfig: GroupConfig[] = [
       { id: "cSingleCuredPol", label: "C - Single Cured", type: "number", unit: "%", subLabel: "Pol" },
       { id: "cDoubleCuredBrix", label: "C - Double Cured ", type: "number", unit: "%", subLabel: "Brix" },
       { id: "cDoubleCuredPol", label: "C - Double Cured", type: "number", unit: "%", subLabel: "Pol" },
-      { id: "magmaBrix", label: "Magma ", type: "number", unit: "%", subLabel: "Brix" },
-      { id: "magmaPol", label: "Magma", type: "number", unit: "%", subLabel: "Pol" },
-      { id: "meltBrix", label: "Melt ", type: "number", unit: "%", subLabel: "Brix" },
-      { id: "meltPol", label: "Melt", type: "number", unit: "%", subLabel: "Pol" },
+      { id: "bAndCMeltBrix", label: "B & C Melt ", type: "number", unit: "%", subLabel: "Brix" },
+      { id: "bAndCMeltPol", label: "B & C Melt", type: "number", unit: "%", subLabel: "Pol" },
       { id: "rawMeltBrix", label: "Raw Melt ", type: "number", unit: "%", subLabel: "Brix" },
       { id: "rawMeltPol", label: "Raw Melt", type: "number", unit: "%", subLabel: "Pol" },
-      { id: "refinedSyrupBrix", label: "Refined Syrup ", type: "number", unit: "%", subLabel: "Brix" },
-      { id: "refinedSyrupPol", label: "Refined Syrup", type: "number", unit: "%", subLabel: "Pol" },
+      { id: "refinedSyrupBrix", label: "Refined Syrup/Melt ", type: "number", unit: "%", subLabel: "Brix" },
+      { id: "refinedSyrupPol", label: "Refined Syrup/Melt", type: "number", unit: "%", subLabel: "Pol" },
       { id: "r1MassecuiteBrix", label: "Refined/R1 - Massecuite ", type: "number", unit: "%", subLabel: "Brix" },
       { id: "r1MassecuitePol", label: "Refined/R1 - Massecuite", type: "number", unit: "%", subLabel: "Pol" },
       { id: "r1MolassesBrix", label: "Refined/R1 - Molasses ", type: "number", unit: "%", subLabel: "Brix" },
       { id: "r1MolassesPol", label: "Refined/R1 - Molasses", type: "number", unit: "%", subLabel: "Pol" },
+       { id: "r2MassecuiteBrix", label: "R2 - Massecuite ", type: "number", unit: "%", subLabel: "Brix" },
+      { id: "r2MassecuitePol", label: "R2 - Massecuite", type: "number", unit: "%", subLabel: "Pol" },
+      { id: "r2MolassesBrix", label: "R2 - Molasses ", type: "number", unit: "%", subLabel: "Brix" },
+      { id: "r2MolassesPol", label: "R2 - Molasses", type: "number", unit: "%", subLabel: "Pol" },
       { id: "r3MassecuiteBrix", label: "R3 - Massecuite ", type: "number", unit: "%", subLabel: "Brix" },
       { id: "r3MassecuitePol", label: "R3 - Massecuite", type: "number", unit: "%", subLabel: "Pol" },
       { id: "r3MolassesBrix", label: "R3 - Molasses ", type: "number", unit: "%", subLabel: "Brix" },
@@ -291,9 +353,9 @@ export const analysisConfig: GroupConfig[] = [
         subGroupId: "specialanalysisResults",
         title: "TRS ANALYSIS RESULTS",
         fields: [
-          { id: "divertedSyrupTrs", label: "Diverted Syrup", type: "number", unit: "%" },
-          { id: "BheavyMolassesTrs", label: "B-Heavy Molasses", type: "number", unit: "%" },
-          { id: "FinalMolassesTrs", label: "Final Molasses", type: "number", unit: "%" },
+          { id: "divertedSyrupTrs", label: "Diverted Syrup TRS", type: "number", unit: "%" },
+          { id: "BheavyMolassesTrs", label: "B-Heavy Molasses TRS", type: "number", unit: "%" },
+          { id: "FinalMolassesTrs", label: "Final Molasses TRS", type: "number", unit: "%" },
         ]
       },
       {
@@ -319,22 +381,22 @@ export const analysisConfig: GroupConfig[] = [
         subGroupId: "coluoranalysisResults",
         title: "COLOUR ANALYSIS RESULTS",
         fields: [
-          { id: "ColourPrimaryJuice", label: "Primary Juice", type: "number", unit: "IU" },
-          { id: "ColourMixedJuice", label: "Mixed Juice", type: "number", unit: "IU" },
-          { id: "ColourClearJuice", label: "Clear Juice", type: "number", unit: "IU" },
-          { id: "ColourUnSulSyrup", label: "Un Sulphured Syrup", type: "number", unit: "IU" },
-          { id: "ColourSulSyrup", label: "Sulphured Syrup", type: "number", unit: "IU" },
-          { id: "ColourAMass", label: "A-Massecuite", type: "number", unit: "IU" },
-          { id: "ColourAlight", label: "A-Light", type: "number", unit: "IU" },
-          { id: "ColourAheavy", label: "A-Heavy", type: "number", unit: "IU" },
-          { id: "ColourBMass", label: "B-Massecuite", type: "number", unit: "IU" },
-          { id: "ColourBheavy", label: "B-Heavy", type: "number", unit: "IU" },
-          { id: "ColourBsugar", label: "B-Sugar", type: "number", unit: "IU" },
-          { id: "ColourCMass", label: "C-Massecuite", type: "number", unit: "IU" },
-          { id: "ColourCfwSugar", label: "CFW Sugar", type: "number", unit: "IU" },
-          { id: "ColourFinalMol", label: "Final Molasses", type: "number", unit: "IU" },
-          { id: "ColourClight", label: "Sulphured Syrup", type: "number", unit: "IU" },
-          { id: "ColourCawSugar", label: "CAW Sugar", type: "number", unit: "IU" }
+          { id: "primaryJuiceColour", label: "Primary Juice Colour", type: "number", unit: "IU" },
+          { id: "mixedJuiceColour", label: "Mixed Juice Colour", type: "number", unit: "IU" },
+          { id: "clearJuiceColour", label: "Clear Juice Colour", type: "number", unit: "IU" },
+          { id: "unSulphuredSyrupColour", label: "Un Sulphured Syrup Colour", type: "number", unit: "IU" },
+          { id: "sulphuredSyrupColour", label: "Sulphured Syrup Colour", type: "number", unit: "IU" },
+          { id: "aMassecuiteColour", label: "A-Massecuite Colour", type: "number", unit: "IU" },
+          { id: "aLightColour", label: "A-Light Colour", type: "number", unit: "IU" },
+          { id: "aHeavyColour", label: "A-Heavy Colour", type: "number", unit: "IU" },
+          { id: "bMassecuiteColour", label: "B-Massecuite Colour", type: "number", unit: "IU" },
+          { id: "bHeavyColour", label: "B-Heavy Colour", type: "number", unit: "IU" },
+          { id: "bSugarSolour", label: "B-Sugar Colour", type: "number", unit: "IU" },
+          { id: "cMassecuite", label: "C-Massecuite", type: "number", unit: "IU" },
+          { id: "CFWsugar", label: "CFW Sugar", type: "number", unit: "IU" },
+          { id: "CAWsugar", label: "CAW Sugar", type: "number", unit: "IU" },
+          { id: "cLightColour", label: "C-Light Colour", type: "number", unit: "IU" },
+          { id: "finalMolassesColour", label: "Final Molasses Colour", type: "number", unit: "IU" },
         ]
       },
     ]

@@ -138,9 +138,6 @@ const RatioCalculatedInput = React.memo(({ label, fields }: BaseInputProps) => {
   );
 });
 
-export const PrimitiveInput = React.memo(({ label, fields, groupId }: PrimitiveInputProps) => {
-  if (groupId === 'analysisResults') {
+export const PrimitiveInput = React.memo(({ label, fields }: PrimitiveInputProps) => {
     return <RatioCalculatedInput label={label} fields={fields} />;
-  }
-  return <BasePrimitiveInputRow label={label} fields={fields} />;
 });

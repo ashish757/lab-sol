@@ -24,7 +24,7 @@ export const EXCEL_ROW_SINGLE_VALUES: Record<number, string> = {
   16: 'road',
   17: 'closingBal',
   18: 'earlyVariety',
-  19: 'totalCaneCrushed',
+  19: 'caneCrushed',
   20: 'divertedSyrup',
   21: 'molassesSentOut',
   22: 'imbibition',

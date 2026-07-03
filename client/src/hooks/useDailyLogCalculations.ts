@@ -29,7 +29,7 @@ export const CALCULATIONS_CONFIG: CalculationConfig[] = [
     },
   },
   {
-    targetField: 'totalCaneCrushed',
+    targetField: 'caneCrushed',
     dependencies: ['gate', 'road'],
     calculate: (values) => parseNum(values.gate) + parseNum(values.road),
   },

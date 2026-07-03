@@ -19,7 +19,7 @@ export const UnitOpDash = () => {
 
   const totalCane = logs.reduce((acc: number, log: DailyLogResponse) => {
     const metrics = typeof log.metrics === 'string' ? JSON.parse(log.metrics) : log.metrics;
-    return acc + (parseFloat((metrics as any)?.totalCaneCrushed) || 0);
+    return acc + (parseFloat((metrics as any)?.caneCrushed) || 0);
   }, 0);
 
   const totalSugar = logs.reduce((acc: number, log: DailyLogResponse) => {
@@ -294,7 +294,7 @@ export const UnitOpDash = () => {
                               {formatDate(log.createdAt || (log as any).date || (log as any).logDate)}
                             </td>
                             <td className="px-5 py-3.5 font-semibold text-slate-650">
-                              {Number((metrics as any)?.totalCaneCrushed || 0).toLocaleString()} Qtls
+                              {Number((metrics as any)?.caneCrushed || 0).toLocaleString()} Qtls
                             </td>
                             <td className="px-5 py-3.5 font-semibold text-indigo-650">
                               {Number((metrics as any)?.totalSugarBagged || 0).toLocaleString()} Qtls
