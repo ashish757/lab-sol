@@ -76,6 +76,7 @@ export const clientRoutes = {
     dataEntry: '/unit/analysis/new',
     report: '/unit/analysis/:id',
     logsList: '/unit/logs',
+    settings: '/unit/settings',
   },
   settings: '/settings',
   profile: '/profile',

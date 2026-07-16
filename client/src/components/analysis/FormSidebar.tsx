@@ -19,7 +19,7 @@ interface FormSidebarProps {
   hideLockDataButton?: boolean;
 }
 
-export const FormSidebar = ({ config, activeSection, hasUploadedData, onScrollTo, onUploadData, onLockData, isSubmitting = false, hasUnsavedChanges = false, isLocked = false, blockingDate, isFillingPastData = false, hideLockDataButton = false }: FormSidebarProps) => {
+export const FormSidebar = ({ config, activeSection, hasUploadedData, onScrollTo, onUploadData, onLockData, isSubmitting = false, hasUnsavedChanges = false, isLocked = false, blockingDate, hideLockDataButton = false }: FormSidebarProps) => {
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
   
   const toggleGroup = (groupId: string) => {

@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { useGetOrganizationByIdQuery, useCancelUserInviteMutation, useInviteUserMutation, useUpdateUnitMutation, useDeleteUnitMutation, useUpdateUserMutation } from '../../store/api/apiSlice';
+import { useGetOrganizationByIdQuery, useCancelUserInviteMutation, useInviteUserMutation, useUpdateUserMutation } from '../../store/api/apiSlice';
 import { Users, Network, Mail, Building, Plus, Trash2, RefreshCw, MoreVertical, Search, Filter, Settings } from 'lucide-react';
 import type { RootState } from '../../store/store';
 import { useState } from 'react';

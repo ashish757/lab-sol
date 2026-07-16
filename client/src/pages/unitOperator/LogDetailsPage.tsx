@@ -18,7 +18,6 @@ export const LogDetailsPage = () => {
   const handleGenerateReport = async () => {
     if (!log) return;
     
-    const parsedMetrics = typeof log.payload === 'string' ? JSON.parse(log.payload) : log.payload;
     const logDate = log.createdAt ? new Date(log.createdAt).toISOString().split('T')[0] : '';
 
     try {

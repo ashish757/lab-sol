@@ -32,7 +32,7 @@ export const routeConfiguration = [
   { path: PAGES.ANALYSIS_REPORT, component: LogDetailsPage, allowedRoles: [Role.UNIT_OPERATOR, Role.ORG_ADMIN, Role.ORG_STAFF] },
   { path: PAGES.LOGS_LIST, component: LogsPage, allowedRoles: [Role.UNIT_OPERATOR, Role.ORG_ADMIN, Role.ORG_STAFF] },
   { path: PAGES.ORG_UNIT_SETTINGS, component: SessionSettingsPage, allowedRoles: [Role.ORG_ADMIN] },
-  { path: PAGES.UNIT_SETTINGS, component: SessionSettingsPage, allowedRoles: [Role.UNIT_OPERATOR] },
+  { path: PAGES.UNIT_SETTINGS, component: SessionSettingsPage, allowedRoles: [Role.UNIT_OPERATOR, Role.ORG_ADMIN] },
   { path: PAGES.SETTINGS, component: SettingsPage, allowedRoles: allRoles },
   { path: PAGES.PROFILE, component: ProfilePage, allowedRoles: allRoles },
 ];

@@ -9,7 +9,7 @@ import { analysisConfig, getAllSectionIds } from '../../config/analysisConfig';
 import { useScrollSpy } from '../../hooks/useScrollSpy';
 import { FormSidebar } from '../../components/analysis/FormSidebar';
 import { FormSection } from '../../components/analysis/FormSection';
-import { useUpsertUnitLogMutation, useFetchUnitLogsQuery, useSaveAndGenerateReportMutation, useGetUnitByIdQuery, useGetActiveSessionQuery } from '../../store/api/apiSlice';
+import { useUpsertUnitLogMutation, useFetchUnitLogsQuery, useSaveAndGenerateReportMutation, useGetActiveSessionQuery } from '../../store/api/apiSlice';
 import { useDailyLogCalculations, CALCULATIONS_CONFIG } from '../../hooks/useDailyLogCalculations';
 import { useModal } from '../../hooks/useModal';
 import { PowerOff } from 'lucide-react';
