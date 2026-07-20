@@ -270,5 +270,27 @@ export class DailyLogsService {
       where: whereClause,
     });
   }
+
+  async lockUnitLog(id: string, currentUser: any) {
+    const log = await this.findOne(id, currentUser);
+    if (!log) {
+      throw new NotFoundException('Daily log not found');
+    }
+
+    if (log.status === LogStatus.LOCKED) {
+      throw new BadRequestException('Daily log is already locked');
+    }
+
+    return this.prisma.dailyLog.update({
+      where: { id },
+      data: {
+        status: LogStatus.LOCKED,
+        lockedAt: new Date(),
+        updatedById: currentUser?.id,
+        updatedByEmail: currentUser?.email,
+        updatedByName: currentUser?.name,
+      }
+    });
+  }
 }
 

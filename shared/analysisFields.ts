@@ -90,12 +90,12 @@ export const analysisConfig: GroupConfig[] = [
       { id: "molassesSentOut", label: "Final Molasses Sent Out", type: "number", unit: "Qtls" },
       { id: "imbibitionWaterRawData", label: "Imbibition Water Raw Data", type: "number", unit: "Qtls" },
       { id: "imbibitionWaterSpecificGavity", label: "Imbibition Water Sp. Gravity", type: "number", unit: "-" },
-      { id: "dirtPercent", label: "Dirt %", type: "number", unit: "% Cane" },
-      { id: "unknownLosses", label: "unknownLosses", type: "number", unit: "% MJ" },
+      { id: "dirtPercent", label: "Dirt %", type: "number", unit: "% MJ" },
+      { id: "unknownLosses", label: "Unknown Losses", type: "number", unit: "% Cane" },
       { id: "polPercentSugar", label: "Pol Percent Sugar", type: "number", unit: "%" },
       { id: "filterCakeProduction", label: "Filter Cake Production", type: "number", unit: "Qtls" },
-      { id: "grossMixedJuiceRawData", label: "Gross Mixed Juice Raw Data", type: "number", unit: "Qtls" },
-      { id: "mixedJuiceSpecificGravity", label: "Mixed Juice Sp. Gravity", type: "number", unit: "Qtls MJ" },
+      { id: "grossMixedJuiceRawData", label: "Gross Mixed Juice Raw Data", type: "number", unit: "-" },
+      { id: "mixedJuiceSpecificGravity", label: "Mixed Juice Sp. Gravity", type: "number", unit: "-" },
       
 
       
@@ -128,17 +128,18 @@ export const analysisConfig: GroupConfig[] = [
       { id: "reprocessBrownSugar", label: "Reproce Brown Sugar", type: "number", unit: "Qtls" },
       { id: "reprocessRawSugar", label: "Reproce Raw Sugar", type: "number", unit: "Qtls" },
       { id: "reprocessScrapSugar", label: "Reproce Scraping Sugar", type: "number", unit: "Qtls" },
+
       { id: "remaltingWhiteSugarBrix", label: "Remalting White Sugar Analysis", type: "number", unit: "%", subLabel: "Brix" },
       { id: "remaltingWhiteSugarPol", label: "Remalting White Sugar Analysis", type: "number", unit: "%", subLabel: "Pol" },
 
       { id: "reprocessBrownSugarBrix", label: "Reproce Brown Sugar Analysis", type: "number", unit: "%", subLabel: "Brix" },
-      { id: "reprocessBrownSugarPol", label: "Reroce Brown Sugar Analysis", type: "number", unit: "%", subLabel: "Pol" },
+      { id: "reprocessBrownSugarPol", label: "Reproce Brown Sugar Analysis", type: "number", unit: "%", subLabel: "Pol" },
 
       { id: "reprocessRawSugarBrix", label: "Reproce Raw Sugar Analysis", type: "number", unit: "%", subLabel: "Brix" },
-      { id: "reprocessRawSugarPol", label: "Reroce Raw Sugar Analysis", type: "number", unit: "%", subLabel: "Pol" },
+      { id: "reprocessRawSugarPol", label: "Reproce Raw Sugar Analysis", type: "number", unit: "%", subLabel: "Pol" },
 
        { id: "reprocessScrapingSugarBrix", label: "Reproce Scraping Sugar Analysis", type: "number", unit: "%", subLabel: "Brix" },
-      { id: "reprocessScrapingSugarPol", label: "Reroce Scraping Sugar Analysis", type: "number", unit: "%", subLabel: "Pol" }
+      { id: "reprocessScrapingSugarPol", label: "Reproce Scraping Sugar Analysis", type: "number", unit: "%", subLabel: "Pol" }
 
       
     ]

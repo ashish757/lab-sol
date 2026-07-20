@@ -81,6 +81,11 @@ model SessionData {
   isLocked Boolean   @default(false)
   lockedAt DateTime? @map("locked_at")
 
+  plantName        String?
+  plantCode        String?
+  crushingCapacity String?
+  crushingSeason   String?
+
   createdById    String?
   createdByEmail String?
   createdByName  String?

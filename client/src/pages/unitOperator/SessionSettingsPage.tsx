@@ -37,6 +37,10 @@ export const SessionSettingsPage = () => {
     dayStartTime: '08:00',
     sessionOffDate: '',
     sessionOffTime: '',
+    plantName: '',
+    plantCode: '',
+    crushingCapacity: '',
+    crushingSeason: '',
   });
 
   useEffect(() => {
@@ -47,6 +51,10 @@ export const SessionSettingsPage = () => {
         dayStartTime: session.dayStartTime || '08:00',
         sessionOffDate: session.sessionOffDate || '',
         sessionOffTime: session.sessionOffTime || '',
+        plantName: session.plantName || '',
+        plantCode: session.plantCode || '',
+        crushingCapacity: session.crushingCapacity || '',
+        crushingSeason: session.crushingSeason || '',
       });
     }
   }, [session]);
@@ -210,6 +218,66 @@ export const SessionSettingsPage = () => {
                     disabled={isLocked}
                     className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed font-medium text-slate-800 transition-all"
                     required
+                  />
+                </div>
+              </div>
+
+              {/* Plant Details Section */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="col-span-full border-t border-slate-100 pt-8">
+                  <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2 mb-4">
+                    <Calendar size={18} className="text-indigo-500" />
+                    Plant & Season Details
+                  </h3>
+                  <p className="text-sm text-slate-500 font-medium mb-4">
+                    Additional operational details for the daily log headers. These are also locked with the session.
+                  </p>
+                </div>
+                
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Plant Name</label>
+                  <input
+                    type="text"
+                    name="plantName"
+                    value={formData.plantName}
+                    onChange={handleChange}
+                    disabled={isLocked}
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed font-medium text-slate-800 transition-all"
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Plant Code</label>
+                  <input
+                    type="text"
+                    name="plantCode"
+                    value={formData.plantCode}
+                    onChange={handleChange}
+                    disabled={isLocked}
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed font-medium text-slate-800 transition-all"
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Crushing Capacity</label>
+                  <input
+                    type="text"
+                    name="crushingCapacity"
+                    value={formData.crushingCapacity}
+                    onChange={handleChange}
+                    disabled={isLocked}
+                    placeholder="e.g. 5000 TCD"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed font-medium text-slate-800 transition-all"
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Crushing Season</label>
+                  <input
+                    type="text"
+                    name="crushingSeason"
+                    value={formData.crushingSeason}
+                    onChange={handleChange}
+                    disabled={isLocked}
+                    placeholder="e.g. 2025-2026"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed font-medium text-slate-800 transition-all"
                   />
                 </div>
               </div>

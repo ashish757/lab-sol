@@ -21,6 +21,10 @@ export class SessionsService {
       sessionOffDate?: string;
       sessionOffTime?: string;
       dayStartTime?: string;
+      plantName?: string;
+      plantCode?: string;
+      crushingCapacity?: string;
+      crushingSeason?: string;
     },
     user: any
   ) {
@@ -31,7 +35,11 @@ export class SessionsService {
       if (
         (payload.sessionStartDate && payload.sessionStartDate !== session.sessionStartDate) ||
         (payload.sessionStartTime && payload.sessionStartTime !== session.sessionStartTime) ||
-        (payload.dayStartTime && payload.dayStartTime !== session.dayStartTime)
+        (payload.dayStartTime && payload.dayStartTime !== session.dayStartTime) ||
+        (payload.plantName && payload.plantName !== session.plantName) ||
+        (payload.plantCode && payload.plantCode !== session.plantCode) ||
+        (payload.crushingCapacity && payload.crushingCapacity !== session.crushingCapacity) ||
+        (payload.crushingSeason && payload.crushingSeason !== session.crushingSeason)
       ) {
         throw new BadRequestException('Cannot edit start dates or day start time of a locked session.');
       }
@@ -56,6 +64,10 @@ export class SessionsService {
           sessionOffDate: payload.sessionOffDate ?? session.sessionOffDate,
           sessionOffTime: payload.sessionOffTime ?? session.sessionOffTime,
           dayStartTime: payload.dayStartTime ?? session.dayStartTime,
+          plantName: payload.plantName ?? session.plantName,
+          plantCode: payload.plantCode ?? session.plantCode,
+          crushingCapacity: payload.crushingCapacity ?? session.crushingCapacity,
+          crushingSeason: payload.crushingSeason ?? session.crushingSeason,
           updatedById: user.userId,
           updatedByEmail: user.email,
           updatedByName: user.name,
@@ -72,6 +84,10 @@ export class SessionsService {
           sessionOffDate: payload.sessionOffDate,
           sessionOffTime: payload.sessionOffTime,
           dayStartTime: payload.dayStartTime,
+          plantName: payload.plantName,
+          plantCode: payload.plantCode,
+          crushingCapacity: payload.crushingCapacity,
+          crushingSeason: payload.crushingSeason,
           createdById: user.userId,
           createdByEmail: user.email,
           createdByName: user.name,

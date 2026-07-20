@@ -9,7 +9,7 @@ import { analysisConfig, getAllSectionIds } from '../../config/analysisConfig';
 import { useScrollSpy } from '../../hooks/useScrollSpy';
 import { FormSidebar } from '../../components/analysis/FormSidebar';
 import { FormSection } from '../../components/analysis/FormSection';
-import { useUpsertUnitLogMutation, useFetchUnitLogsQuery, useSaveAndGenerateReportMutation, useGetActiveSessionQuery } from '../../store/api/apiSlice';
+import { useUpsertUnitLogMutation, useFetchUnitLogsQuery, useSaveAndGenerateReportMutation, useGetActiveSessionQuery, useLockUnitLogMutation } from '../../store/api/apiSlice';
 import { useDailyLogCalculations, CALCULATIONS_CONFIG } from '../../hooks/useDailyLogCalculations';
 import { useModal } from '../../hooks/useModal';
 import { PowerOff } from 'lucide-react';
@@ -45,6 +45,7 @@ export const NewLogPage = () => {
 
   const { user } = useSelector((state: RootState) => state.auth);
   const [upsertUnitLog, { isLoading: isUpserting }] = useUpsertUnitLogMutation();
+  const [lockUnitLog, { isLoading: isLocking }] = useLockUnitLogMutation();
   const [saveReport] = useSaveAndGenerateReportMutation();
   const { showModal, ModalComponent } = useModal();
   const initialValues = useMemo(() => getInitialValues(), []);
@@ -247,6 +248,26 @@ export const NewLogPage = () => {
     }
   };
 
+  const handleLockData = async () => {
+    if (!selectedLogId || selectedLogStatus === 'LOCKED') return;
+    
+    const confirmLock = await showModal({
+      type: 'confirm',
+      title: 'Lock Daily Log',
+      message: 'Are you sure you want to manually lock this log? Once locked, you will not be able to edit it anymore.',
+      confirmText: 'Lock Data'
+    });
+    
+    if (!confirmLock) return;
+
+    try {
+      await lockUnitLog(selectedLogId).unwrap();
+      await showModal({ type: 'alert', title: 'Success', message: 'Log data has been securely locked.' });
+    } catch (err: any) {
+      await showModal({ type: 'alert', title: 'Error', message: err?.data?.message || 'Failed to lock data.' });
+    }
+  };
+
   const onSubmit = async (data: AnalysisSchema) => {
     const { todayDate, ...rest } = data;
     const payload = {
@@ -388,19 +409,36 @@ export const NewLogPage = () => {
             activeSection={expanded}
             onScrollTo={handleScrollTo}
             onUploadData={handleUploadData}
-            onLockData={() => {}}
-            isSubmitting={isGenerating || isUpserting}
+            onLockData={handleLockData}
+            isSubmitting={isGenerating || isUpserting || isLocking}
             hasUnsavedChanges={methods.formState.isDirty}
             hasUploadedData={!!selectedLogId}
             isLocked={selectedLogStatus === 'LOCKED' || currentDayType === 'SHUTDOWN' || !hasDayEnded}
             isSequentialBlocked={false}
             blockingDate={activeDate}
             isFillingPastData={isFillingPastData}
-            hideLockDataButton={true}
+            hideLockDataButton={!selectedLogId || selectedLogStatus === 'LOCKED' || currentDayType === 'SHUTDOWN'}
           />
 
           <div className="flex-1 overflow-y-auto p-6 lg:p-8 bg-slate-50 relative scroll-smooth flex flex-col items-center">
             
+            {session && (session.plantName || session.plantCode || session.crushingCapacity || session.crushingSeason) && (
+              <div className="max-w-5xl w-full mb-6 p-4 bg-white border border-slate-200 rounded-xl shadow-sm flex flex-wrap items-center justify-between gap-4">
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Plant Name / Code</span>
+                  <span className="text-sm font-black text-slate-800">{session.plantName || '—'} {session.plantCode ? `(${session.plantCode})` : ''}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Crushing Capacity</span>
+                  <span className="text-sm font-black text-slate-800">{session.crushingCapacity || '—'}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Season</span>
+                  <span className="text-sm font-black text-slate-800">{session.crushingSeason || '—'}</span>
+                </div>
+              </div>
+            )}
+
             {missedDates.length > 0 && (
               <div className="max-w-5xl w-full mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl text-center shadow-sm">
                 <p className="text-amber-800 font-bold uppercase tracking-widest text-sm flex items-center justify-center gap-2">
