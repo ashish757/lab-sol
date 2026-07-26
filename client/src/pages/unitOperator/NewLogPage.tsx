@@ -422,19 +422,29 @@ export const NewLogPage = () => {
 
           <div className="flex-1 overflow-y-auto p-6 lg:p-8 bg-slate-50 relative scroll-smooth flex flex-col items-center">
             
-            {session && (session.plantName || session.plantCode || session.crushingCapacity || session.crushingSeason) && (
-              <div className="max-w-5xl w-full mb-6 p-4 bg-white border border-slate-200 rounded-xl shadow-sm flex flex-wrap items-center justify-between gap-4">
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Plant Name / Code</span>
-                  <span className="text-sm font-black text-slate-800">{session.plantName || '—'} {session.plantCode ? `(${session.plantCode})` : ''}</span>
+            {session && (
+              <div className="max-w-5xl w-full mb-6 p-6 bg-white border border-slate-200 rounded-xl shadow-sm">
+                <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">
+                  <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider">Session Plant Details</h3>
+                  <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-bold uppercase rounded-md ml-auto">Read-only</span>
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Crushing Capacity</span>
-                  <span className="text-sm font-black text-slate-800">{session.crushingCapacity || '—'}</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Season</span>
-                  <span className="text-sm font-black text-slate-800">{session.crushingSeason || '—'}</span>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Plant Name</label>
+                    <input type="text" disabled value={session.plantName || ''} className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold text-slate-700 w-full opacity-80 cursor-not-allowed" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Plant Code</label>
+                    <input type="text" disabled value={session.plantCode || ''} className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold text-slate-700 w-full opacity-80 cursor-not-allowed" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Crushing Capacity</label>
+                    <input type="text" disabled value={session.crushingCapacity || ''} className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold text-slate-700 w-full opacity-80 cursor-not-allowed" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Season</label>
+                    <input type="text" disabled value={session.crushingSeason || ''} className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold text-slate-700 w-full opacity-80 cursor-not-allowed" />
+                  </div>
                 </div>
               </div>
             )}

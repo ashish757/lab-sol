@@ -47,7 +47,11 @@ const BasePrimitiveInputRow = React.memo(({ label, fields, children }: BaseInput
       </td>
       <td className="py-3 pr-4 align-middle relative w-auto">
         <div className="flex items-center w-full">
-          <div className={`grid gap-4 ${fields.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} flex-1 w-full`}>
+          <div className={`grid gap-4 ${
+            fields.length === 2 && fields.some(f => f.type === 'time') && fields.some(f => f.type === 'text')
+              ? 'grid-cols-[80px_1fr]'
+              : fields.length > 1 ? 'grid-cols-2' : 'grid-cols-1'
+          } flex-1 w-full`}>
             {fields.map(field => {
               const error = errors[field.id];
               const isDateTime = field.type === 'date' || field.type === 'time';

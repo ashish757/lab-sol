@@ -83,7 +83,7 @@ export const analysisConfig: GroupConfig[] = [
       { id: "caneReceived", label: "Cane Received", type: "number", unit: "Qtls" },
       { id: "gate", label: "Gate", type: "number", unit: "Qtls" },
       { id: "road", label: "Road/Center", type: "number", unit: "Qtls" },
-      { id: "caneCrushed", label: "Cane Crushed", type: "number", unit: "Qtls", isCalculated: true },
+      { id: "caneCrushed", label: "Cane Crushed", type: "number", unit: "Qtls" },
       { id: "closingBal", label: "Closing Balance", type: "number", unit: "Qtls" },
       { id: "earlyVariety", label: "Early Variety", type: "number", unit: "Qtls" },
       { id: "yardBalance", label: "Yard Balance", type: "number", unit: "Qtls" },
@@ -180,12 +180,19 @@ export const analysisConfig: GroupConfig[] = [
     title: "STOPPAGES (Hrs:Min)",
     fields: [
       { id: "stopNoCane", label: "No Cane", type: "time" },
+      { id: "stopNoCaneReason", label: "No Cane", type: "text", subLabel: "Reason" },
       { id: "stopMechanical", label: "Mechanical", type: "time" },
+      { id: "stopMechanicalReason", label: "Mechanical", type: "text", subLabel: "Reason" },
       { id: "stopElectrical", label: "Electrical", type: "time" },
+      { id: "stopElectricalReason", label: "Electrical", type: "text", subLabel: "Reason" },
       { id: "stopInstrumentation", label: "Instrumentation", type: "time" },
+      { id: "stopInstrumentationReason", label: "Instrumentation", type: "text", subLabel: "Reason" },
       { id: "stopProcess", label: "Process", type: "time" },
+      { id: "stopProcessReason", label: "Process", type: "text", subLabel: "Reason" },
       { id: "stopGenCleaning", label: "Gen. Cleaning", type: "time" },
+      { id: "stopGenCleaningReason", label: "Gen. Cleaning", type: "text", subLabel: "Reason" },
       { id: "stopMiscellaneous", label: "Miscellaneous", type: "time" },
+      { id: "stopMiscellaneousReason", label: "Miscellaneous", type: "text", subLabel: "Reason" },
       { id: "totalHoursLost", label: "Total Hours Lost", type: "time" }
     ]
   },

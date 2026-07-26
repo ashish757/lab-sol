@@ -29,11 +29,6 @@ export const CALCULATIONS_CONFIG: CalculationConfig[] = [
     },
   },
   {
-    targetField: 'caneCrushed',
-    dependencies: ['gate', 'road'],
-    calculate: (values) => parseNum(values.gate) + parseNum(values.road),
-  },
-  {
     targetField: "dayAvaliableHours",
     dependencies: ["dayUnavaliableHours"],
     calculate: (values) => {
