@@ -104,7 +104,7 @@ export const UnitOpDash = () => {
               <div className="shrink-0 flex items-center gap-3">
                 <RoleGuard allowedRoles={[Role.SUPER_ADMIN, Role.ORG_ADMIN, Role.UNIT_OPERATOR]}>
                   <button
-                    onClick={() => navigate(PAGES.DATA_ENTRY)}
+                    onClick={() => navigate(PAGES.NEW_LOG_DATA)}
                     className="inline-flex items-center gap-2 px-4.5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-indigo-650/30 uppercase tracking-wider active:scale-[0.98]"
                   >
                     <Plus size={14} />
@@ -266,7 +266,7 @@ export const UnitOpDash = () => {
                   Failed to sync records from active laboratory database.
                 </div>
               ) : logs.length === 0 ? (
-                <div className="p-8 text-center text-xs text-slate-550 font-bold uppercase tracking-wider cursor-pointer hover:text-indigo-600 transition-colors" onClick={() => navigate(PAGES.DATA_ENTRY)}>
+                <div className="p-8 text-center text-xs text-slate-550 font-bold uppercase tracking-wider cursor-pointer hover:text-indigo-600 transition-colors" onClick={() => navigate(PAGES.NEW_LOG_DATA)}>
                   No logs recorded yet. Click to begin a new entry!
                 </div>
               ) : (
@@ -304,7 +304,7 @@ export const UnitOpDash = () => {
                             </td>
                             <td className="px-5 py-3.5 text-right">
                               <Link
-                                to={getPagePath.analysisReport(log.id)}
+                                to={getPagePath.logDataReport(log.id)}
                                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-750 text-[10px] font-extrabold rounded-lg transition-all uppercase tracking-wide cursor-pointer"
                               >
                                 View Details

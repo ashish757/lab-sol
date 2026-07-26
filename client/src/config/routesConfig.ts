@@ -2,9 +2,8 @@ import { getClientApiPath, clientRoutes } from '../../../shared/routes.config';
 
 export const PAGES = {
   LOGS_LIST: clientRoutes.unit.logsList,
-  DATA_ENTRY: clientRoutes.unit.dataEntry,
-  NEW_ANALYSIS: clientRoutes.unit.dataEntry,
-  ANALYSIS_REPORT: clientRoutes.unit.report,
+  NEW_LOG_DATA: clientRoutes.unit.dataEntry,
+  LOG_DATA_REPORT: clientRoutes.unit.report,
   SETTINGS: clientRoutes.settings,
   SUPER_ADMIN_INVITE: clientRoutes.admin.invite,
   LOGIN: clientRoutes.auth.login,
@@ -24,9 +23,8 @@ export const PAGES = {
 
 export const getPagePath = {
   logsList: () => PAGES.LOGS_LIST,
-  dataEntry: () => PAGES.DATA_ENTRY,
-  newAnalysis: () => PAGES.NEW_ANALYSIS,
-  analysisReport: (id: string | number) => `/unit/analysis/${id}`,
+  newLogData: () => PAGES.NEW_LOG_DATA,
+  logDataReport: (id: string | number) => PAGES.LOG_DATA_REPORT.replace(':id', String(id)),
   superAdminInvite: () => PAGES.SUPER_ADMIN_INVITE,
   login: () => PAGES.LOGIN,
   adminDashboard: () => PAGES.ADMIN_DASHBOARD,
@@ -59,9 +57,9 @@ export const API_ENDPOINTS = {
   UPDATE_UNIT: (id: string | number) => getClientApiPath.units.update(id),
   DELETE_UNIT: (id: string | number) => getClientApiPath.units.delete(id),
   DAILY_LOGS: getClientApiPath.dailyLogs.base(),
-  FETCH_UNIT_LOGS: (unitId: string) => `/api/daily-logs/unit/${unitId}`,
-  UPSERT_UNIT_LOG: (unitId: string) => `/api/daily-logs/unit/${unitId}/upsert`,
-  LOCK_UNIT_LOG: (logId: string) => `/api/daily-logs/${logId}/lock`,
+  FETCH_UNIT_LOGS: getClientApiPath.dailyLogs.unitLogs,
+  UPSERT_UNIT_LOG: getClientApiPath.dailyLogs.upsert,
+  LOCK_UNIT_LOG: getClientApiPath.dailyLogs.lock,
   DAILY_LOG_BY_ID: (id: string | number) => getClientApiPath.dailyLogs.one(id),
   DOWNLOAD_DAILY_REPORT: getClientApiPath.reports.downloadTemplate(),
   SAVE_AND_GENERATE: getClientApiPath.reports.saveAndGenerate(),

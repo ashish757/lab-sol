@@ -35,6 +35,9 @@ export const apiRoutes = {
     create: '',
     getAll: '',
     getOne: ':id',
+    unitLogs: 'unit/:unitId',
+    upsert: 'unit/:unitId/upsert',
+    lock: ':id/lock',
   },
   reports: {
     base: 'api/reports',
@@ -73,8 +76,8 @@ export const clientRoutes = {
   },
   unit: {
     dashboard: '/unit/dash',
-    dataEntry: '/unit/analysis/new',
-    report: '/unit/analysis/:id',
+    dataEntry: '/unit/log-data/new',
+    report: '/unit/log-data/:id',
     logsList: '/unit/logs',
     settings: '/unit/settings',
   },
@@ -112,6 +115,9 @@ export const getClientApiPath = {
   dailyLogs: {
     base: () => `/${apiRoutes.dailyLogs.base}`,
     one: (id: string | number) => `/${apiRoutes.dailyLogs.base}/${id}`,
+    unitLogs: (unitId: string) => `/${apiRoutes.dailyLogs.base}/unit/${unitId}`,
+    upsert: (unitId: string) => `/${apiRoutes.dailyLogs.base}/unit/${unitId}/upsert`,
+    lock: (logId: string) => `/${apiRoutes.dailyLogs.base}/${logId}/lock`,
   },
   reports: {
     downloadTemplate: () => `/${apiRoutes.reports.base}/${apiRoutes.reports.downloadTemplate}`,

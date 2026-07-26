@@ -17,7 +17,7 @@ export class DailyLogsController {
    * GET /api/daily-logs/unit/:unitId
    * Added to shared routes by standard pattern if not strictly defined, or just use current path.
    */
-  @Get('unit/:unitId')
+  @Get(apiRoutes.dailyLogs.unitLogs)
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.ORG_ADMIN, Role.ORG_STAFF, Role.UNIT_OPERATOR)
   getLogsForUnit(@Param('unitId') unitId: string) {
@@ -27,7 +27,7 @@ export class DailyLogsController {
   /**
    * PUT /api/daily-logs/unit/:unitId/upsert
    */
-  @Put('unit/:unitId/upsert')
+  @Put(apiRoutes.dailyLogs.upsert)
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.UNIT_OPERATOR, Role.ORG_ADMIN)
   upsertLog(
@@ -44,7 +44,7 @@ export class DailyLogsController {
   /**
    * PATCH /api/daily-logs/:id/lock
    */
-  @Patch(':id/lock')
+  @Patch(apiRoutes.dailyLogs.lock)
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.UNIT_OPERATOR, Role.ORG_ADMIN)
   lockLog(@Param('id') id: string, @Req() request: any) {

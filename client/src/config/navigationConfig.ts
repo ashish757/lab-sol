@@ -20,7 +20,7 @@ export const navigationConfig = {
   ],
   [Role.UNIT_OPERATOR]: [
     { to: PAGES.UNIT_DASHBOARD, icon: LayoutDashboard, label: 'Dashboard', end: true },
-    { to: PAGES.DATA_ENTRY, icon: FileText, label: 'New Analysis', end: true },
+    { to: PAGES.NEW_LOG_DATA, icon: FileText, label: 'New Daily Log', end: true },
     { to: PAGES.LOGS_LIST, icon: List, label: 'Logs', end: true },
     { to: PAGES.SETTINGS, icon: Settings, label: 'Settings', end: false },
   ],

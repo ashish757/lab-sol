@@ -252,7 +252,7 @@ export const LogsPage = () => {
                           </td>
                           <td className="px-6 py-5 whitespace-nowrap">
                             <Link
-                              to={getPagePath.analysisReport(log.id)}
+                              to={getPagePath.logDataReport(log.id)}
                               className="inline-flex items-center gap-2 px-3.5 py-2 bg-white hover:bg-indigo-50 text-indigo-700 text-xs font-bold rounded-lg border border-slate-200 hover:border-indigo-200 transition-all shadow-sm"
                             >
                               <FileText size={14} className="text-indigo-500" />
