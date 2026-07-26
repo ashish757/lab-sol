@@ -61,6 +61,7 @@ export const analysisConfig: GroupConfig[] = [
       { id: "todayDate", label: "Today Date", type: "date", required: true, readonly: true },
       { id: "cropDay", label: "Crop day", type: "number", unit: "Nos", isCalculated: true },
       { id: "dayUnavaliableHours", label: "Day Unavaliable Hours", type: "number", unit: "HH:MM" },
+      { id: "dayAvaliableHours", label: "Day Avaliable Hours", type: "number", unit: "HH:MM", isCalculated: true },
     ]
   },
   {

@@ -34,6 +34,13 @@ export const CALCULATIONS_CONFIG: CalculationConfig[] = [
     calculate: (values) => parseNum(values.gate) + parseNum(values.road),
   },
   {
+    targetField: "dayAvaliableHours",
+    dependencies: ["dayUnavaliableHours"],
+    calculate: (values) => {
+      return 24 - parseNum(values.dayUnavaliableHours);
+    }
+  },
+  {
     targetField: 'totalSugarBagged',
     dependencies: ['rawSugar', 'llBold', 'brownSugar', 's31', 'm31', 'l31', 'sSs31Export'],
     calculate: (values) =>
