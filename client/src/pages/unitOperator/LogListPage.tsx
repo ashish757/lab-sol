@@ -57,6 +57,9 @@ export const LogsPage = () => {
   const isAdminOrStaff = user?.role === 'ORG_ADMIN' || user?.role === 'ORG_STAFF';
 
   const [selectedUnit, setSelectedUnit] = useState<string>('ALL');
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
+  const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
 
   const { data: org } = useGetOrganizationByIdQuery(user?.orgId as string, {
     skip: !user?.orgId || !isAdminOrStaff,
@@ -66,9 +69,46 @@ export const LogsPage = () => {
 
   const logs = useMemo(() => {
     if (!rawLogs) return [];
-    if (selectedUnit === 'ALL') return rawLogs;
-    return rawLogs.filter((log: any) => log.unitId === selectedUnit);
-  }, [rawLogs, selectedUnit]);
+    
+    let filtered = [...rawLogs];
+    
+    if (selectedUnit !== 'ALL') {
+      filtered = filtered.filter((log: any) => log.unitId === selectedUnit);
+    }
+    
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
+      filtered = filtered.filter((log: any) => {
+        const d = new Date(log.createdAt || log.date || log.logDate);
+        return d >= start && d <= end;
+      });
+    } else if (startDate) {
+      const start = new Date(startDate);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(startDate);
+      end.setHours(23, 59, 59, 999);
+      filtered = filtered.filter((log: any) => {
+        const d = new Date(log.createdAt || log.date || log.logDate);
+        return d >= start && d <= end;
+      });
+    } else if (endDate) {
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
+      filtered = filtered.filter((log: any) => {
+        const d = new Date(log.createdAt || log.date || log.logDate);
+        return d <= end;
+      });
+    }
+    
+    return filtered.sort((a: any, b: any) => {
+      const dateA = new Date(a.createdAt || a.date || a.logDate).getTime();
+      const dateB = new Date(b.createdAt || b.date || b.logDate).getTime();
+      return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
+    });
+  }, [rawLogs, selectedUnit, startDate, endDate, sortOrder]);
 
   const metricsSummary = useMemo(() => {
     if (!logs || logs.length === 0) {
@@ -110,38 +150,6 @@ export const LogsPage = () => {
             <p className="text-sm font-medium text-slate-500 mt-2 ml-1">
               Historical daily log entries and analytics
             </p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {isAdminOrStaff && org && (
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                  <Filter size={16} className="text-indigo-500 group-hover:text-indigo-600 transition-colors" />
-                </div>
-                <select
-                  value={selectedUnit}
-                  onChange={(e) => setSelectedUnit(e.target.value)}
-                  className="pl-10 pr-10 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm appearance-none cursor-pointer min-w-[180px]"
-                >
-                  <option value="ALL">All Units</option>
-                  {org.units?.map((unit: any) => (
-                    <option key={unit.id} value={unit.id}>{unit.name}</option>
-                  ))}
-                </select>
-                <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none">
-                  <svg className="h-4 w-4 text-slate-400 group-hover:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" /></svg>
-                </div>
-              </div>
-            )}
-
-            <button
-              onClick={() => refetch()}
-              disabled={isFetching}
-              className="flex items-center gap-2.5 px-5 py-2.5 bg-white border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/50 text-slate-700 hover:text-indigo-700 text-sm font-bold rounded-xl shadow-sm transition-all disabled:opacity-50 active:scale-[0.98]"
-            >
-              <RefreshCw size={16} className={`${isFetching ? 'animate-spin text-indigo-600' : 'text-slate-400'}`} />
-              Refresh
-            </button>
           </div>
         </div>
 
@@ -195,6 +203,84 @@ export const LogsPage = () => {
             </div>
           </div>
         )}
+
+        {/* Filters & Actions */}
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4 p-5 bg-white rounded-2xl border border-slate-200 shadow-sm">
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Sort Filter */}
+            <div className="relative group">
+              <select
+                value={sortOrder}
+                onChange={(e) => setSortOrder(e.target.value as 'desc' | 'asc')}
+                className="pl-4 pr-10 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm appearance-none cursor-pointer min-w-[140px]"
+              >
+                <option value="desc">Newest First</option>
+                <option value="asc">Oldest First</option>
+              </select>
+              <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none">
+                <svg className="h-4 w-4 text-slate-400 group-hover:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" /></svg>
+              </div>
+            </div>
+
+            {/* Date Filters */}
+            <div className="flex items-center gap-2">
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm"
+                title="Start Date"
+              />
+              <span className="text-slate-400 text-sm font-medium">to</span>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm"
+                title="End Date"
+              />
+              {(startDate || endDate) && (
+                <button 
+                  onClick={() => { setStartDate(''); setEndDate(''); }}
+                  className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                  title="Clear Dates"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+              )}
+            </div>
+
+            {isAdminOrStaff && org && (
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                  <Filter size={16} className="text-indigo-500 group-hover:text-indigo-600 transition-colors" />
+                </div>
+                <select
+                  value={selectedUnit}
+                  onChange={(e) => setSelectedUnit(e.target.value)}
+                  className="pl-10 pr-10 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm appearance-none cursor-pointer min-w-[180px]"
+                >
+                  <option value="ALL">All Units</option>
+                  {org.units?.map((unit: any) => (
+                    <option key={unit.id} value={unit.id}>{unit.name}</option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none">
+                  <svg className="h-4 w-4 text-slate-400 group-hover:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" /></svg>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <button
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="flex items-center gap-2.5 px-5 py-2.5 bg-slate-50 border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/50 text-slate-700 hover:text-indigo-700 text-sm font-bold rounded-xl shadow-sm transition-all disabled:opacity-50 active:scale-[0.98]"
+          >
+            <RefreshCw size={16} className={`${isFetching ? 'animate-spin text-indigo-600' : 'text-slate-400'}`} />
+            Refresh
+          </button>
+        </div>
 
         {!isLoading && !isError && logs?.length === 0 && (
           <div className="flex flex-col items-center justify-center py-32 text-center text-slate-400 bg-white border border-slate-200 rounded-3xl shadow-sm">
