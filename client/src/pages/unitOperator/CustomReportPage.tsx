@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Search, Copy, Calendar, Activity, CheckCircle2, ChevronRight, Download } from 'lucide-react';
+import { ArrowLeft, Search, Copy, Calendar, Activity, CheckCircle2 } from 'lucide-react';
 import type { RootState } from '../../store/store';
 import { useFetchUnitLogsQuery, useGetActiveSessionQuery } from '../../store/api/apiSlice';
 import { customReportFields } from '../../config/customReportFields';
@@ -200,6 +200,7 @@ export const CustomReportPage = () => {
                     return (
                       <label 
                         key={field.id}
+                        onClick={() => toggleField(field.id)}
                         className={`flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer transition-colors ${
                           isSelected ? 'bg-emerald-50' : 'hover:bg-slate-50'
                         }`}
