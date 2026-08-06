@@ -64,6 +64,8 @@ const seedConfig = {
   ],
 };
 
+
+
 async function main() {
   const password = await bcrypt.hash('pass', 10);
 
@@ -71,7 +73,8 @@ async function main() {
   for (const org of seedConfig.organizations) {
     await prisma.organization.upsert({
       where: { id: org.id },
-      update: { name: org.name, status: 'ACTIVE' },
+      // Leave update empty to prevent overwriting user-edited names in production
+      update: {}, 
       create: { ...org, status: 'ACTIVE' },
     });
   }
@@ -80,7 +83,7 @@ async function main() {
   for (const unit of seedConfig.units) {
     await prisma.unit.upsert({
       where: { id: unit.id },
-      update: { name: unit.name, orgId: unit.orgId },
+      update: {}, // Leave empty
       create: unit,
     });
   }
@@ -90,17 +93,16 @@ async function main() {
     await prisma.user.upsert({
       where: { email: user.email },
       update: {
-        password,
+        // We DO NOT update the password or name here. 
+        // We only enforce their role and unit access just in case we changed it in the config.
         role: user.role,
         orgId: user.orgId || null,
         unitId: user.unitId || null,
-        status: 'ACTIVE',
-        name: user.email.split('@')[0],
       },
       create: {
         email: user.email,
         name: user.email.split('@')[0],
-        password,
+        password, // Only sets 'pass' when the user is created for the very first time
         role: user.role,
         orgId: user.orgId,
         unitId: user.unitId,
@@ -109,7 +111,7 @@ async function main() {
     });
   }
 
-  console.log('Database successfully seeded via configuration!');
+  console.log('Database successfully seeded safely!');
 }
 
 main()
