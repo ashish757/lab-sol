@@ -11,9 +11,19 @@ import { UsersModule } from './users/users.module';
 import { MailModule } from './mail/mail.module';
 import { SessionsModule } from './sessions/sessions.module';
 import { CalculationsModule } from './calculations/calculations.module';
+import { LoggerModule } from 'nestjs-pino';
 
 @Module({
-  imports: [AuthModule, DailyLogsModule, ReportsModule, PrismaModule, OrganizationsModule, UnitsModule, UsersModule, MailModule, SessionsModule, CalculationsModule],
+  imports: [
+    LoggerModule.forRoot({
+      pinoHttp: {
+        transport: process.env.NODE_ENV !== 'production'
+          ? { target: 'pino-pretty' }
+          : undefined,
+      },
+    }),
+    AuthModule, DailyLogsModule, ReportsModule, PrismaModule, OrganizationsModule, UnitsModule, UsersModule, MailModule, SessionsModule, CalculationsModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
