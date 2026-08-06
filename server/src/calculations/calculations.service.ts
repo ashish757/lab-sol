@@ -1,10 +1,12 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { FormulaRegistry, requiredFormulaIds } from '../comman/calc/formulas';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class CalculationsService {
+  private readonly logger = new Logger(CalculationsService.name);
+
   constructor(private prisma: PrismaService) {}
 
   /**
@@ -17,6 +19,7 @@ export class CalculationsService {
     const dfsEvaluate = (prop: string): any => {
       if (cache.hasOwnProperty(prop)) return cache[prop];
       if (visited.has(prop)) {
+        this.logger.error(`Circular Dependency detected for formula: ${prop}`);
         throw new BadRequestException(`Circular Dependency detected for formula: ${prop}`);
       }
 
@@ -43,7 +46,7 @@ export class CalculationsService {
           if (error instanceof BadRequestException) {
             throw error; // Re-throw circular dependency exceptions
           }
-          console.error(`Error evaluating ${prop}:`, error);
+          this.logger.warn(`Error evaluating ${prop}: ${error.message || error}`);
           result = 0; // Resilience: return 0 if formula throws
         }
       } else {

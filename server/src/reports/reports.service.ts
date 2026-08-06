@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, Logger } from '@nestjs/common';
 import * as ExcelJS from 'exceljs';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -13,6 +13,8 @@ import { requiredFormulaIds } from '../comman/calc/formulas';
 
 @Injectable()
 export class ReportsService {
+  private readonly logger = new Logger(ReportsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly dailyLogsService: DailyLogsService,
@@ -115,6 +117,7 @@ export class ReportsService {
       ? new Date(log.createdAt).toISOString().split('T')[0]
       : (metrics.todayDate as string | undefined);
 
+    this.logger.log(`Generating daily report Excel for log ID: ${id}`);
     return this.generateDailyReportFromData(data);
   }
 
@@ -209,6 +212,7 @@ export class ReportsService {
       ? JSON.parse(calculation.calculatedMetrics) 
       : calculation.calculatedMetrics;
 
+    this.logger.log(`Generating calculated Excel report for log ID: ${id}`);
     return this.generateSimpleTwoColumnReport(calculatedMetrics as Record<string, any>);
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, ForbiddenException, NotFoundException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { InviteStaffDto } from './dto/inviteStaff.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
@@ -7,6 +7,8 @@ import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly magicLinkService: MagicLinkService,
@@ -38,6 +40,8 @@ export class UsersService {
 
     await this.mailService.sendStaffInvite(invitePayload.email, orgName, invitePayload.role, rawToken);
 
+    this.logger.log(`User invite generated and dispatched for ${invitePayload.email} as ${invitePayload.role} in org ${orgId}`);
+
     return {
       success: true,
       message: 'User invited successfully.',
@@ -47,16 +51,25 @@ export class UsersService {
 
   async cancelUserInvite(tokenId: string) {
     const token = await this.prisma.inviteToken.findUnique({ where: { id: tokenId } });
-    if (!token) throw new BadRequestException('Invite token not found');
-    if (token.isUsed) throw new BadRequestException('Cannot cancel an already used invite');
+    if (!token) {
+      this.logger.warn(`Failed to cancel user invite ${tokenId}: Token not found`);
+      throw new BadRequestException('Invite token not found');
+    }
+    if (token.isUsed) {
+      this.logger.warn(`Failed to cancel user invite ${tokenId}: Token already used`);
+      throw new BadRequestException('Cannot cancel an already used invite');
+    }
 
     await this.prisma.inviteToken.delete({ where: { id: tokenId } });
+    
+    this.logger.log(`Cancelled user invite ${tokenId} for email ${token.email}`);
 
     return { success: true, message: 'User invite cancelled' };
   }
 
   async updateUser(targetUserId: string, requesterId: string, orgId: string, dto: UpdateUserDto) {
     if (targetUserId === requesterId) {
+      this.logger.warn(`Failed to update user ${targetUserId}: User attempted to modify their own account roles`);
       throw new ForbiddenException('You cannot modify your own account roles or assignments');
     }
 
@@ -72,12 +85,16 @@ export class UsersService {
       }
     }
 
-    return this.prisma.user.update({
+    const updatedUser = await this.prisma.user.update({
       where: { id: targetUserId },
       data: {
         unitId: dto.unitId,
         status: dto.status,
       },
     });
+
+    this.logger.log(`Updated user ${targetUserId}: status=${dto.status}, unitId=${dto.unitId}`);
+
+    return updatedUser;
   }
 }

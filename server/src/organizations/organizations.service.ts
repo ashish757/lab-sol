@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/common';
+import { Injectable, BadRequestException, ForbiddenException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { InviteOrgDto } from './dto/inviteOrg.dto';
 import { InviteUserDto } from './dto/inviteUser.dto';
@@ -9,6 +9,8 @@ import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class OrganizationsService {
+  private readonly logger = new Logger(OrganizationsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly magicLinkService: MagicLinkService,
@@ -37,6 +39,8 @@ export class OrganizationsService {
       });
 
       await this.mailService.sendOrgAdminInvite(dto.email, dto.orgName, rawToken);
+
+      this.logger.log(`Organization invite generated for ${dto.orgName} (ID: ${org.id}) and sent to ${dto.email}`);
 
       return {
         success: true,
@@ -86,14 +90,21 @@ export class OrganizationsService {
 
   async cancelOrganizationInvite(id: string) {
     const org = await this.prisma.organization.findUnique({ where: { id } });
-    if (!org) throw new BadRequestException('Organization not found');
+    if (!org) {
+      this.logger.warn(`Failed to cancel org invite ${id}: Organization not found`);
+      throw new BadRequestException('Organization not found');
+    }
     if (org.status !== 'INACTIVE') {
+      this.logger.warn(`Failed to cancel org invite ${id}: Organization is active`);
       throw new BadRequestException('Cannot cancel an active organization');
     }
 
     return this.prisma.$transaction(async (tx) => {
       await tx.inviteToken.deleteMany({ where: { orgId: id } });
       await tx.organization.delete({ where: { id } });
+      
+      this.logger.log(`Successfully cancelled invite and deleted inactive organization ${id}`);
+      
       return { success: true, message: 'Organization invite cancelled' };
     });
   }

@@ -1,4 +1,4 @@
-import { Injectable, ForbiddenException, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Injectable, ForbiddenException, BadRequestException, NotFoundException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpsertDailyLogDto } from './dto/dailyLog.dto';
 import { Prisma, Role, LogStatus, LogDayType } from '@prisma/client';
@@ -6,6 +6,8 @@ import { CalculationsService } from '../calculations/calculations.service';
 
 @Injectable()
 export class DailyLogsService {
+  private readonly logger = new Logger(DailyLogsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly calculationsService: CalculationsService,
@@ -100,6 +102,7 @@ export class DailyLogsService {
 
   async upsertLog(unitId: string, orgId: string, currentUser: any, dto: UpsertDailyLogDto & { dayType?: LogDayType }) {
     const requestedDate = new Date(dto.createdAt);
+    const requestedDateStr = requestedDate.toISOString().split('T')[0];
 
     const session = await this.prisma.sessionData.findFirst({
       where: { unitId, isLocked: true },
@@ -107,14 +110,15 @@ export class DailyLogsService {
     });
 
     if (!session) {
+      this.logger.warn(`Failed to upsert log for unit ${unitId}: No active locked session data found`);
       throw new BadRequestException('No active locked session data found. Please contact admin to lock session data first.');
     }
 
     await this.autoLockAndFillMissedDays(unitId, orgId, session);
 
     if (session.sessionOffDate) {
-      const requestedDateStr = requestedDate.toISOString().split('T')[0];
       if (requestedDateStr > session.sessionOffDate) {
+        this.logger.warn(`Failed to upsert log for unit ${unitId}: Session ended on ${session.sessionOffDate}`);
         throw new BadRequestException('The session has ended.');
       }
     }
@@ -126,6 +130,7 @@ export class DailyLogsService {
 
     const now = new Date();
     if (now < dayEndDate) {
+      this.logger.warn(`Failed to upsert log for unit ${unitId}: Day has not ended yet (${dayEndDate.toISOString()})`);
       throw new BadRequestException('The day has not ended yet. You can only log data after the day is complete.');
     }
 
@@ -134,6 +139,7 @@ export class DailyLogsService {
     });
 
     if (existingLog && existingLog.status === LogStatus.LOCKED) {
+      this.logger.warn(`Failed to upsert log for unit ${unitId}: Log for ${requestedDateStr} is already locked`);
       throw new ForbiddenException('Upload window for this date has closed. Log is locked and cannot be edited.');
     }
 
@@ -177,9 +183,8 @@ export class DailyLogsService {
       nextExpectedDate = seasonStartDateStr;
     }
 
-    const requestedDateStr = requestedDate.toISOString().split('T')[0];
-
     if (nextExpectedDate && requestedDateStr > nextExpectedDate) {
+      this.logger.warn(`Failed to upsert log for unit ${unitId}: Missing sequential logs. Expected ${nextExpectedDate}, got ${requestedDateStr}`);
       throw new BadRequestException(`Sequential upload required. You must complete data for ${nextExpectedDate} first.`);
     }
 
@@ -213,6 +218,8 @@ export class DailyLogsService {
 
     // Auto-calculate required metrics and save to DailyCalculation table
     await this.calculationsService.processCalculations(savedLog.id, sanitizedPayload);
+
+    this.logger.log(`Successfully upserted daily log ${savedLog.id} for unit ${unitId} on ${requestedDateStr}`);
 
     return savedLog;
   }
@@ -282,7 +289,7 @@ export class DailyLogsService {
       throw new BadRequestException('Daily log is already locked');
     }
 
-    return this.prisma.dailyLog.update({
+    const updatedLog = await this.prisma.dailyLog.update({
       where: { id },
       data: {
         status: LogStatus.LOCKED,
@@ -292,6 +299,10 @@ export class DailyLogsService {
         updatedByName: currentUser?.name,
       }
     });
+
+    this.logger.log(`Successfully locked daily log ${id} by user ${currentUser?.email}`);
+    
+    return updatedLog;
   }
 }
 

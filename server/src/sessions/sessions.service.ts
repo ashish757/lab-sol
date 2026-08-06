@@ -1,8 +1,10 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class SessionsService {
+  private readonly logger = new Logger(SessionsService.name);
+
   constructor(private prisma: PrismaService) {}
 
   async getActiveSession(unitId: string) {
@@ -41,6 +43,7 @@ export class SessionsService {
         (payload.crushingCapacity && payload.crushingCapacity !== session.crushingCapacity) ||
         (payload.crushingSeason && payload.crushingSeason !== session.crushingSeason)
       ) {
+        this.logger.warn(`Failed to update locked session ${session.id}: Attempted to edit immutable fields by user ${user.email}`);
         throw new BadRequestException('Cannot edit start dates or day start time of a locked session.');
       }
 
@@ -106,18 +109,23 @@ export class SessionsService {
       },
     });
 
+    this.logger.log(`Successfully upserted session data ${session.id} for unit ${unitId}`);
+
     return session;
   }
 
   async lockSessionData(id: string, user: any) {
     const session = await this.prisma.sessionData.findUnique({ where: { id } });
     if (!session) {
+      this.logger.warn(`Failed to lock session ${id}: Session not found`);
       throw new BadRequestException('Session not found.');
     }
     if (session.isLocked) {
+      this.logger.warn(`Failed to lock session ${id}: Already locked`);
       throw new BadRequestException('Session is already locked.');
     }
     if (!session.sessionStartDate || !session.sessionStartTime || !session.dayStartTime) {
+      this.logger.warn(`Failed to lock session ${id}: Missing required start configuration`);
       throw new BadRequestException('Start date, start time, and day start time are required before locking.');
     }
 
@@ -131,6 +139,8 @@ export class SessionsService {
         updatedByName: user.name,
       },
     });
+
+    this.logger.log(`Successfully locked session ${id} by user ${user.email}`);
 
     return lockedSession;
   }
