@@ -43,11 +43,13 @@ RUN npx prisma generate
 # Copy the compiled dist folder from the builder stage
 COPY --from=builder /app/server/dist ./dist
 
-# Note: If your compiled code requires the raw shared files at runtime, 
-# uncomment the line below. (Usually, NestJS compiles shared code directly into 'dist').
-# COPY --from=builder /app/shared /app/shared
+# CHANGE 1: Give the built-in 'node' user ownership of the app files
+RUN chown -R node:node /app
+
+# CHANGE 2: Switch from the 'root' user to the 'node' user
+USER node
 
 EXPOSE 3000
 
 # Start the application
-CMD ["node", "dist/server/src/main.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/server/src/main.js"]
