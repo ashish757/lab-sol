@@ -36,15 +36,52 @@ export const CALCULATIONS_CONFIG: CalculationConfig[] = [
     }
   },
   {
+    targetField: "closingBal",
+    dependencies: ["caneOpeningBalance", "caneReceived", "caneCrushed" ],
+    calculate: (values) => parseNum(values.caneOpeningBalance) + parseNum(values.caneReceived) - parseNum(values.caneCrushed)
+    
+  },
+  {
+    targetField: "totalMassecuite",
+    dependencies: ["aMassecuite", "a1Massecuite", "bMassecuite", 'b1Massecuite', 'cMassecuite', 'c1Massecuite', 'r1Massecuite', 'r2Massecuite', 'r3Massecuite' ],
+    calculate: (values) =>  
+      parseNum(values.aMassecuite) +
+      parseNum(values.a1Massecuite) +
+      parseNum(values.bMassecuite) +
+      parseNum(values.b1Massecuite) +
+      parseNum(values.cMassecuite) +
+      parseNum(values.c1Massecuite) +
+      parseNum(values.r1Massecuite) +
+      parseNum(values.r2Massecuite) +
+      parseNum(values.r3Massecuite)
+    
+  }, 
+  {
+    targetField: "totalHoursLost",
+    dependencies: ["stopNoCane"],
+    calculate: (values) =>
+      parseNum(values.stopNoCane) +
+      parseNum(values.stopMechanical) +
+      parseNum(values.stopElectrical) +
+      parseNum(values.stopInstrumentation) +
+      parseNum(values.stopProcess) +
+      parseNum(values.stopGenCleaning) +
+      parseNum(values.stopMiscellaneous)
+  },
+  {
     targetField: 'totalSugarBagged',
-    dependencies: ['rawSugar', 'llBold', 'brownSugar', 's31', 'm31', 'l31', 'sSs31Export'],
+    dependencies: ['rawSugar', 'llBold', 'brownSugar', 's31', 'm31', 'l31', 's30', 'm30', 'l30', 'sSs31Export', 'scrapingSugar'],
     calculate: (values) =>
       parseNum(values.rawSugar) +
       parseNum(values.llBold) +
       parseNum(values.brownSugar) +
+      parseNum(values.s30) +
+      parseNum(values.m30) +
+      parseNum(values.l30) +
       parseNum(values.s31) +
       parseNum(values.m31) +
       parseNum(values.l31) +
+      parseNum(values.scrapingSugar) +
       parseNum(values.sSs31Export),
   },
 ];

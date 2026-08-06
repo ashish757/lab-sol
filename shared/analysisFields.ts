@@ -10,6 +10,7 @@ export interface FieldConfig {
   required?: boolean;
   isCalculated?: boolean;
   readonly?: boolean;
+  previousDayData?: string;
 }
 
 export interface SubGroupConfig {
@@ -71,7 +72,7 @@ export const analysisConfig: GroupConfig[] = [
       { id: "rain", label: "Rain", type: "number", unit: "Inch" },
       { id: "tempMax", label: "Temperature Max", type: "number", unit: "Deg C" },
       { id: "tempMin", label: "Temperature Min", type: "number", unit: "Deg C" },
-      { id: "weatherCondition", label: "Weather Condition", type: "text", unit: "-" },
+      { id: "weatherCondition", label: "Weather Condition", type: "text", unit: "-", previousDayData: "weatherCondition"},
       { id: "humidity", label: "Humidity", type: "number", unit: "%" }
     ]
   },
@@ -79,24 +80,24 @@ export const analysisConfig: GroupConfig[] = [
     groupId: "CaneCrushing",
     title: "CANE CRUSHING DATA",
     fields: [
-      { id: "caneOpeningBalance", label: "Cane Opening Balance", type: "number", unit: "Qtls" },
+      { id: "caneOpeningBalance", label: "Cane Opening Balance", type: "number", unit: "Qtls", previousDayData: "closingBal" },
       { id: "caneReceived", label: "Cane Received", type: "number", unit: "Qtls" },
       { id: "gate", label: "Gate", type: "number", unit: "Qtls" },
       { id: "road", label: "Road/Center", type: "number", unit: "Qtls" },
       { id: "caneCrushed", label: "Cane Crushed", type: "number", unit: "Qtls" },
-      { id: "closingBal", label: "Closing Balance", type: "number", unit: "Qtls" },
+      { id: "closingBal", label: "Closing Balance", type: "number", unit: "Qtls", isCalculated: true },
       { id: "earlyVariety", label: "Early Variety", type: "number", unit: "Qtls" },
       { id: "yardBalance", label: "Yard Balance", type: "number", unit: "Qtls" },
       { id: "divertedSyrup", label: "Diverted Syrup", type: "number", unit: "Qtls" },
       { id: "molassesSentOut", label: "Final Molasses Sent Out", type: "number", unit: "Qtls" },
       { id: "imbibitionWaterRawData", label: "Imbibition Water Raw Data", type: "number", unit: "Qtls" },
-      { id: "imbibitionWaterSpecificGavity", label: "Imbibition Water Sp. Gravity", type: "number", unit: "-" },
-      { id: "dirtPercent", label: "Dirt %", type: "number", unit: "% MJ" },
+      { id: "imbibitionWaterSpecificGavity", label: "Imbibition Water Sp. Gravity", type: "number", unit: "-", previousDayData: "imbibitionWaterSpecificGavity" },
+      { id: "dirtPercent", label: "Dirt %", type: "number", unit: "% MJ", previousDayData: "dirtPercent" },
       { id: "unknownLosses", label: "Unknown Losses", type: "number", unit: "% Cane" },
       { id: "polPercentSugar", label: "Pol Percent Sugar", type: "number", unit: "%" },
       { id: "filterCakeProduction", label: "Filter Cake Production", type: "number", unit: "Qtls" },
       { id: "grossMixedJuiceRawData", label: "Gross Mixed Juice Raw Data", type: "number", unit: "-" },
-      { id: "mixedJuiceSpecificGravity", label: "Mixed Juice Sp. Gravity", type: "number", unit: "-" },
+      { id: "mixedJuiceSpecificGravity", label: "Mixed Juice Sp. Gravity", type: "number", unit: "-", previousDayData: "mixedJuiceSpecificGravity" },
       
 
       
@@ -172,7 +173,7 @@ export const analysisConfig: GroupConfig[] = [
       { id: "r1Massecuite", label: "R1 - Massecuite", type: "number", unit: "Qtls" },
       { id: "r2Massecuite", label: "R2 - Massecuite", type: "number", unit: "Qtls" },
       { id: "r3Massecuite", label: "R3 - Massecuite", type: "number", unit: "Qtls" },
-      { id: "totalMassecuite", label: "Total Massecuite", type: "number", unit: "Qtls" }
+      { id: "totalMassecuite", label: "Total Massecuite", type: "number", unit: "Qtls", isCalculated: true }
     ]
   },
   {
@@ -193,7 +194,7 @@ export const analysisConfig: GroupConfig[] = [
       { id: "stopGenCleaningReason", label: "Gen. Cleaning", type: "text", subLabel: "Reason" },
       { id: "stopMiscellaneous", label: "Miscellaneous", type: "time" },
       { id: "stopMiscellaneousReason", label: "Miscellaneous", type: "text", subLabel: "Reason" },
-      { id: "totalHoursLost", label: "Total Hours Lost", type: "time" }
+      { id: "totalHoursLost", label: "Total Hours Lost", type: "time", isCalculated: true }
     ]
   },
   {
@@ -401,7 +402,7 @@ export const analysisConfig: GroupConfig[] = [
           { id: "bMassecuiteColour", label: "B-Massecuite Colour", type: "number", unit: "IU" },
           { id: "bHeavyColour", label: "B-Heavy Colour", type: "number", unit: "IU" },
           { id: "bSugarSolour", label: "B-Sugar Colour", type: "number", unit: "IU" },
-          { id: "cMassecuite", label: "C-Massecuite", type: "number", unit: "IU" },
+          { id: "cMassecuiteColour", label: "C-Massecuite Colour", type: "number", unit: "IU" },
           { id: "CFWsugar", label: "CFW Sugar", type: "number", unit: "IU" },
           { id: "CAWsugar", label: "CAW Sugar", type: "number", unit: "IU" },
           { id: "cLightColour", label: "C-Light Colour", type: "number", unit: "IU" },

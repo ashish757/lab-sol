@@ -19,6 +19,7 @@ export const PAGES = {
   PROFILE: clientRoutes.profile,
   ORG_UNIT_SETTINGS: clientRoutes.org.unitSettings,
   UNIT_SETTINGS: clientRoutes.unit.settings,
+  CUSTOM_REPORT: clientRoutes.unit.customReport,
 } as const;
 
 export const getPagePath = {
@@ -30,6 +31,7 @@ export const getPagePath = {
   adminDashboard: () => PAGES.ADMIN_DASHBOARD,
   adminOrgDetails: (id: string | number) => `/admin/dash/org/${id}`,
   orgUnitDetails: (id: string | number) => `/org/dash/unit/${id}`,
+  customReport: () => PAGES.CUSTOM_REPORT,
 };
 
 export const API_ENDPOINTS = {

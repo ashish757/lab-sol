@@ -93,6 +93,7 @@ export class DailyLogsService {
       orderBy: { createdAt: 'desc' },
       include: {
         unit: { select: { id: true, name: true } },
+        calculation: true,
       },
     });
   }

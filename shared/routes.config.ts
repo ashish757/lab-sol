@@ -80,6 +80,7 @@ export const clientRoutes = {
     report: '/unit/log-data/:id',
     logsList: '/unit/logs',
     settings: '/unit/settings',
+    customReport: '/unit/custom-report',
   },
   settings: '/settings',
   profile: '/profile',

@@ -9,6 +9,8 @@ import { analysisConfig, getAllSectionIds } from '../../config/analysisConfig';
 import { useScrollSpy } from '../../hooks/useScrollSpy';
 import { FormSidebar } from '../../components/analysis/FormSidebar';
 import { FormSection } from '../../components/analysis/FormSection';
+import { useFormContext } from 'react-hook-form';
+import { getAllFields } from '../../config/analysisConfig';
 import { useUpsertUnitLogMutation, useFetchUnitLogsQuery, useSaveAndGenerateReportMutation, useGetActiveSessionQuery, useLockUnitLogMutation } from '../../store/api/apiSlice';
 import { useDailyLogCalculations, CALCULATIONS_CONFIG } from '../../hooks/useDailyLogCalculations';
 import { useModal } from '../../hooks/useModal';
@@ -34,14 +36,18 @@ const getInitialValues = () => {
   };
 };
 
+const CalculationsEngine = () => {
+  const { control, setValue } = useFormContext();
+  useDailyLogCalculations(control, setValue);
+  return null;
+};
+
 export const NewLogPage = () => {
   const methods = useForm<AnalysisSchema>({
     resolver: zodResolver(analysisSchema),
     mode: 'onBlur',
     defaultValues: getInitialValues(),
   });
-
-  useDailyLogCalculations(methods.control, methods.setValue);
 
   const { user } = useSelector((state: RootState) => state.auth);
   const [upsertUnitLog, { isLoading: isUpserting }] = useUpsertUnitLogMutation();
@@ -164,19 +170,55 @@ export const NewLogPage = () => {
 
   const [isGenerating, setIsGenerating] = useState(false);
 
+  const previousDayFields = useMemo(() => 
+    getAllFields(analysisConfig)
+      .filter(f => typeof f.previousDayData === 'string')
+      .map(f => ({
+        currentFieldId: f.id,
+        prevFieldId: f.previousDayData as string
+      })),
+  []);
+
   useEffect(() => {
     methods.setValue('todayDate', activeDate);
 
     if (Array.isArray(logs)) {
+      let previousLogValues: Record<string, any> = {};
+      
+      if (previousDayFields.length > 0) {
+        const sortedLogsDesc = [...logs].filter(l => {
+          const logDateVal = l.createdAt || (l as any).date || (l as any).logDate;
+          if (!logDateVal) return false;
+          const logDateStr = new Date(logDateVal).toISOString().split('T')[0];
+          return logDateStr < activeDate;
+        }).sort((a, b) => {
+          const d1 = new Date(a.createdAt || (a as any).date || (a as any).logDate).getTime();
+          const d2 = new Date(b.createdAt || (b as any).date || (b as any).logDate).getTime();
+          return d2 - d1;
+        });
+
+        const prevLog = sortedLogsDesc[0];
+        if (prevLog) {
+          const prevParsed = typeof prevLog.payload === 'string' ? JSON.parse(prevLog.payload) : prevLog.payload;
+          previousDayFields.forEach(({ currentFieldId, prevFieldId }) => {
+            if (prevParsed[prevFieldId] !== undefined) {
+              previousLogValues[currentFieldId] = prevParsed[prevFieldId];
+            }
+          });
+        }
+      }
+
       const log = logs.find(l => {
         const logDateVal = l.createdAt || (l as any).date || (l as any).logDate;
         if (!logDateVal) return false;
         return new Date(logDateVal).toISOString().split('T')[0] === activeDate;
       });
+
       if (log) {
         const parsedMetrics = typeof log.payload === 'string' ? JSON.parse(log.payload) : log.payload;
         methods.reset({ 
-          ...initialValues, 
+          ...initialValues,
+          ...previousLogValues,
           ...parsedMetrics, 
           todayDate: activeDate,
           seasonStartDate: session?.sessionStartDate || '',
@@ -187,7 +229,8 @@ export const NewLogPage = () => {
         });
       } else {
         methods.reset({ 
-          ...initialValues, 
+          ...initialValues,
+          ...previousLogValues,
           todayDate: activeDate,
           seasonStartDate: session?.sessionStartDate || '',
           seasonStartTime: session?.sessionStartTime || '',
@@ -197,7 +240,7 @@ export const NewLogPage = () => {
         });
       }
     }
-  }, [logs, session, activeDate, methods, initialValues]);
+  }, [logs, session, activeDate, methods, initialValues, previousDayFields]);
 
   const sectionIds = getAllSectionIds(analysisConfig);
   const defaultSection = sectionIds[0] ?? '';
@@ -399,11 +442,13 @@ export const NewLogPage = () => {
     <div className="flex-1 flex overflow-hidden flex-col bg-white">
 
       <FormProvider {...methods}>
-        <form
-          onSubmit={methods.handleSubmit(onSubmit)}
-          onKeyDown={handleKeyDown}
-          className="flex flex-1 overflow-hidden flex-col lg:flex-row"
-        >
+        <CalculationsEngine />
+        <div className="flex-1 overflow-hidden flex flex-col md:flex-row bg-slate-50">
+          <form
+            onSubmit={methods.handleSubmit(onSubmit)}
+            onKeyDown={handleKeyDown}
+            className="flex flex-1 overflow-hidden flex-col lg:flex-row"
+          >
           <FormSidebar
             config={analysisConfig}
             activeSection={expanded}
@@ -512,6 +557,7 @@ export const NewLogPage = () => {
             </fieldset>
           </div>
         </form>
+        </div>
       </FormProvider>
       <ModalComponent />
     </div>
