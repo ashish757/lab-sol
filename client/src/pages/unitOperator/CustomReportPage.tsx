@@ -51,9 +51,18 @@ export const CustomReportPage = () => {
     
     return filtered.map((log: any) => {
       const payload = typeof log.payload === 'string' ? JSON.parse(log.payload) : (log.payload || {});
-      const calc = typeof log.calculation?.calculatedMetrics === 'string' 
+      const calcRaw = typeof log.calculation?.calculatedMetrics === 'string' 
         ? JSON.parse(log.calculation.calculatedMetrics) 
         : (log.calculation?.calculatedMetrics || {});
+        
+      const calc: Record<string, any> = {};
+      for (const [key, val] of Object.entries(calcRaw)) {
+        if (val && typeof val === 'object' && 'onDate' in (val as any)) {
+          calc[key] = (val as any).onDate;
+        } else {
+          calc[key] = val;
+        }
+      }
         
       const logDateVal = log.createdAt || log.date || log.logDate;
       const dateStr = logDateVal ? new Date(logDateVal).toISOString().split('T')[0] : '';

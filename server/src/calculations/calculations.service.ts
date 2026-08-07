@@ -1,6 +1,7 @@
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { FormulaRegistry, requiredFormulaIds } from '../comman/calc/formulas';
+import { TimeMetric } from '../comman/calc/types';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
@@ -41,13 +42,13 @@ export class CalculationsService {
         });
         
         try {
-          result = FormulaRegistry[prop](proxy);
-        } catch (error) {
+          result = FormulaRegistry[prop].calculate(proxy);
+        } catch (error: any) {
           if (error instanceof BadRequestException) {
             throw error; // Re-throw circular dependency exceptions
           }
-          this.logger.warn(`Error evaluating ${prop}: ${error.message || error}`);
-          result = 0; // Resilience: return 0 if formula throws
+          this.logger.warn(`Error evaluating ${prop}: ${error?.message || error}`);
+          result = null; // Fail explicitly instead of silent 0
         }
       } else {
         // Base case: it's a raw data point
@@ -71,21 +72,97 @@ export class CalculationsService {
    * Master execution pipeline: evaluates formulas and upserts the DailyCalculation record.
    */
   async processCalculations(dailyLogId: string, payload: Record<string, any>) {
-    // 1. Trigger calculation engine
-    const calculatedMetrics = this.evaluateFormulas(payload);
+    const currentLog = await this.prisma.dailyLog.findUnique({
+      where: { id: dailyLogId },
+    });
 
-    // 2. Use Prisma to insert or update the DailyCalculation record
+    if (!currentLog) {
+      this.logger.warn(`DailyLog ${dailyLogId} not found, aborting calculations.`);
+      return null;
+    }
+
+    // 1. Fetch Snapshot (Yesterday's Calculation)
+    const yesterdayLog = await this.prisma.dailyLog.findFirst({
+      where: {
+        unitId: currentLog.unitId,
+        sessionDataId: currentLog.sessionDataId,
+        createdAt: { lt: currentLog.createdAt },
+      },
+      orderBy: { createdAt: 'desc' },
+      include: { calculation: true },
+    });
+
+    const yesterdayMetrics = yesterdayLog?.calculation?.calculatedMetrics as Record<string, TimeMetric> || {};
+
+    // 2. Check Temporal Boundaries
+    const currentDate = new Date(currentLog.createdAt);
+    const isFirstOfMonth = currentDate.getUTCDate() === 1;
+    const isFirstOfSeason = !yesterdayLog;
+
+    // 3. Pass 1: Calculate onDate values using today's payload
+    const onDateMetrics = this.evaluateFormulas(payload);
+
+    const calculatedMetrics: Record<string, TimeMetric> = {};
+
+    // 4. Pass 2: Additive Aggregation
+    for (const id of requiredFormulaIds) {
+      const formulaDef = FormulaRegistry[id];
+      if (!formulaDef) continue;
+
+      const onDateVal = Number(onDateMetrics[id]) || 0;
+
+      if (formulaDef.type === 'ADDITIVE') {
+        const toMonth = isFirstOfMonth ? onDateVal : onDateVal + (Number(yesterdayMetrics[id]?.toMonth) || 0);
+        const toDate = isFirstOfSeason ? onDateVal : onDateVal + (Number(yesterdayMetrics[id]?.toDate) || 0);
+
+        calculatedMetrics[id] = {
+          onDate: onDateVal,
+          toMonth,
+          toDate,
+        };
+      }
+    }
+
+    // 5. Pass 3: Derived Aggregation
+    // We need to feed the aggregated Additive metrics back into the evaluation engine for Derived metrics.
+    // Build context objects that contain both the raw payload (for any raw values needed) AND the aggregated additive values.
+    const toMonthContext = { ...payload };
+    const toDateContext = { ...payload };
+
+    for (const id of requiredFormulaIds) {
+      if (calculatedMetrics[id]) {
+        toMonthContext[id] = calculatedMetrics[id].toMonth;
+        toDateContext[id] = calculatedMetrics[id].toDate;
+      }
+    }
+
+    const toMonthDerivedMetrics = this.evaluateFormulas(toMonthContext);
+    const toDateDerivedMetrics = this.evaluateFormulas(toDateContext);
+
+    for (const id of requiredFormulaIds) {
+      const formulaDef = FormulaRegistry[id];
+      if (formulaDef && formulaDef.type === 'DERIVED') {
+        calculatedMetrics[id] = {
+          onDate: Number(onDateMetrics[id]) || 0,
+          toMonth: Number(toMonthDerivedMetrics[id]) || 0,
+          toDate: Number(toDateDerivedMetrics[id]) || 0,
+        };
+      }
+    }
+
+    // 6. Use Prisma to insert or update the DailyCalculation record
     const record = await this.prisma.dailyCalculation.upsert({
       where: { dailyLogId },
       update: {
-        calculatedMetrics: calculatedMetrics as Prisma.InputJsonValue,
+        calculatedMetrics: calculatedMetrics as unknown as Prisma.InputJsonValue,
       },
       create: {
         dailyLogId,
-        calculatedMetrics: calculatedMetrics as Prisma.InputJsonValue,
+        calculatedMetrics: calculatedMetrics as unknown as Prisma.InputJsonValue,
       },
     });
 
+    this.logger.log(`Calculations processed successfully for log ${dailyLogId}`);
     return record;
   }
 }

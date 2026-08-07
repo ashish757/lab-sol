@@ -8,7 +8,7 @@ import { analysisConfig, getAllFields } from '@shared/analysisFields';
 import { populateRow } from './reports.utils';
 import { DailyLogsService } from '../dailyLogs/dailyLogs.service';
 import { UpsertDailyLogDto } from '../dailyLogs/dto/dailyLog.dto';
-import { calculateReportData } from '../comman/calc/calculation';
+import { CalculationsService } from '../calculations/calculations.service';
 import { requiredFormulaIds } from '../comman/calc/formulas';
 
 @Injectable()
@@ -18,6 +18,7 @@ export class ReportsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly dailyLogsService: DailyLogsService,
+    private readonly calculationsService: CalculationsService,
   ) {}
 
   private fieldTypeMap: Map<string, 'number' | 'date' | 'time' | 'text'> =
@@ -151,7 +152,10 @@ export class ReportsService {
       ? new Date(savedLog.createdAt).toISOString().split('T')[0]
       : (metrics.todayDate as string | undefined);
 
-    const calculatedData = calculateReportData(data, requiredFormulaIds);
+    const calculatedData = {
+      ...data,
+      ...this.calculationsService.evaluateFormulas(data, requiredFormulaIds)
+    };
     const buffer = await this.generateDailyReportFromData(calculatedData);
 
     res.setHeader(
