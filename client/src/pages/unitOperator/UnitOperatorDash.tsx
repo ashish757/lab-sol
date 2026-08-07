@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux';
-import { useGetUnitByIdQuery, useGetDailyLogsQuery } from '../../store/api/apiSlice';
+import { useGetUnitByIdQuery, useGetDailyLogsQuery, useGetActiveSessionQuery } from '../../store/api/apiSlice';
 import type { RootState } from '../../store/store';
 import { ShieldCheck, Network, ArrowRight, Activity, TrendingUp, Calendar, CalendarDays, RefreshCw, Plus, CheckCircle, Edit, XCircle, Settings } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -16,6 +16,9 @@ export const UnitOpDash = () => {
   });
   
   const { data: logs = [], isLoading: logsLoading, isError, refetch } = useGetDailyLogsQuery(undefined);
+  const { data: activeSession, isLoading: sessionLoading } = useGetActiveSessionQuery(user?.unitId as string, {
+    skip: !user?.unitId,
+  });
 
   const totalCane = logs.reduce((acc: number, log: DailyLogResponse) => {
     const metrics = typeof log.metrics === 'string' ? JSON.parse(log.metrics) : log.metrics;
@@ -191,7 +194,22 @@ export const UnitOpDash = () => {
                 </div>
                 
                 <div className="p-5 flex flex-col gap-4">
-                  {timeline.map((item, index) => {
+                  {sessionLoading ? (
+                    <div className="flex justify-center p-4">
+                      <div className="w-5 h-5 rounded-full border-2 border-indigo-100 border-t-indigo-600 animate-spin" />
+                    </div>
+                  ) : !activeSession || !activeSession.isLocked ? (
+                    <div className="flex flex-col items-center justify-center py-6 text-center">
+                      <span className="text-xs text-slate-500 font-bold uppercase mb-4">No active session found.</span>
+                      <button 
+                        onClick={() => navigate(PAGES.SETTINGS)} 
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-indigo-600/20 uppercase tracking-wider"
+                      >
+                        Start Session
+                      </button>
+                    </div>
+                  ) : (
+                    timeline.map((item, index) => {
                     const isLocked = item.status === 'LOCKED';
                     const isUnlocked = item.status === 'UNLOCKED';
                     
@@ -226,7 +244,8 @@ export const UnitOpDash = () => {
                         </div>
                       </div>
                     );
-                  })}
+                  })
+                  )}
                 </div>
               </div>
 
