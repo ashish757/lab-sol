@@ -19,26 +19,34 @@ export function populateRow(
     const fieldId = EXCEL_ROW_SINGLE_VALUES[rowNum];
     const rawVal = data[fieldId];
 
-    if (
-      rawVal !== undefined &&
-      rawVal !== null &&
-      String(rawVal).trim() !== ''
-    ) {
+    if (rawVal !== undefined && rawVal !== null && String(rawVal).trim() !== '') {
       const type = fieldTypeMap.get(fieldId) || 'number';
-      const cell = row.getCell(4); // Column D (value)
-
-      if (type === 'number') {
-        const num = parseFloat(rawVal);
-        cell.value = isNaN(num) ? null : num;
-      } else if (type === 'date') {
-        const dateObj = new Date(rawVal);
-        if (!isNaN(dateObj.getTime())) {
-          cell.value = dateObj;
+      
+      const setCell = (colIdx: number, val: any) => {
+        const cell = row.getCell(colIdx);
+        if (type === 'number') {
+          const num = parseFloat(val);
+          cell.value = isNaN(num) ? null : num;
+        } else if (type === 'date') {
+          const dateObj = new Date(val);
+          if (!isNaN(dateObj.getTime())) {
+            cell.value = dateObj;
+          } else {
+            cell.value = val;
+          }
         } else {
-          cell.value = rawVal;
+          cell.value = val;
         }
+      };
+
+      if (typeof rawVal === 'object' && 'onDate' in rawVal) {
+        // It's a TimeMetric: write to columns D(4), E(5), F(6)
+        setCell(4, rawVal.onDate);
+        setCell(5, rawVal.toMonth);
+        setCell(6, rawVal.toDate);
       } else {
-        cell.value = rawVal;
+        // Raw primitive value: write to column D(4)
+        setCell(4, rawVal);
       }
     }
   }
@@ -49,22 +57,27 @@ export function populateRow(
     const brixVal = data[config.brixKey];
     const polVal = data[config.polKey];
 
-    if (
-      brixVal !== undefined &&
-      brixVal !== null &&
-      String(brixVal).trim() !== ''
-    ) {
-      const brixNum = parseFloat(brixVal);
-      row.getCell(2).value = isNaN(brixNum) ? null : brixNum; // Column B (Brix)
+    const setBrixPolCell = (colIdx: number, val: any) => {
+      if (val !== undefined && val !== null && String(val).trim() !== '') {
+        const num = parseFloat(val);
+        row.getCell(colIdx).value = isNaN(num) ? null : num;
+      }
+    };
+
+    if (typeof brixVal === 'object' && brixVal !== null && 'onDate' in brixVal) {
+      setBrixPolCell(2, brixVal.onDate); // B: Brix onDate
+      setBrixPolCell(4, brixVal.toMonth); // D: Brix toMonth
+      setBrixPolCell(6, brixVal.toDate); // F: Brix toDate
+    } else {
+      setBrixPolCell(2, brixVal);
     }
 
-    if (
-      polVal !== undefined &&
-      polVal !== null &&
-      String(polVal).trim() !== ''
-    ) {
-      const polNum = parseFloat(polVal);
-      row.getCell(3).value = isNaN(polNum) ? null : polNum; // Column C (Pol)
+    if (typeof polVal === 'object' && polVal !== null && 'onDate' in polVal) {
+      setBrixPolCell(3, polVal.onDate); // C: Pol onDate
+      setBrixPolCell(5, polVal.toMonth); // E: Pol toMonth
+      setBrixPolCell(7, polVal.toDate); // G: Pol toDate
+    } else {
+      setBrixPolCell(3, polVal);
     }
   }
 }

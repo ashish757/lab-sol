@@ -9,7 +9,6 @@ import { populateRow } from './reports.utils';
 import { DailyLogsService } from '../dailyLogs/dailyLogs.service';
 import { UpsertDailyLogDto } from '../dailyLogs/dto/dailyLog.dto';
 import { CalculationsService } from '../calculations/calculations.service';
-import { requiredFormulaIds } from '../comman/calc/formulas';
 
 @Injectable()
 export class ReportsService {
@@ -154,7 +153,7 @@ export class ReportsService {
 
     const calculatedData = {
       ...data,
-      ...this.calculationsService.evaluateFormulas(data, requiredFormulaIds)
+      ...this.calculationsService.evaluateFormulas(data)
     };
     const buffer = await this.generateDailyReportFromData(calculatedData);
 
@@ -170,16 +169,18 @@ export class ReportsService {
   }
 
   /**
-   * Generates a simple 2-column Excel file from a JSON object.
+   * Generates a multi-column Excel file from a JSON object (handles TimeMetric).
    */
-  async generateSimpleTwoColumnReport(data: Record<string, any>): Promise<Buffer> {
+  async generateMultiColumnReport(data: Record<string, any>): Promise<Buffer> {
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet('Calculations');
     
     // Define columns
     sheet.columns = [
       { header: 'Metric', key: 'metric', width: 40 },
-      { header: 'Value', key: 'value', width: 25 }
+      { header: 'On Date', key: 'onDate', width: 20 },
+      { header: 'To Month', key: 'toMonth', width: 20 },
+      { header: 'To Date', key: 'toDate', width: 20 }
     ];
     
     // Style header row
@@ -191,9 +192,19 @@ export class ReportsService {
       fgColor: { argb: 'FFE0E0E0' }
     };
     
-    // Add rows
     for (const [key, value] of Object.entries(data)) {
-      sheet.addRow({ metric: key, value });
+      if (typeof value === 'object' && value !== null && 'onDate' in value) {
+        sheet.addRow({
+          metric: key,
+          onDate: value.onDate,
+          toMonth: value.toMonth,
+          toDate: value.toDate
+        });
+      } else if (typeof value === 'object' && value !== null) {
+        sheet.addRow({ metric: key, onDate: JSON.stringify(value) });
+      } else {
+        sheet.addRow({ metric: key, onDate: value });
+      }
     }
     
     const buffer = await workbook.xlsx.writeBuffer();
@@ -217,6 +228,6 @@ export class ReportsService {
       : calculation.calculatedMetrics;
 
     this.logger.log(`Generating calculated Excel report for log ID: ${id}`);
-    return this.generateSimpleTwoColumnReport(calculatedMetrics as Record<string, any>);
+    return this.generateMultiColumnReport(calculatedMetrics as Record<string, any>);
   }
 }

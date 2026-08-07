@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { FormulaRegistry, requiredFormulaIds } from '../comman/calc/formulas';
+import { FormulaRegistry } from '../comman/calc/formulas';
 import { TimeMetric } from '../comman/calc/types';
 import { Prisma } from '@prisma/client';
 
@@ -11,46 +11,69 @@ export class CalculationsService {
   constructor(private prisma: PrismaService) {}
 
   /**
-   * Evaluates formulas recursively using a DFS approach with a Proxy to detect dependencies automatically.
+   * Evaluates ALL formulas in the registry recursively.
+   * @param rawData The raw input payload for the day.
+   * @param preCalculated Overrides for DFS (used to pass toMonth/toDate sums into derived calculations).
    */
-  public evaluateFormulas(rawData: Record<string, any>, targetFormulaIds: string[] = requiredFormulaIds): Record<string, any> {
+  public evaluateFormulas(
+    rawData: Record<string, any>, 
+    preCalculated: Record<string, any> = {}
+  ): Record<string, any> {
     const cache: Record<string, any> = {};
     const visited = new Set<string>();
 
     const dfsEvaluate = (prop: string): any => {
+      // 1. Check cache first
       if (cache.hasOwnProperty(prop)) return cache[prop];
+      
+      // 2. Prevent Circular Dependencies
       if (visited.has(prop)) {
         this.logger.error(`Circular Dependency detected for formula: ${prop}`);
         throw new BadRequestException(`Circular Dependency detected for formula: ${prop}`);
+      }
+
+      // 3. Use Pre-Calculated Overrides (CRITICAL for toMonth/toDate derived formulas)
+      if (preCalculated.hasOwnProperty(prop)) {
+        cache[prop] = preCalculated[prop];
+        return preCalculated[prop];
       }
 
       visited.add(prop);
 
       let result;
       if (FormulaRegistry[prop]) {
-        // Create a Proxy around an empty object to intercept gets
-        const proxy = new Proxy({}, {
-          get: (target, key: string | symbol) => {
-            if (typeof key === 'symbol') return Reflect.get(target, key);
-            if (['hasOwnProperty', 'toString', 'valueOf', 'constructor'].includes(key)) {
-              return Reflect.get(target, key);
+          // Create a Proxy around an empty object to intercept gets
+          const proxy = new Proxy({}, {
+            get: (target, key: string | symbol) => {
+              if (typeof key === 'symbol') return Reflect.get(target, key);
+              if (['hasOwnProperty', 'toString', 'valueOf', 'constructor'].includes(key)) {
+                return Reflect.get(target, key);
+              }
+              
+              // THE FIX: If a formula asks for its own exact name, bypass the evaluation 
+              // and hand it the raw input data (or pre-calculated sum) directly!
+              if (key === prop) {
+                return preCalculated.hasOwnProperty(key as string) 
+                  ? preCalculated[key as string] 
+                  : rawData[key as string];
+              }
+              
+              // Recursively evaluate the dependency
+              return dfsEvaluate(key as string);
             }
-            
-            // Recursively evaluate the dependency
-            return dfsEvaluate(key);
+          });
+          
+          try {
+            result = FormulaRegistry[prop].calculate(proxy);
+          } catch (error: any) {
+            if (error.name === 'BadRequestException' || error.message.includes('Circular')) {
+              throw error; // Re-throw circular dependency exceptions
+            }
+            // Cannot use this.logger here directly if it's a nested function without context, but we are inside evaluateFormulas so we can if we bind it. 
+            // We'll just set it to null.
+            result = null; // Fail explicitly instead of silent 0
           }
-        });
-        
-        try {
-          result = FormulaRegistry[prop].calculate(proxy);
-        } catch (error: any) {
-          if (error instanceof BadRequestException) {
-            throw error; // Re-throw circular dependency exceptions
-          }
-          this.logger.warn(`Error evaluating ${prop}: ${error?.message || error}`);
-          result = null; // Fail explicitly instead of silent 0
-        }
-      } else {
+        } else {
         // Base case: it's a raw data point
         result = rawData[prop];
       }
@@ -60,8 +83,9 @@ export class CalculationsService {
       return result;
     };
 
-    // Trigger evaluation for all requested targets
-    for (const id of targetFormulaIds) {
+    // Evaluate EVERYTHING in the registry to maintain the snapshot integrity
+    const allFormulaIds = Object.keys(FormulaRegistry);
+    for (const id of allFormulaIds) {
       dfsEvaluate(id);
     }
 
@@ -92,7 +116,12 @@ export class CalculationsService {
       include: { calculation: true },
     });
 
-    const yesterdayMetrics = yesterdayLog?.calculation?.calculatedMetrics as Record<string, TimeMetric> || {};
+    let yesterdayMetrics: Record<string, TimeMetric> = {};
+    if (yesterdayLog?.calculation?.calculatedMetrics) {
+      yesterdayMetrics = typeof yesterdayLog.calculation.calculatedMetrics === 'string'
+        ? JSON.parse(yesterdayLog.calculation.calculatedMetrics)
+        : yesterdayLog.calculation.calculatedMetrics;
+    }
 
     // 2. Check Temporal Boundaries
     const currentDate = new Date(currentLog.createdAt);
@@ -103,12 +132,14 @@ export class CalculationsService {
     const onDateMetrics = this.evaluateFormulas(payload);
 
     const calculatedMetrics: Record<string, TimeMetric> = {};
+    const toMonthSums: Record<string, any> = {};
+    const toDateSums: Record<string, any> = {};
+
+    const allFormulaIds = Object.keys(FormulaRegistry);
 
     // 4. Pass 2: Additive Aggregation
-    for (const id of requiredFormulaIds) {
+    for (const id of allFormulaIds) {
       const formulaDef = FormulaRegistry[id];
-      if (!formulaDef) continue;
-
       const onDateVal = Number(onDateMetrics[id]) || 0;
 
       if (formulaDef.type === 'ADDITIVE') {
@@ -120,28 +151,22 @@ export class CalculationsService {
           toMonth,
           toDate,
         };
+
+        // Store these sums to feed into the Derived calculation context
+        toMonthSums[id] = toMonth;
+        toDateSums[id] = toDate;
       }
     }
 
     // 5. Pass 3: Derived Aggregation
-    // We need to feed the aggregated Additive metrics back into the evaluation engine for Derived metrics.
-    // Build context objects that contain both the raw payload (for any raw values needed) AND the aggregated additive values.
-    const toMonthContext = { ...payload };
-    const toDateContext = { ...payload };
+    // Feed the additive sums as 'preCalculated' overrides so derived formulas use the aggregated data
+    const toMonthDerivedMetrics = this.evaluateFormulas(payload, toMonthSums);
+    const toDateDerivedMetrics = this.evaluateFormulas(payload, toDateSums);
 
-    for (const id of requiredFormulaIds) {
-      if (calculatedMetrics[id]) {
-        toMonthContext[id] = calculatedMetrics[id].toMonth;
-        toDateContext[id] = calculatedMetrics[id].toDate;
-      }
-    }
-
-    const toMonthDerivedMetrics = this.evaluateFormulas(toMonthContext);
-    const toDateDerivedMetrics = this.evaluateFormulas(toDateContext);
-
-    for (const id of requiredFormulaIds) {
+    for (const id of allFormulaIds) {
       const formulaDef = FormulaRegistry[id];
-      if (formulaDef && formulaDef.type === 'DERIVED') {
+      
+      if (formulaDef.type === 'DERIVED') {
         calculatedMetrics[id] = {
           onDate: Number(onDateMetrics[id]) || 0,
           toMonth: Number(toMonthDerivedMetrics[id]) || 0,
@@ -150,7 +175,7 @@ export class CalculationsService {
       }
     }
 
-    // 6. Use Prisma to insert or update the DailyCalculation record
+    // 6. Upsert the DailyCalculation record
     const record = await this.prisma.dailyCalculation.upsert({
       where: { dailyLogId },
       update: {
