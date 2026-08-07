@@ -84,6 +84,16 @@ export const CALCULATIONS_CONFIG: CalculationConfig[] = [
       parseNum(values.scrapingSugar) +
       parseNum(values.sSs31Export),
   },
+  { 
+    targetField: "imbibitionWater",
+    dependencies: ["imbibitionWaterRawData", "imbibitionWaterSpecificGavity"],
+    calculate: (values) => parseNum(values.imbibitionWaterRawData) * parseNum(values.imbibitionWaterSpecificGavity),
+  },
+  {
+    targetField: "grossMixedJuice",
+    dependencies: ["grossMixedJuiceRawData", "mixedJuiceSpecificGravity"],
+    calculate: (values) => parseNum(values.grossMixedJuiceRawData) * parseNum(values.imbibitionWater),
+  }
 ];
 
 /**

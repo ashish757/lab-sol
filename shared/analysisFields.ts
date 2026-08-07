@@ -92,14 +92,14 @@ export const analysisConfig: GroupConfig[] = [
       { id: "molassesSentOut", label: "Final Molasses Sent Out", type: "number", unit: "Qtls" },
       { id: "imbibitionWaterRawData", label: "Imbibition Water Raw Data", type: "number", unit: "Qtls" },
       { id: "imbibitionWaterSpecificGavity", label: "Imbibition Water Sp. Gravity", type: "number", unit: "-", previousDayData: "imbibitionWaterSpecificGavity" },
+      { id: "imbibitionWater", label: "Imbibition Water", type: "number", unit: "Qtls", isCalculated: true },
       { id: "dirtPercent", label: "Dirt %", type: "number", unit: "% MJ", previousDayData: "dirtPercent" },
       { id: "unknownLosses", label: "Unknown Losses", type: "number", unit: "% Cane" },
       { id: "polPercentSugar", label: "Pol Percent Sugar", type: "number", unit: "%" },
       { id: "filterCakeProduction", label: "Filter Cake Production", type: "number", unit: "Qtls" },
       { id: "grossMixedJuiceRawData", label: "Gross Mixed Juice Raw Data", type: "number", unit: "-" },
       { id: "mixedJuiceSpecificGravity", label: "Mixed Juice Sp. Gravity", type: "number", unit: "-", previousDayData: "mixedJuiceSpecificGravity" },
-      
-
+      { id: "grossMixedJuice", label: "Gross Mixed Juice", type: "number", unit: "-" , isCalculated: true},
       
     ]
   },
