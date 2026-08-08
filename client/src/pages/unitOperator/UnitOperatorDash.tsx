@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
 import { useGetUnitByIdQuery, useGetDailyLogsQuery, useGetActiveSessionQuery } from '../../store/api/apiSlice';
 import type { RootState } from '../../store/store';
-import { ShieldCheck, Network, ArrowRight, Activity, TrendingUp, Calendar, CalendarDays, RefreshCw, Plus, CheckCircle, Edit, XCircle, Settings } from 'lucide-react';
+import { ShieldCheck, Network, ArrowRight, Activity, TrendingUp, Calendar, CalendarDays, RefreshCw, Plus, CheckCircle, Edit, XCircle, Settings, Clock } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { PAGES, getPagePath } from '../../config/routesConfig';
 import type { DailyLogResponse } from '../../types/dailyLogs';
@@ -21,19 +21,22 @@ export const UnitOpDash = () => {
   });
 
   const totalCane = logs.reduce((acc: number, log: DailyLogResponse) => {
-    const metrics = typeof log.metrics === 'string' ? JSON.parse(log.metrics) : log.metrics;
+    let metrics = log.metrics || (log as any).payload;
+    if (typeof metrics === 'string') { try { metrics = JSON.parse(metrics); } catch {} }
     return acc + (parseFloat((metrics as any)?.caneCrushed) || 0);
   }, 0);
 
   const totalSugar = logs.reduce((acc: number, log: DailyLogResponse) => {
-    const metrics = typeof log.metrics === 'string' ? JSON.parse(log.metrics) : log.metrics;
+    let metrics = log.metrics || (log as any).payload;
+    if (typeof metrics === 'string') { try { metrics = JSON.parse(metrics); } catch {} }
     return acc + (parseFloat((metrics as any)?.totalSugarBagged) || 0);
   }, 0);
 
   let puritySum = 0;
   let purityCount = 0;
   logs.forEach((log: DailyLogResponse) => {
-    const metrics = typeof log.metrics === 'string' ? JSON.parse(log.metrics) : log.metrics;
+    let metrics = log.metrics || (log as any).payload;
+    if (typeof metrics === 'string') { try { metrics = JSON.parse(metrics); } catch {} }
     const brix = parseFloat((metrics as any)?.primaryJuiceBrix) || 0;
     const pol = parseFloat((metrics as any)?.primaryJuicePol) || 0;
     if (brix > 0) {
@@ -56,6 +59,9 @@ export const UnitOpDash = () => {
     const d = new Date();
     d.setDate(d.getDate() - offsetDays);
     const dateStr = d.toISOString().split('T')[0];
+    
+    const isBeforeSeason = activeSession?.sessionStartDate && dateStr < activeSession.sessionStartDate;
+
     const log = logs.find((l: DailyLogResponse) => {
       const logDate = l.createdAt || (l as any).date || (l as any).logDate; 
       if (!logDate) return false;
@@ -65,15 +71,15 @@ export const UnitOpDash = () => {
     return {
       date: d,
       dateStr,
-      status: log ? log.status : 'MISSING',
-      isToday: offsetDays === 0
+      status: isBeforeSeason ? 'PRE_SEASON' : (log ? log.status : 'MISSING'),
+      isToday: offsetDays === 1
     };
   };
 
   const timeline = [
-    getLogStatusForDateOffset(0),
     getLogStatusForDateOffset(1),
-    getLogStatusForDateOffset(2)
+    getLogStatusForDateOffset(2),
+    getLogStatusForDateOffset(3)
   ];
 
   return (
@@ -229,10 +235,12 @@ export const UnitOpDash = () => {
                         <div className={`relative z-10 shrink-0 w-8 h-8 rounded-full flex items-center justify-center border-2 ${
                           isLocked ? 'bg-emerald-50 border-emerald-200 text-emerald-600' :
                           isUnlocked ? 'bg-amber-50 border-amber-200 text-amber-600' :
+                          item.status === 'PRE_SEASON' ? 'bg-slate-50 border-slate-200 text-slate-300' :
                           'bg-slate-50 border-slate-200 text-slate-500'
                         }`}>
                           {isLocked ? <CheckCircle size={14} /> : 
                            isUnlocked ? <Edit size={14} /> : 
+                           item.status === 'PRE_SEASON' ? <Clock size={14} /> :
                            <XCircle size={14} />}
                         </div>
                         <div className="flex flex-col pt-1.5">
@@ -243,10 +251,12 @@ export const UnitOpDash = () => {
                           <span className={`text-[10px] font-black uppercase tracking-widest mt-0.5 ${
                             isLocked ? 'text-emerald-600' :
                             isUnlocked ? 'text-amber-600' :
+                            item.status === 'PRE_SEASON' ? 'text-slate-400' :
                             'text-slate-500'
                           }`}>
                             {isLocked ? 'Locked' :
                              isUnlocked ? 'Draft' :
+                             item.status === 'PRE_SEASON' ? 'Pre-Season' :
                              'Missing Entry'}
                           </span>
                         </div>

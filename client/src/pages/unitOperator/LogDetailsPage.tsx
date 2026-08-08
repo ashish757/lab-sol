@@ -133,7 +133,7 @@ export const LogDetailsPage = () => {
                   </div>
                   <div>
                     <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Log ID</p>
-                    <p className="text-sm font-medium text-slate-900 mt-1 truncate max-w-[200px]" title={log.id}>{log.id}</p>
+                    <p className="text-sm font-medium text-slate-900 mt-1 break-all" title={log.id}>{log.id}</p>
                   </div>
                 </div>
 
