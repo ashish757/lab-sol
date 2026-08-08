@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
   Factory,
   ArrowRight,
@@ -8,7 +7,6 @@ import {
   FileText,
   ClipboardCheck,
   Workflow,
-  ClipboardList,
   Lock,
   Gauge,
   Sparkles,
@@ -21,7 +19,6 @@ import {
   X,
   Users
 } from 'lucide-react';
-import { PAGES } from '../config/routesConfig';
 
 export const LandingPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);

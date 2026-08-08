@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { 
   useGetActiveSessionQuery, 
@@ -12,7 +12,6 @@ import { useModal } from '../../hooks/useModal';
 import { Calendar, Clock, Lock, Save, ArrowLeft, AlertCircle, Settings, ArrowRight, Unlock } from 'lucide-react';
 
 export const SessionSettingsPage = () => {
-  const navigate = useNavigate();
   const { id: paramUnitId } = useParams();
   const { user } = useSelector((state: RootState) => state.auth);
   
