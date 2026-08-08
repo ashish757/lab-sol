@@ -13,13 +13,14 @@ import { StaffSetupAccount } from './pages/auth/StaffSetupAccount';
 import { ProtectedRoute } from './components/guards/ProtectedRoute';
 import { routeConfiguration } from './config/routeConfiguration';
 import { PAGES } from './config/routesConfig';
+import { LandingPage } from './pages/LandingPage';
 
 const IndexRedirect = () => {
   const authState = useSelector((state: RootState) => state.auth);
   const userRole = authState.user?.role;
   
   if (!authState.isAuthenticated || !userRole) {
-    return <Navigate to={PAGES.LOGIN} replace />;
+    return <LandingPage />;
   }
 
   switch (userRole) {
@@ -53,8 +54,8 @@ function App() {
               element={<ProtectedRoute component={routeConfig.component} allowedRoles={routeConfig.allowedRoles} />}
             />
           ))}
-          <Route path="/" element={<IndexRedirect />} />
         </Route>
+        <Route path="/" element={<IndexRedirect />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
