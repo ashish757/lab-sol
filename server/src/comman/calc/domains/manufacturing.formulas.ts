@@ -6,7 +6,6 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   grossMixedJuice: { type: 'ADDITIVE', calculate: (data) => Number(data.grossMixedJuice) || 0 },
   filterCakeProduction: { type: 'ADDITIVE', calculate: (data) => Number(data.filterCakeProduction) || 0 },
   aMassecuite: { type: 'ADDITIVE', calculate: (data) => Number(data.aMassecuite) || 0 },
-  ClearJuiceQuantity: { type: 'ADDITIVE', calculate: (data) => Number(data.ClearJuiceQuantity) || 0 },
   
   grossMixedJuiceRawData: { type: 'ADDITIVE', calculate: (data) => Number(data.grossMixedJuiceRawData) || 0 },
   imbibitionWaterCalc: {

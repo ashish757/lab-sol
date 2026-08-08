@@ -134,10 +134,12 @@ export const UnitOpDash = () => {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
             <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden group">
-              <div className="absolute top-4 right-4 text-slate-300 group-hover:text-indigo-500 transition-colors">
-                <TrendingUp size={16} />
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block">Cane Crushed YTD</span>
+                <div className="text-slate-400 group-hover:text-indigo-500 transition-colors bg-slate-50 p-1.5 rounded-md">
+                  <TrendingUp size={14} />
+                </div>
               </div>
-              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Cane Crushed YTD</span>
               <span className="text-xl font-black text-slate-950 block">
                 {logsLoading ? '—' : totalCane.toLocaleString()} <span className="text-xs text-slate-500 font-bold uppercase">Qtls</span>
               </span>
@@ -147,10 +149,12 @@ export const UnitOpDash = () => {
             </div>
 
             <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden group">
-              <div className="absolute top-4 right-4 text-slate-300 group-hover:text-indigo-500 transition-colors">
-                <CalendarDays size={16} />
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block">Sugar Bagged YTD</span>
+                <div className="text-slate-400 group-hover:text-indigo-500 transition-colors bg-slate-50 p-1.5 rounded-md">
+                  <CalendarDays size={14} />
+                </div>
               </div>
-              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Sugar Bagged YTD</span>
               <span className="text-xl font-black text-indigo-650 block">
                 {logsLoading ? '—' : totalSugar.toLocaleString()} <span className="text-xs text-slate-500 font-bold uppercase">Qtls</span>
               </span>
@@ -160,10 +164,12 @@ export const UnitOpDash = () => {
             </div>
 
             <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden group">
-              <div className="absolute top-4 right-4 text-slate-300 group-hover:text-emerald-500 transition-colors">
-                <Activity size={16} />
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block">Avg Juice Purity</span>
+                <div className="text-slate-400 group-hover:text-emerald-500 transition-colors bg-slate-50 p-1.5 rounded-md">
+                  <Activity size={14} />
+                </div>
               </div>
-              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Avg Juice Purity</span>
               <span className="text-xl font-black text-emerald-650 block">
                 {logsLoading ? '—' : avgPurity}
               </span>
@@ -173,10 +179,12 @@ export const UnitOpDash = () => {
             </div>
 
             <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden group">
-              <div className="absolute top-4 right-4 text-slate-300 group-hover:text-slate-500 transition-colors">
-                <CalendarDays size={16} />
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block">Archive Entries</span>
+                <div className="text-slate-400 group-hover:text-slate-600 transition-colors bg-slate-50 p-1.5 rounded-md">
+                  <CalendarDays size={14} />
+                </div>
               </div>
-              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Archive Entries</span>
               <span className="text-xl font-black text-slate-850 block">
                 {logsLoading ? '—' : logs.length} <span className="text-xs text-slate-500 font-bold uppercase">Logs</span>
               </span>
@@ -221,7 +229,7 @@ export const UnitOpDash = () => {
                         <div className={`relative z-10 shrink-0 w-8 h-8 rounded-full flex items-center justify-center border-2 ${
                           isLocked ? 'bg-emerald-50 border-emerald-200 text-emerald-600' :
                           isUnlocked ? 'bg-amber-50 border-amber-200 text-amber-600' :
-                          'bg-red-50 border-red-200 text-red-500'
+                          'bg-slate-50 border-slate-200 text-slate-500'
                         }`}>
                           {isLocked ? <CheckCircle size={14} /> : 
                            isUnlocked ? <Edit size={14} /> : 
@@ -235,11 +243,11 @@ export const UnitOpDash = () => {
                           <span className={`text-[10px] font-black uppercase tracking-widest mt-0.5 ${
                             isLocked ? 'text-emerald-600' :
                             isUnlocked ? 'text-amber-600' :
-                            'text-red-500'
+                            'text-slate-500'
                           }`}>
                             {isLocked ? 'Locked' :
                              isUnlocked ? 'Draft' :
-                             'No Entry Found'}
+                             'Missing Entry'}
                           </span>
                         </div>
                       </div>

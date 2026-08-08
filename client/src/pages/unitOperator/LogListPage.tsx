@@ -21,9 +21,18 @@ function formatDate(dateStr: string | null | undefined): string {
 }
 
 function getMetric(
-  metrics: Record<string, unknown>,
+  log: any,
   key: string,
 ): string {
+  let metrics = log.metrics;
+  if (!metrics) metrics = log.payload;
+  if (typeof metrics === 'string') {
+    try {
+      metrics = JSON.parse(metrics);
+    } catch {
+      metrics = {};
+    }
+  }
   const val = metrics?.[key];
   if (val === undefined || val === null) return '—';
   return Number(val).toLocaleString('en-IN');
@@ -117,8 +126,17 @@ export const LogsPage = () => {
     let totalCane = 0;
     let totalSugar = 0;
     logs.forEach((log: DailyLogResponse) => {
-      const cane = parseFloat(log.metrics?.caneCrushed as string);
-      const sugar = parseFloat(log.metrics?.totalSugarBagged as string);
+      let metrics = log.metrics;
+      if (!metrics) metrics = (log as any).payload;
+      if (typeof metrics === 'string') {
+        try {
+          metrics = JSON.parse(metrics);
+        } catch {
+          metrics = {};
+        }
+      }
+      const cane = parseFloat((metrics as any)?.caneCrushed);
+      const sugar = parseFloat((metrics as any)?.totalSugarBagged);
       if (!isNaN(cane)) totalCane += cane;
       if (!isNaN(sugar)) totalSugar += sugar;
     });
@@ -331,10 +349,10 @@ export const LogsPage = () => {
                             <StatusBadge status={log.status} />
                           </td>
                           <td className="px-6 py-5 tabular-nums text-slate-700 font-semibold">
-                            {getMetric(log.metrics, 'caneCrushed')}
+                            {getMetric(log, 'caneCrushed')}
                           </td>
                           <td className="px-6 py-5 tabular-nums text-slate-700 font-semibold">
-                            {getMetric(log.metrics, 'totalSugarBagged')}
+                            {getMetric(log, 'totalSugarBagged')}
                           </td>
                           <td className="px-6 py-5 whitespace-nowrap">
                             <Link
