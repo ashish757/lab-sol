@@ -9,7 +9,7 @@ import {
 } from '../../store/api/apiSlice';
 import type { RootState } from '../../store/store';
 import { useModal } from '../../hooks/useModal';
-import { Calendar, Clock, Lock, Save, ArrowLeft, AlertCircle } from 'lucide-react';
+import { Calendar, Clock, Lock, Save, ArrowLeft, AlertCircle, Settings, ArrowRight, Unlock } from 'lucide-react';
 
 export const SessionSettingsPage = () => {
   const navigate = useNavigate();
@@ -30,6 +30,7 @@ export const SessionSettingsPage = () => {
   const [upsertSession, { isLoading: isSaving }] = useUpsertSessionMutation();
   const [lockSession, { isLoading: isLocking }] = useLockSessionMutation();
   const { showModal, ModalComponent } = useModal();
+  const [view, setView] = useState<'menu' | 'session'>('menu');
 
   const [formData, setFormData] = useState({
     sessionStartDate: '',
@@ -120,15 +121,63 @@ export const SessionSettingsPage = () => {
 
   return (
     <div className="flex-1 flex flex-col bg-slate-50 overflow-y-auto">
-      <div className="bg-white border-b border-slate-200 p-6 md:p-8">
-        <div className="max-w-4xl mx-auto flex flex-col gap-4">
-          <button 
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors w-fit"
-          >
-            <ArrowLeft size={16} />
-            Back
-          </button>
+      {view === 'menu' ? (
+        <main className="max-w-4xl mx-auto px-6 md:px-8 py-10 w-full flex-1 flex flex-col gap-8">
+          <div>
+            <h1 className="text-2xl font-black tracking-tight text-slate-900 flex items-center gap-3">
+              <div className="p-2 bg-indigo-600 rounded-lg shadow-sm shadow-indigo-500/20">
+                <Settings size={20} className="text-white" />
+              </div>
+              Unit Settings
+            </h1>
+            <p className="text-sm font-medium text-slate-500 mt-2">
+              Manage configuration and session settings for {unit?.name || 'this unit'}.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <h2 className="text-xs font-black uppercase tracking-wider text-slate-500">Configuration Modules</h2>
+            
+            <div className="grid gap-4">
+              {/* Session Card */}
+              <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:border-indigo-300 transition-colors flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className={`p-3 rounded-xl border ${isLocked ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-slate-50 border-slate-200 text-slate-500'}`}>
+                    {isLocked ? <Lock size={20} /> : <Unlock size={20} />}
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-slate-900">Session Data</h3>
+                    <p className="text-xs font-semibold text-slate-500 mt-0.5">
+                      {isLocked ? 'Session Locked' : 'No Active Session'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setView('session')}
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-sm active:scale-[0.98] ${
+                    isLocked 
+                      ? 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50' 
+                      : 'bg-indigo-600 text-white hover:bg-indigo-500 border border-transparent shadow-indigo-500/20'
+                  }`}
+                >
+                  {isLocked ? 'View Session Data' : 'Start Session'}
+                  <ArrowRight size={16} className={isLocked ? 'text-slate-400' : 'text-indigo-200'} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </main>
+      ) : (
+        <>
+          <div className="bg-white border-b border-slate-200 p-6 md:p-8">
+            <div className="max-w-4xl mx-auto flex flex-col gap-4">
+              <button 
+                onClick={() => setView('menu')}
+                className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors w-fit"
+              >
+                <ArrowLeft size={16} />
+                Back to Settings
+              </button>
           
           <div>
             <div className="flex items-center gap-3 mb-2">
@@ -341,7 +390,9 @@ export const SessionSettingsPage = () => {
           </form>
 
         </div>
-      </div>
+        </div>
+        </>
+      )}
       <ModalComponent />
     </div>
   );
