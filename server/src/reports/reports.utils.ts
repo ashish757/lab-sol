@@ -4,6 +4,8 @@ import {
   EXCEL_ROW_BRIX_POL,
 } from '@shared/excelMapping';
 
+import { InputType } from '@shared/analysisFields';
+
 /**
  * Standard utility function to populate a worksheet row's columns based on
  * the row number, raw JSON metrics, and a field type map.
@@ -12,7 +14,7 @@ export function populateRow(
   rowNum: number,
   row: ExcelJS.Row,
   data: Record<string, any>,
-  fieldTypeMap: Map<string, 'number' | 'date' | 'time' | 'text'>,
+  fieldTypeMap: Map<string, InputType>,
 ): void {
   // 1. Single value field matching
   if (EXCEL_ROW_SINGLE_VALUES[rowNum]) {

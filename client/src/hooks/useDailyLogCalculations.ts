@@ -12,6 +12,23 @@ const parseNum = (val: any) => {
   return isNaN(num) ? 0 : num;
 };
 
+const parseDurationToMinutes = (val: any) => {
+  if (!val || typeof val !== 'string') return 0;
+  const parts = val.split(':');
+  if (parts.length === 2) {
+    const hours = parseInt(parts[0], 10) || 0;
+    const minutes = parseInt(parts[1], 10) || 0;
+    return hours * 60 + minutes;
+  }
+  return 0;
+};
+
+const formatMinutesToDuration = (totalMinutes: number) => {
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `${hours}:${minutes.toString().padStart(2, '0')}`;
+};
+
 // Define all calculations in a single configuration array for easy maintenance
 export const CALCULATIONS_CONFIG: CalculationConfig[] = [
   {
@@ -58,15 +75,19 @@ export const CALCULATIONS_CONFIG: CalculationConfig[] = [
   }, 
   {
     targetField: "totalHoursLost",
-    dependencies: ["stopNoCane"],
-    calculate: (values) =>
-      parseNum(values.stopNoCane) +
-      parseNum(values.stopMechanical) +
-      parseNum(values.stopElectrical) +
-      parseNum(values.stopInstrumentation) +
-      parseNum(values.stopProcess) +
-      parseNum(values.stopGenCleaning) +
-      parseNum(values.stopMiscellaneous)
+    dependencies: ["stopNoCane", "stopMechanical", "stopElectrical", "stopInstrumentation", "stopProcess", "stopProcessMech", "stopGenCleaning", "stopMiscellaneous"],
+    calculate: (values) => {
+      const totalMins = 
+        parseDurationToMinutes(values.stopNoCane) +
+        parseDurationToMinutes(values.stopMechanical) +
+        parseDurationToMinutes(values.stopElectrical) +
+        parseDurationToMinutes(values.stopInstrumentation) +
+        parseDurationToMinutes(values.stopProcess) +
+        parseDurationToMinutes(values.stopProcessMech) +
+        parseDurationToMinutes(values.stopGenCleaning) +
+        parseDurationToMinutes(values.stopMiscellaneous);
+      return formatMinutesToDuration(totalMins);
+    }
   },
   {
     targetField: 'totalSugarBagged',

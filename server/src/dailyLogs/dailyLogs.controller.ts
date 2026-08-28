@@ -52,6 +52,16 @@ export class DailyLogsController {
     return this.dailyLogsService.lockUnitLog(id, currentUser);
   }
 
+  /**
+   * POST /api/daily-logs/:id/unlock
+   */
+  @Post(apiRoutes.dailyLogs.unlock)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ORG_ADMIN, Role.SUPER_ADMIN)
+  unlockLog(@Param('id') id: string, @Body() body: { hours?: number }) {
+    return this.dailyLogsService.unlockLog(id, body.hours);
+  }
+
   // --- Adapted Legacy Endpoints ---
 
   /**

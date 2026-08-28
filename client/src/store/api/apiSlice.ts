@@ -151,12 +151,25 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Logs'],
     }),
+    unlockUnitLog: builder.mutation({
+      query: ({ logId, hours }: { logId: string, hours?: number }) => ({
+        url: API_ENDPOINTS.UNLOCK_UNIT_LOG(logId),
+        method: 'POST',
+        body: { hours },
+      }),
+      invalidatesTags: ['Logs'],
+    }),
     saveAndGenerateReport: builder.mutation({
       query: (body) => ({
         url: API_ENDPOINTS.SAVE_AND_GENERATE,
         method: 'POST',
         body,
-        responseHandler: (res) => res.blob(),
+        responseHandler: async (res) => {
+          if (!res.ok) {
+            return res.text();
+          }
+          return res.blob();
+        },
       }),
       transformResponse: (res: Blob, meta: any) => {
         const contentDisposition = meta?.response?.headers.get('content-disposition') || '';
@@ -169,7 +182,12 @@ export const apiSlice = createApi({
       query: (logId: string) => ({
         url: API_ENDPOINTS.GENERATE_CALCULATED_REPORT(logId),
         method: 'POST',
-        responseHandler: (res) => res.blob(),
+        responseHandler: async (res) => {
+          if (!res.ok) {
+            return res.text();
+          }
+          return res.blob();
+        },
       }),
       transformResponse: (res: Blob, meta: any) => {
         const contentDisposition = meta?.response?.headers.get('content-disposition') || '';
@@ -223,6 +241,7 @@ export const {
   useFetchUnitLogsQuery,
   useUpsertUnitLogMutation,
   useLockUnitLogMutation,
+  useUnlockUnitLogMutation,
   useSaveAndGenerateReportMutation,
   useGenerateCalculatedReportMutation,
   useGetDailyLogsQuery,

@@ -19,7 +19,7 @@ export class DailyLogsService {
     const [h, m] = (sessionData.dayStartTime || '00:00').split(':').map(Number);
     const now = new Date();
 
-    // 1. Lock existing unlocked logs whose window has passed
+    // 1. Lock existing unlocked logs whose window has passed or unlock has expired
     const unlockedLogs = await this.prisma.dailyLog.findMany({
       where: { unitId, sessionDataId: sessionData.id, status: LogStatus.UNLOCKED }
     });
@@ -29,10 +29,15 @@ export class DailyLogsService {
       closeDate.setUTCDate(closeDate.getUTCDate() + 2);
       closeDate.setUTCHours(h, m, 0, 0);
 
-      if (now > closeDate) {
+      const isPastCloseDate = now > closeDate;
+      const isUnlockExpired = log.unlockExpiresAt && now > log.unlockExpiresAt;
+      
+      const shouldLock = (isPastCloseDate && !log.unlockExpiresAt) || isUnlockExpired;
+
+      if (shouldLock) {
         await this.prisma.dailyLog.update({
           where: { id: log.id },
-          data: { status: LogStatus.LOCKED, lockedAt: new Date() }
+          data: { status: LogStatus.LOCKED, lockedAt: new Date(), unlockExpiresAt: null }
         });
       }
     }
@@ -142,6 +147,12 @@ export class DailyLogsService {
       this.logger.warn(`Failed to upsert log for unit ${unitId}: Log for ${requestedDateStr} is already locked`);
       throw new ForbiddenException('Upload window for this date has closed. Log is locked and cannot be edited.');
     }
+    
+    if (existingLog && existingLog.status === LogStatus.UNLOCKED && existingLog.unlockExpiresAt && now > existingLog.unlockExpiresAt) {
+      await this.prisma.dailyLog.update({ where: { id: existingLog.id }, data: { status: LogStatus.LOCKED, unlockExpiresAt: null, lockedAt: new Date() }});
+      this.logger.warn(`Failed to upsert log for unit ${unitId}: Unlock expired for ${requestedDateStr}`);
+      throw new ForbiddenException('The temporary unlock period has expired. Log is now locked.');
+    }
 
     const allLogs = await this.prisma.dailyLog.findMany({
       where: { unitId, sessionDataId: session.id },
@@ -218,6 +229,26 @@ export class DailyLogsService {
 
     // Auto-calculate required metrics and save to DailyCalculation table
     await this.calculationsService.processCalculations(savedLog.id, sanitizedPayload);
+
+    // CRITICAL: Cascade recalculation to all subsequent logs in the same session
+    // because their "toMonth" and "toDate" aggregations depend on this updated log.
+    const subsequentLogs = await this.prisma.dailyLog.findMany({
+      where: {
+        unitId,
+        sessionDataId: session.id,
+        createdAt: { gt: requestedDate }
+      },
+      orderBy: { createdAt: 'asc' }
+    });
+
+    if (subsequentLogs.length > 0) {
+      this.logger.log(`Cascading recalculation to ${subsequentLogs.length} subsequent logs for unit ${unitId}...`);
+      for (const subLog of subsequentLogs) {
+        const payload = typeof subLog.payload === 'string' ? JSON.parse(subLog.payload as string) : subLog.payload;
+        await this.calculationsService.processCalculations(subLog.id, payload as Record<string, any>);
+      }
+      this.logger.log(`Cascading recalculation complete.`);
+    }
 
     this.logger.log(`Successfully upserted daily log ${savedLog.id} for unit ${unitId} on ${requestedDateStr}`);
 
@@ -303,6 +334,25 @@ export class DailyLogsService {
     this.logger.log(`Successfully locked daily log ${id} by user ${currentUser?.email}`);
     
     return updatedLog;
+  }
+
+  async unlockLog(id: string, hours?: number) {
+    const log = await this.prisma.dailyLog.findUnique({ where: { id } });
+    if (!log) throw new NotFoundException('Log not found');
+
+    let unlockExpiresAt: Date | null = null;
+    if (hours && hours > 0) {
+      unlockExpiresAt = new Date(Date.now() + hours * 3600 * 1000);
+    }
+
+    return this.prisma.dailyLog.update({
+      where: { id },
+      data: { 
+        status: LogStatus.UNLOCKED, 
+        lockedAt: null, 
+        unlockExpiresAt 
+      },
+    });
   }
 }
 

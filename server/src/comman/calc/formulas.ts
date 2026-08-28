@@ -8,6 +8,7 @@ import {utilityFormulas} from './domains/utility.formulas';
 import { sugarAnalysisLGradeFormulas } from './domains/sugarAnalysis.formulas';
 import {routineAnalysisFormulas} from './domains/routine.formulas';
 import { specialAnalysisFormulas } from './domains/specialAnalysis.formulas';
+import { extraAddedFormulas } from './domains/extraAdded.formulas';
 
 
 export const FormulaRegistry: Record<string, FormulaDefinition> = {
@@ -19,4 +20,5 @@ export const FormulaRegistry: Record<string, FormulaDefinition> = {
   ...sugarAnalysisLGradeFormulas,
   ...routineAnalysisFormulas, 
   ...specialAnalysisFormulas,
+  ...extraAddedFormulas,
 };

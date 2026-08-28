@@ -14,6 +14,7 @@ interface PrimitiveInputProps extends BaseInputProps {
 const getFieldUnit = (field: FieldConfig): string => {
   if (field.type === 'date') return 'DD/MM/YYYY';
   if (field.type === 'time') return 'HH:MM';
+  if (field.type === 'duration') return 'HH:MM';
   return field.unit || '-';
 };
 
@@ -28,6 +29,81 @@ const getRegisterOptions = (type: string) => {
   if (type === 'number') return { valueAsNumber: true };
   return {};
 };
+
+const DurationInput = React.memo(({ field, error }: { field: FieldConfig, error: any }) => {
+  const { setValue, watch } = useFormContext();
+  const value = watch(field.id) || '';
+  const isReadOnly = field.isCalculated || field.readonly;
+
+  let hoursStr = '';
+  let minsStr = '';
+  if (value) {
+    const parts = value.split(':');
+    hoursStr = parts[0] || '';
+    minsStr = parts[1] || '';
+  }
+
+  const handleHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let newHours = e.target.value;
+    if (newHours === '') {
+      setValue(field.id, minsStr ? `0:${minsStr}` : '', { shouldValidate: true, shouldDirty: true });
+    } else {
+      setValue(field.id, `${parseInt(newHours, 10) || 0}:${minsStr || '00'}`, { shouldValidate: true, shouldDirty: true });
+    }
+  };
+
+  const handleMinutesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let newMins = e.target.value;
+    if (newMins === '') {
+      setValue(field.id, hoursStr ? `${hoursStr}:00` : '', { shouldValidate: true, shouldDirty: true });
+    } else {
+      let mins = parseInt(newMins, 10);
+      if (isNaN(mins)) mins = 0;
+      if (mins > 59) mins = 59;
+      if (mins < 0) mins = 0;
+      setValue(field.id, `${hoursStr || '0'}:${mins.toString().padStart(2, '0')}`, { shouldValidate: true, shouldDirty: true });
+    }
+  };
+
+  const baseClasses = "px-2 py-1.5 border rounded-md text-sm transition-all duration-200 w-full text-left";
+  const readOnlyClasses = "bg-slate-200 cursor-not-allowed opacity-80 border-slate-300 font-bold text-slate-700";
+  const errorClasses = "bg-slate-50/50 hover:bg-white border-red-500 focus:bg-white focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 bg-red-50/20";
+  const defaultClasses = "bg-slate-50/50 hover:bg-white border-slate-200 hover:border-blue-400 focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100";
+  const activeClasses = isReadOnly ? readOnlyClasses : error ? errorClasses : defaultClasses;
+
+  return (
+    <div className="flex items-center gap-1 w-full max-w-[180px]">
+      <div className="flex flex-col w-full relative group/input">
+        <input
+          type="number"
+          min="0"
+          placeholder="0"
+          value={hoursStr}
+          onChange={handleHoursChange}
+          readOnly={isReadOnly}
+          tabIndex={isReadOnly ? -1 : 0}
+          className={`${baseClasses} ${activeClasses} pr-8 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
+        />
+        <span className="text-[10px] font-bold text-slate-400 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">h</span>
+      </div>
+      <span className="font-black text-slate-300 pb-1">:</span>
+      <div className="flex flex-col w-full relative group/input">
+        <input
+          type="number"
+          min="0"
+          max="59"
+          placeholder="00"
+          value={minsStr}
+          onChange={handleMinutesChange}
+          readOnly={isReadOnly}
+          tabIndex={isReadOnly ? -1 : 0}
+          className={`${baseClasses} ${activeClasses} pr-8 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
+        />
+         <span className="text-[10px] font-bold text-slate-400 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">m</span>
+      </div>
+    </div>
+  );
+});
 
 const BasePrimitiveInputRow = React.memo(({ label, fields, children }: BaseInputProps & { children?: React.ReactNode }) => {
   const { register, formState: { errors } } = useFormContext();
@@ -76,16 +152,20 @@ const BasePrimitiveInputRow = React.memo(({ label, fields, children }: BaseInput
                         {subLabel}
                       </span>
                     )}
-                    <input
-                      id={field.id}
-                      type={getInputType(field.type)}
-                      step={field.type === 'number' ? 'any' : undefined}
-                      placeholder={field.type === 'time' ? 'HH:MM' : ''}
-                      readOnly={isReadOnly}
-                      tabIndex={isReadOnly ? -1 : 0}
-                      {...register(field.id, getRegisterOptions(field.type))}
-                      className={inputClassName}
-                    />
+                    {field.type === 'duration' ? (
+                      <DurationInput field={field} error={error} />
+                    ) : (
+                      <input
+                        id={field.id}
+                        type={getInputType(field.type)}
+                        step={field.type === 'number' ? 'any' : undefined}
+                        placeholder={field.type === 'time' ? 'HH:MM' : ''}
+                        readOnly={isReadOnly}
+                        tabIndex={isReadOnly ? -1 : 0}
+                        {...register(field.id, getRegisterOptions(field.type))}
+                        className={inputClassName}
+                      />
+                    )}
                   </div>
                   {error && (
                     <span className="text-[10px] font-bold text-red-500 select-none block">

@@ -21,8 +21,9 @@ enum LogDayType {
 model DailyLog {
   id        String     @id @unique() @default(uuid())
   createdAt DateTime   @map("created_at")
-  status    LogStatus  @default(UNLOCKED)
-  lockedAt  DateTime?  @map("locked_at")
+  status          LogStatus  @default(UNLOCKED)
+  lockedAt        DateTime?  @map("locked_at")
+  unlockExpiresAt DateTime?  @map("unlock_expires_at")
   dayType   LogDayType @default(NORMAL)
 
   payload Json @map("metrics")

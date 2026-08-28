@@ -62,6 +62,7 @@ export const API_ENDPOINTS = {
   FETCH_UNIT_LOGS: getClientApiPath.dailyLogs.unitLogs,
   UPSERT_UNIT_LOG: getClientApiPath.dailyLogs.upsert,
   LOCK_UNIT_LOG: getClientApiPath.dailyLogs.lock,
+  UNLOCK_UNIT_LOG: getClientApiPath.dailyLogs.unlock,
   DAILY_LOG_BY_ID: (id: string | number) => getClientApiPath.dailyLogs.one(id),
   DOWNLOAD_DAILY_REPORT: getClientApiPath.reports.downloadTemplate(),
   SAVE_AND_GENERATE: getClientApiPath.reports.saveAndGenerate(),

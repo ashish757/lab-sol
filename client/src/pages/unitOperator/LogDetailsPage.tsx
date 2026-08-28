@@ -38,9 +38,19 @@ export const LogDetailsPage = () => {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to generate report", err);
-      await showModal({ type: 'alert', title: 'Error', message: "Failed to generate report" });
+      let errorMessage = "Failed to generate report. Please try again later.";
+      
+      if (typeof err === 'string') {
+        errorMessage = err;
+      } else if (err?.data && typeof err.data === 'string') {
+        errorMessage = err.data;
+      } else if (err?.message) {
+        errorMessage = err.message;
+      }
+      
+      await showModal({ type: 'alert', title: 'Error', message: errorMessage });
     } finally {
       setIsGenerating(false);
     }

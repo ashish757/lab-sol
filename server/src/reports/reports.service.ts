@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as express from 'express';
 import { PrismaService } from '../prisma/prisma.service';
-import { analysisConfig, getAllFields } from '@shared/analysisFields';
+import { analysisConfig, getAllFields, InputType } from '@shared/analysisFields';
 import { populateRow } from './reports.utils';
 import { DailyLogsService } from '../dailyLogs/dailyLogs.service';
 import { UpsertDailyLogDto } from '../dailyLogs/dto/dailyLog.dto';
@@ -20,8 +20,7 @@ export class ReportsService {
     private readonly calculationsService: CalculationsService,
   ) {}
 
-  private fieldTypeMap: Map<string, 'number' | 'date' | 'time' | 'text'> =
-    new Map();
+  private fieldTypeMap: Map<string, InputType> = new Map();
 
   private initializeFieldTypes() {
     if (this.fieldTypeMap.size > 0) return;
@@ -175,9 +174,16 @@ export class ReportsService {
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet('Calculations');
     
+    // Create label mapping from shared config
+    const labelMap = new Map<string, string>();
+    getAllFields(analysisConfig).forEach(field => {
+      labelMap.set(field.id, field.label);
+    });
+
     // Define columns
     sheet.columns = [
-      { header: 'Metric', key: 'metric', width: 40 },
+      { header: 'Metric ID', key: 'metricId', width: 30 },
+      { header: 'Metric Name', key: 'metricName', width: 40 },
       { header: 'On Date', key: 'onDate', width: 20 },
       { header: 'To Month', key: 'toMonth', width: 20 },
       { header: 'To Date', key: 'toDate', width: 20 }
@@ -193,17 +199,28 @@ export class ReportsService {
     };
     
     for (const [key, value] of Object.entries(data)) {
+      const metricName = labelMap.get(key) || key;
+
       if (typeof value === 'object' && value !== null && 'onDate' in value) {
         sheet.addRow({
-          metric: key,
+          metricId: key,
+          metricName: metricName,
           onDate: value.onDate,
           toMonth: value.toMonth,
           toDate: value.toDate
         });
       } else if (typeof value === 'object' && value !== null) {
-        sheet.addRow({ metric: key, onDate: JSON.stringify(value) });
+        sheet.addRow({ 
+          metricId: key, 
+          metricName: metricName, 
+          onDate: JSON.stringify(value) 
+        });
       } else {
-        sheet.addRow({ metric: key, onDate: value });
+        sheet.addRow({ 
+          metricId: key, 
+          metricName: metricName, 
+          onDate: value 
+        });
       }
     }
     

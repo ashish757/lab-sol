@@ -64,9 +64,28 @@ const seedConfig = {
   ],
 };
 
-
-
 async function main() {
+  console.log('Clearing existing data...');
+  
+  // 1. Fetch all table names in the public schema
+  const tablenames = await prisma.$queryRaw<{ tablename: string }[]>`
+    SELECT tablename FROM pg_tables WHERE schemaname='public'
+  `;
+
+  // 2. Filter out the migrations table and format the names safely
+  const tables = tablenames
+    .map(({ tablename }) => tablename)
+    .filter((name) => name !== '_prisma_migrations')
+    .map((name) => `"${name}"`)
+    .join(', ');
+
+  // 3. Truncate all tables and cascade to handle relations
+  if (tables.length > 0) {
+    await prisma.$executeRawUnsafe(`TRUNCATE TABLE ${tables} CASCADE;`);
+  }
+  
+  console.log('Database cleared. Generating new seed data...');
+
   const password = await bcrypt.hash('pass', 10);
 
   console.log('Seeding Organizations...');

@@ -38,6 +38,7 @@ export const apiRoutes = {
     unitLogs: 'unit/:unitId',
     upsert: 'unit/:unitId/upsert',
     lock: ':id/lock',
+    unlock: ':id/unlock',
   },
   reports: {
     base: 'api/reports',
@@ -118,7 +119,8 @@ export const getClientApiPath = {
     one: (id: string | number) => `/${apiRoutes.dailyLogs.base}/${id}`,
     unitLogs: (unitId: string) => `/${apiRoutes.dailyLogs.base}/unit/${unitId}`,
     upsert: (unitId: string) => `/${apiRoutes.dailyLogs.base}/unit/${unitId}/upsert`,
-    lock: (logId: string) => `/${apiRoutes.dailyLogs.base}/${logId}/lock`,
+    lock: (id: string) => `/${apiRoutes.dailyLogs.base}/${id}/lock`,
+    unlock: (id: string) => `/${apiRoutes.dailyLogs.base}/${id}/unlock`,
   },
   reports: {
     downloadTemplate: () => `/${apiRoutes.reports.base}/${apiRoutes.reports.downloadTemplate}`,

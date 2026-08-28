@@ -391,7 +391,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
     },
   },
 
-  TotalSyrup: {
+  TotalSyrupPerCane: {
     type: 'DERIVED',
     calculate: (data) => {
       const syrup = Number(data.TotalSyrupCalc) || 0;

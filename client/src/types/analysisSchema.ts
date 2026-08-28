@@ -24,6 +24,18 @@ getAllFields(analysisConfig).forEach((field) => {
         z.number().optional()
       );
     }
+  } else if (field.type === 'duration') {
+    if (field.required) {
+      schemaShape[field.id] = z.preprocess(
+        (val) => (val === '' || val === null || val === undefined ? undefined : String(val)),
+        z.string({ error: `${field.label} is required` }).regex(/^\d+:[0-5]\d$/, "Format HH:MM")
+      );
+    } else {
+      schemaShape[field.id] = z.preprocess(
+        (val) => (val === '' || val === null || val === undefined ? undefined : String(val)),
+        z.string().regex(/^\d+:[0-5]\d$/, "Format HH:MM").optional().or(z.literal(''))
+      );
+    }
   } else {
     if (field.required) {
       schemaShape[field.id] = z.preprocess(
@@ -36,7 +48,7 @@ getAllFields(analysisConfig).forEach((field) => {
         z.string().optional()
       );
     }
-  }
+  } 
 });
 
 export const analysisSchema = z.object(schemaShape);

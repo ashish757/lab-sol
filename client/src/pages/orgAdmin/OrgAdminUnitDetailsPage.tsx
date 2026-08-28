@@ -1,7 +1,8 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGetUnitByIdQuery, useFetchUnitLogsQuery, useUpdateUnitMutation, useDeleteUnitMutation } from '../../store/api/apiSlice';
-import { Building, ArrowLeft, Users, Calendar, Clock, Lock, FileText, Settings, ShieldCheck, Mail, Edit2, Trash2, AlertTriangle } from 'lucide-react';
+import { Building, ArrowLeft, Users, Calendar, Clock, Lock, FileText, Settings, ShieldCheck, Mail, Edit2, Trash2, AlertTriangle, Unlock } from 'lucide-react';
 import { useModal } from '../../hooks/useModal';
+import { useUnlockUnitLogMutation } from '../../store/api/apiSlice';
 
 export const OrgAdminUnitDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -18,6 +19,7 @@ export const OrgAdminUnitDetailsPage = () => {
 
   const [updateUnit] = useUpdateUnitMutation();
   const [deleteUnit] = useDeleteUnitMutation();
+  const [unlockUnitLog] = useUnlockUnitLogMutation();
 
   if (isUnitLoading || isLogsLoading) {
     return (
@@ -73,6 +75,32 @@ export const OrgAdminUnitDetailsPage = () => {
         navigate('/org/dash');
       } catch (err: any) {
         await showModal({ type: 'alert', title: 'Error', message: err?.data?.message || 'Failed to delete unit' });
+      }
+    }
+  };
+
+  const handleUnlockLog = async (logId: string) => {
+    const unlockOption = await showModal({
+      type: 'prompt',
+      inputType: 'select',
+      title: 'Unlock Daily Log',
+      message: 'Choose how long this log should remain unlocked for operators to edit:',
+      inputLabel: 'Duration',
+      options: [
+        { label: 'Indefinitely (Until locked manually)', value: '0' },
+        { label: '5 Hours', value: '5' },
+        { label: '10 Hours', value: '10' },
+        { label: '24 Hours', value: '24' },
+      ],
+      defaultValue: '24',
+      confirmText: 'Unlock Log'
+    });
+
+    if (unlockOption !== null) {
+      try {
+        await unlockUnitLog({ logId, hours: Number(unlockOption) }).unwrap();
+      } catch (err: any) {
+        await showModal({ type: 'alert', title: 'Error', message: err?.data?.message || 'Failed to unlock log' });
       }
     }
   };
@@ -253,6 +281,7 @@ export const OrgAdminUnitDetailsPage = () => {
                       <th className="px-6 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">Log Date</th>
                       <th className="px-6 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
                       <th className="px-6 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">Last Updated By</th>
+                      <th className="px-6 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -286,6 +315,18 @@ export const OrgAdminUnitDetailsPage = () => {
                               </div>
                             ) : (
                               <span className="text-sm text-slate-400 italic">Unknown</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            {log.status === 'LOCKED' && (
+                              <button
+                                onClick={() => handleUnlockLog(log.id)}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-indigo-200 text-indigo-700 hover:bg-indigo-50 text-[10px] font-bold rounded-lg transition-colors uppercase tracking-wide shadow-sm"
+                                title="Unlock this log to allow edits"
+                              >
+                                <Unlock size={14} />
+                                Unlock
+                              </button>
                             )}
                           </td>
                         </tr>
