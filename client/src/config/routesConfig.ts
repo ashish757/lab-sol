@@ -3,6 +3,7 @@ import { getClientApiPath, clientRoutes } from '../../../shared/routes.config';
 export const PAGES = {
   LOGS_LIST: clientRoutes.unit.logsList,
   NEW_LOG_DATA: clientRoutes.unit.dataEntry,
+  EDIT_LOG_DATA: clientRoutes.unit.editLog,
   LOG_DATA_REPORT: clientRoutes.unit.report,
   SETTINGS: clientRoutes.settings,
   SUPER_ADMIN_INVITE: clientRoutes.admin.invite,
@@ -25,6 +26,7 @@ export const PAGES = {
 export const getPagePath = {
   logsList: () => PAGES.LOGS_LIST,
   newLogData: () => PAGES.NEW_LOG_DATA,
+  editLogData: (id: string | number) => PAGES.EDIT_LOG_DATA.replace(':id', String(id)),
   logDataReport: (id: string | number) => PAGES.LOG_DATA_REPORT.replace(':id', String(id)),
   superAdminInvite: () => PAGES.SUPER_ADMIN_INVITE,
   login: () => PAGES.LOGIN,

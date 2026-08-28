@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { CalendarX, Clock } from 'lucide-react';
+import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../store/store';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -49,6 +50,10 @@ export const NewLogPage = () => {
     defaultValues: getInitialValues(),
   });
 
+  const { id: editLogId } = useParams<{ id: string }>();
+  const [viewMode, setViewMode] = useState<'current' | 'past'>(editLogId ? 'past' : 'current');
+  const [selectedPastDate, setSelectedPastDate] = useState<string>('');
+
   const { user } = useSelector((state: RootState) => state.auth);
   const [upsertUnitLog, { isLoading: isUpserting }] = useUpsertUnitLogMutation();
   const [lockUnitLog, { isLoading: isLocking }] = useLockUnitLogMutation();
@@ -71,7 +76,17 @@ export const NewLogPage = () => {
     let missingOrUnlocked = false;
     let dayType = 'NORMAL';
 
-    if (session?.sessionStartDate && session?.isLocked) {
+    if (viewMode === 'past' && selectedPastDate) {
+      nextExpectedDate = selectedPastDate;
+    } else if (editLogId && Array.isArray(logs)) {
+      const logToEdit = logs.find(l => String(l.id) === String(editLogId));
+      if (logToEdit) {
+        const logDateVal = logToEdit.createdAt || (logToEdit as any).date || (logToEdit as any).logDate;
+        if (logDateVal) {
+          nextExpectedDate = new Date(logDateVal).toISOString().split('T')[0];
+        }
+      }
+    } else if (session?.sessionStartDate && session?.isLocked) {
       nextExpectedDate = session.sessionStartDate;
 
       if (Array.isArray(logs) && logs.length > 0) {
@@ -163,12 +178,24 @@ export const NewLogPage = () => {
       selectedLogId: sLogId,
       isFillingPastData,
       currentDayType: dayType,
-      hasDayEnded,
+      hasDayEnded: viewMode === 'past' ? true : hasDayEnded,
       missedDates
     };
-  }, [logs, initialValues.todayDate, session]);
+  }, [logs, initialValues.todayDate, session, editLogId, viewMode, selectedPastDate]);
 
   const [isGenerating, setIsGenerating] = useState(false);
+
+  useEffect(() => {
+    if (editLogId && Array.isArray(logs) && !selectedPastDate) {
+      const logToEdit = logs.find(l => String(l.id) === String(editLogId));
+      if (logToEdit) {
+        const logDateVal = logToEdit.createdAt || (logToEdit as any).date || (logToEdit as any).logDate;
+        if (logDateVal) {
+          setSelectedPastDate(new Date(logDateVal).toISOString().split('T')[0]);
+        }
+      }
+    }
+  }, [editLogId, logs, selectedPastDate]);
 
   const previousDayFields = useMemo(() => 
     getAllFields(analysisConfig)
@@ -178,6 +205,17 @@ export const NewLogPage = () => {
         prevFieldId: f.previousDayData as string
       })),
   []);
+
+  const pastDates = useMemo(() => {
+    if (!Array.isArray(logs)) return [];
+    return logs
+      .map(l => {
+        const d = l.createdAt || (l as any).date || (l as any).logDate;
+        return d ? new Date(d).toISOString().split('T')[0] : null;
+      })
+      .filter((d): d is string => d !== null)
+      .sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+  }, [logs]);
 
   useEffect(() => {
     methods.setValue('todayDate', activeDate);
@@ -467,6 +505,52 @@ export const NewLogPage = () => {
 
           <div className="flex-1 overflow-y-auto p-6 lg:p-8 bg-slate-50 relative scroll-smooth flex flex-col items-center">
             
+            {/* Toggle Mode */}
+            {!editLogId && (
+              <div className="max-w-5xl w-full mb-6 flex flex-col sm:flex-row items-center bg-white border border-slate-200 rounded-xl p-4 shadow-sm gap-4">
+                <div className="flex bg-slate-100 p-1 rounded-lg">
+                  <button
+                    type="button"
+                    onClick={() => setViewMode('current')}
+                    className={`px-4 py-2 text-sm font-bold rounded-md transition-all ${
+                      viewMode === 'current'
+                        ? 'bg-white text-indigo-700 shadow-sm border border-slate-200/60'
+                        : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
+                    }`}
+                  >
+                    Log Today's Data
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setViewMode('past')}
+                    className={`px-4 py-2 text-sm font-bold rounded-md transition-all ${
+                      viewMode === 'past'
+                        ? 'bg-white text-indigo-700 shadow-sm border border-slate-200/60'
+                        : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
+                    }`}
+                  >
+                    View / Edit Past Data
+                  </button>
+                </div>
+
+                {viewMode === 'past' && (
+                  <div className="flex items-center gap-3">
+                    <label className="text-sm font-bold text-slate-600">Select Date:</label>
+                    <select
+                      value={selectedPastDate}
+                      onChange={(e) => setSelectedPastDate(e.target.value)}
+                      className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm cursor-pointer min-w-[150px]"
+                    >
+                      <option value="" disabled>-- Select a Date --</option>
+                      {pastDates.map(date => (
+                        <option key={date} value={date}>{date}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </div>
+            )}
+
             {session && (
               <div className="max-w-5xl w-full mb-6 p-6 bg-white border border-slate-200 rounded-xl shadow-sm">
                 <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">

@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '../../store/store';
 import { useGetDailyLogsQuery, useGetOrganizationByIdQuery } from '../../store/api/apiSlice';
 import type { DailyLogResponse } from '../../types/dailyLogs';
-import { FileText, AlertCircle, RefreshCw, Layers, Filter, Activity, TrendingUp, Clock } from 'lucide-react';
+import { FileText, AlertCircle, RefreshCw, Layers, Filter, Activity, TrendingUp, Clock, Edit } from 'lucide-react';
 import { getPagePath } from '../../config/routesConfig';
 
 function formatDate(dateStr: string | null | undefined): string {
@@ -355,13 +355,24 @@ export const LogsPage = () => {
                             {getMetric(log, 'totalSugarBagged')}
                           </td>
                           <td className="px-6 py-5 whitespace-nowrap">
-                            <Link
-                              to={getPagePath.logDataReport(log.id)}
-                              className="inline-flex items-center gap-2 px-3.5 py-2 bg-white hover:bg-indigo-50 text-indigo-700 text-xs font-bold rounded-lg border border-slate-200 hover:border-indigo-200 transition-all shadow-sm"
-                            >
-                              <FileText size={14} className="text-indigo-500" />
-                              View
-                            </Link>
+                            <div className="flex items-center gap-2">
+                              <Link
+                                to={getPagePath.logDataReport(log.id)}
+                                className="inline-flex items-center gap-2 px-3.5 py-2 bg-white hover:bg-indigo-50 text-indigo-700 text-xs font-bold rounded-lg border border-slate-200 hover:border-indigo-200 transition-all shadow-sm"
+                              >
+                                <FileText size={14} className="text-indigo-500" />
+                                View
+                              </Link>
+                              {!isAdminOrStaff && (log.status === 'UNLOCKED' || log.status === 'DRAFT') && (
+                                <Link
+                                  to={getPagePath.editLogData(log.id)}
+                                  className="inline-flex items-center gap-2 px-3.5 py-2 bg-white hover:bg-amber-50 text-amber-700 text-xs font-bold rounded-lg border border-slate-200 hover:border-amber-200 transition-all shadow-sm"
+                                >
+                                  <Edit size={14} className="text-amber-500" />
+                                  Edit
+                                </Link>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       ))}

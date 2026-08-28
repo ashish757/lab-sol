@@ -30,6 +30,7 @@ export const routeConfiguration = [
   { path: PAGES.STAFF_DASHBOARD, component: OrgStaffDash, allowedRoles: [Role.ORG_STAFF] },
   { path: PAGES.UNIT_DASHBOARD, component: UnitOpDash, allowedRoles: [Role.UNIT_OPERATOR] },
   { path: PAGES.NEW_LOG_DATA, component: NewLogPage, allowedRoles: [Role.UNIT_OPERATOR] },
+  { path: PAGES.EDIT_LOG_DATA, component: NewLogPage, allowedRoles: [Role.UNIT_OPERATOR] },
   { path: PAGES.LOG_DATA_REPORT, component: LogDetailsPage, allowedRoles: [Role.UNIT_OPERATOR, Role.ORG_ADMIN, Role.ORG_STAFF] },
   { path: PAGES.CUSTOM_REPORT, component: CustomReportPage, allowedRoles: [Role.UNIT_OPERATOR, Role.ORG_ADMIN, Role.ORG_STAFF] },
   { path: PAGES.LOGS_LIST, component: LogsPage, allowedRoles: [Role.UNIT_OPERATOR, Role.ORG_ADMIN, Role.ORG_STAFF] },

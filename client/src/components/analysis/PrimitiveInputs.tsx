@@ -19,14 +19,18 @@ const getFieldUnit = (field: FieldConfig): string => {
 };
 
 const getInputType = (type: string): string => {
-  if (type === 'number') return 'number';
+  if (type === 'number') return 'text';
   if (type === 'date') return 'date';
   if (type === 'time') return 'time';
   return 'text';
 };
 
 const getRegisterOptions = (type: string) => {
-  if (type === 'number') return { valueAsNumber: true };
+  if (type === 'number') {
+    return {
+      setValueAs: (v: string) => v === '' || v === undefined ? undefined : Number(v)
+    };
+  }
   return {};
 };
 
@@ -75,7 +79,7 @@ const DurationInput = React.memo(({ field, error }: { field: FieldConfig, error:
     <div className="flex items-center gap-1 w-full max-w-[180px]">
       <div className="flex flex-col w-full relative group/input">
         <input
-          type="number"
+          type="text"
           min="0"
           placeholder="0"
           value={hoursStr}
@@ -89,7 +93,7 @@ const DurationInput = React.memo(({ field, error }: { field: FieldConfig, error:
       <span className="font-black text-slate-300 pb-1">:</span>
       <div className="flex flex-col w-full relative group/input">
         <input
-          type="number"
+          type="text"
           min="0"
           max="59"
           placeholder="00"

@@ -78,6 +78,7 @@ export const clientRoutes = {
   unit: {
     dashboard: '/unit/dash',
     dataEntry: '/unit/log-data/new',
+    editLog: '/unit/log-data/:id/edit',
     report: '/unit/log-data/:id',
     logsList: '/unit/logs',
     settings: '/unit/settings',
