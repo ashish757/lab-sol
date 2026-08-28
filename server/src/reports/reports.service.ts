@@ -9,6 +9,7 @@ import { populateRow } from './reports.utils';
 import { DailyLogsService } from '../dailyLogs/dailyLogs.service';
 import { UpsertDailyLogDto } from '../dailyLogs/dto/dailyLog.dto';
 import { CalculationsService } from '../calculations/calculations.service';
+import { FormulaRegistry } from '../comman/calc/formulas';
 
 @Injectable()
 export class ReportsService {
@@ -18,7 +19,7 @@ export class ReportsService {
     private readonly prisma: PrismaService,
     private readonly dailyLogsService: DailyLogsService,
     private readonly calculationsService: CalculationsService,
-  ) {}
+  ) { }
 
   private fieldTypeMap: Map<string, InputType> = new Map();
 
@@ -173,11 +174,18 @@ export class ReportsService {
   async generateMultiColumnReport(data: Record<string, any>): Promise<Buffer> {
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet('Calculations');
-    
+
     // Create label mapping from shared config
     const labelMap = new Map<string, string>();
     getAllFields(analysisConfig).forEach(field => {
       labelMap.set(field.id, field.label);
+    });
+
+    // Add explicitly defined formula labels
+    Object.entries(FormulaRegistry).forEach(([id, formula]) => {
+      if (!labelMap.has(id) && formula.label) {
+        labelMap.set(id, formula.label);
+      }
     });
 
     // Define columns
@@ -188,7 +196,7 @@ export class ReportsService {
       { header: 'To Month', key: 'toMonth', width: 20 },
       { header: 'To Date', key: 'toDate', width: 20 }
     ];
-    
+
     // Style header row
     const headerRow = sheet.getRow(1);
     headerRow.font = { bold: true };
@@ -197,7 +205,7 @@ export class ReportsService {
       pattern: 'solid',
       fgColor: { argb: 'FFE0E0E0' }
     };
-    
+
     for (const [key, value] of Object.entries(data)) {
       const metricName = labelMap.get(key) || key;
 
@@ -210,20 +218,20 @@ export class ReportsService {
           toDate: value.toDate
         });
       } else if (typeof value === 'object' && value !== null) {
-        sheet.addRow({ 
-          metricId: key, 
-          metricName: metricName, 
-          onDate: JSON.stringify(value) 
+        sheet.addRow({
+          metricId: key,
+          metricName: metricName,
+          onDate: JSON.stringify(value)
         });
       } else {
-        sheet.addRow({ 
-          metricId: key, 
-          metricName: metricName, 
-          onDate: value 
+        sheet.addRow({
+          metricId: key,
+          metricName: metricName,
+          onDate: value
         });
       }
     }
-    
+
     const buffer = await workbook.xlsx.writeBuffer();
     return Buffer.from(buffer as any);
   }
@@ -240,8 +248,8 @@ export class ReportsService {
       throw new NotFoundException(`Calculation record not found for log ID ${id}. Please make sure the log is saved first.`);
     }
 
-    const calculatedMetrics = typeof calculation.calculatedMetrics === 'string' 
-      ? JSON.parse(calculation.calculatedMetrics) 
+    const calculatedMetrics = typeof calculation.calculatedMetrics === 'string'
+      ? JSON.parse(calculation.calculatedMetrics)
       : calculation.calculatedMetrics;
 
     this.logger.log(`Generating calculated Excel report for log ID: ${id}`);

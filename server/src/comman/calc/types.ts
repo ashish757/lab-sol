@@ -10,5 +10,6 @@ export type FormulaFunction = (data: Record<string, any>) => number;
 
 export interface FormulaDefinition {
   type: AggregationType;
+  label?: string;
   calculate: FormulaFunction;
 }

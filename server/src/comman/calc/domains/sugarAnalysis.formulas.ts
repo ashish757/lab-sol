@@ -3,27 +3,27 @@ import { FormulaDefinition } from '../types';
 export const sugarAnalysisLGradeFormulas: Record<string, FormulaDefinition> = {
   // 1. Calculate the hidden "Products" (Quantity x Quality) - These are ADDITIVE
   _LsugarColourGs10_Product: {
-    type: 'ADDITIVE',
+    label: "Lsugar Colour Gs10 Product", type: 'ADDITIVE',
     calculate: (data) => (Number(data.LsugarColourGs10) || 0) * (Number(data.l31) || 0),
   },
   _LsugarColourGs8_Product: {
-    type: 'ADDITIVE',
+    label: "Lsugar Colour Gs8 Product", type: 'ADDITIVE',
     calculate: (data) => (Number(data.LsugarColourGs8) || 0) * (Number(data.l31) || 0),
   },
   _LsugarReflectance_Product: {
-    type: 'ADDITIVE',
+    label: "Lsugar Reflectance Product", type: 'ADDITIVE',
     calculate: (data) => (Number(data.LsugarReflectance) || 0) * (Number(data.l31) || 0),
   },
   _Lmoisture_Product: {
-    type: 'ADDITIVE',
+    label: "Lmoisture Product", type: 'ADDITIVE',
     calculate: (data) => (Number(data.Lmoisture) || 0) * (Number(data.l31) || 0),
   },
   _llBoldColour_Product: {
-    type: 'ADDITIVE',
+    label: "Ll Bold Colour Product", type: 'ADDITIVE',
     calculate: (data) => (Number(data.llBoldColour) || 0) * (Number(data.llBold) || 0),
   },
   _L30sugarColourGs10_Product: {
-    type: 'ADDITIVE',
+    label: "L30sugar Colour Gs10 Product", type: 'ADDITIVE',
     calculate: (data) => (Number(data.L30sugarColourGs10) || 0) * (Number(data.l30) || 0),
   },
 
@@ -32,7 +32,7 @@ export const sugarAnalysisLGradeFormulas: Record<string, FormulaDefinition> = {
   // and it will divide the Month's Total Product by the Month's Total Qty for the 'toMonth' value!
   
   LsugarColourGs10_Avg: {
-    type: 'DERIVED',
+    label: "Lsugar Colour Gs10 Avg", type: 'DERIVED',
     calculate: (data) => {
       const product = Number(data._LsugarColourGs10_Product) || 0;
       const qty = Number(data.l31) || 0;
@@ -42,7 +42,7 @@ export const sugarAnalysisLGradeFormulas: Record<string, FormulaDefinition> = {
   },
   
   LsugarColourGs8_Avg: {
-    type: 'DERIVED',
+    label: "Lsugar Colour Gs8 Avg", type: 'DERIVED',
     calculate: (data) => {
       const product = Number(data._LsugarColourGs8_Product) || 0;
       const qty = Number(data.l31) || 0;
@@ -52,7 +52,7 @@ export const sugarAnalysisLGradeFormulas: Record<string, FormulaDefinition> = {
   },
 
   LsugarReflectance_Avg: {
-    type: 'DERIVED',
+    label: "Lsugar Reflectance Avg", type: 'DERIVED',
     calculate: (data) => {
       const product = Number(data._LsugarReflectance_Product) || 0;
       const qty = Number(data.l31) || 0;
@@ -62,7 +62,7 @@ export const sugarAnalysisLGradeFormulas: Record<string, FormulaDefinition> = {
   },
 
   Lmoisture_Avg: {
-    type: 'DERIVED',
+    label: "Lmoisture Avg", type: 'DERIVED',
     calculate: (data) => {
       const product = Number(data._Lmoisture_Product) || 0;
       const qty = Number(data.l31) || 0;
@@ -72,7 +72,7 @@ export const sugarAnalysisLGradeFormulas: Record<string, FormulaDefinition> = {
   },
 
   llBoldColour_Avg: {
-    type: 'DERIVED',
+    label: "Ll Bold Colour Avg", type: 'DERIVED',
     calculate: (data) => {
       const product = Number(data._llBoldColour_Product) || 0;
       const qty = Number(data.llBold) || 0;
@@ -82,7 +82,7 @@ export const sugarAnalysisLGradeFormulas: Record<string, FormulaDefinition> = {
   },
 
   L30sugarColourGs10_Avg: {
-    type: 'DERIVED',
+    label: "L30sugar Colour Gs10 Avg", type: 'DERIVED',
     calculate: (data) => {
       const product = Number(data._L30sugarColourGs10_Product) || 0;
       const qty = Number(data.l30) || 0;

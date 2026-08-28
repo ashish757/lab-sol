@@ -72,7 +72,7 @@ export const analysisConfig: GroupConfig[] = [
       { id: "rain", label: "Rain", type: "number", unit: "Inch" },
       { id: "tempMax", label: "Temperature Max", type: "number", unit: "Deg C" },
       { id: "tempMin", label: "Temperature Min", type: "number", unit: "Deg C" },
-      { id: "weatherCondition", label: "Weather Condition", type: "text", unit: "-", previousDayData: "weatherCondition"},
+      { id: "weatherCondition", label: "Weather Condition", type: "text", unit: "-", previousDayData: "weatherCondition" },
       { id: "humidity", label: "Humidity", type: "number", unit: "%" }
     ]
   },
@@ -99,8 +99,8 @@ export const analysisConfig: GroupConfig[] = [
       { id: "filterCakeProduction", label: "Filter Cake Production", type: "number", unit: "Qtls" },
       { id: "grossMixedJuiceRawData", label: "Gross Mixed Juice Raw Data", type: "number", unit: "-" },
       { id: "mixedJuiceSpecificGravity", label: "Mixed Juice Sp. Gravity", type: "number", unit: "-", previousDayData: "mixedJuiceSpecificGravity" },
-      { id: "grossMixedJuice", label: "Gross Mixed Juice", type: "number", unit: "-" , isCalculated: true},
-      
+      { id: "grossMixedJuice", label: "Gross Mixed Juice", type: "number", unit: "-", isCalculated: true },
+
     ]
   },
   {
@@ -140,10 +140,10 @@ export const analysisConfig: GroupConfig[] = [
       { id: "reprocessRawSugarBrix", label: "Reproce Raw Sugar Analysis", type: "number", unit: "%", subLabel: "Brix" },
       { id: "reprocessRawSugarPol", label: "Reproce Raw Sugar Analysis", type: "number", unit: "%", subLabel: "Pol" },
 
-       { id: "reprocessScrapingSugarBrix", label: "Reproce Scraping Sugar Analysis", type: "number", unit: "%", subLabel: "Brix" },
+      { id: "reprocessScrapingSugarBrix", label: "Reproce Scraping Sugar Analysis", type: "number", unit: "%", subLabel: "Brix" },
       { id: "reprocessScrapingSugarPol", label: "Reproce Scraping Sugar Analysis", type: "number", unit: "%", subLabel: "Pol" }
 
-      
+
     ]
   },
   {
@@ -210,7 +210,7 @@ export const analysisConfig: GroupConfig[] = [
       { id: "l31particleSizeMa", label: "L-31 Sugar MA", type: "number", unit: "mm" },
       { id: "l31particleSizeCv", label: "L-31 Sugar CV", type: "number", unit: "%" },
       { id: "llBoldColour", label: "LL Bold Colour", type: "number", unit: "IU" },
-       { id: "l30sugarColourGs10", label: "L-30 Sugar Colour GS-10", type: "number", unit: "IU" },
+      { id: "l30sugarColourGs10", label: "L-30 Sugar Colour GS-10", type: "number", unit: "IU" },
 
     ]
   },
@@ -224,7 +224,7 @@ export const analysisConfig: GroupConfig[] = [
       { id: "m31Moisture", label: "M-31 Sugar Moisture", type: "number", unit: "%" },
       { id: "m31ParticleSizeMa", label: "M-31 Sugar MA", type: "number", unit: "mm" },
       { id: "m31ParticleSizeCv", label: "M-31 Sugar CV", type: "number", unit: "%" },
-       { id: "m30SugarColourGs10", label: "M-30 Sugar Colour GS-10", type: "number", unit: "IU" },
+      { id: "m30SugarColourGs10", label: "M-30 Sugar Colour GS-10", type: "number", unit: "IU" },
     ]
   },
   {
@@ -271,7 +271,7 @@ export const analysisConfig: GroupConfig[] = [
       { id: "treatedWaterRecycled", label: "Treated Water Re-cycled", type: "number", unit: "KLtr" },
       { id: "dmWaterConsumption", label: "DM Water Consumption", type: "number", unit: "KLtr" },
       { id: "steamGeneration", label: "Steam Generation", type: "number", unit: "Ton" },
-      { id: "exhaustCondensateReturn", label: "Exhaust Condensate Return", type: "number", unit: "Ton"},
+      { id: "exhaustCondensateReturn", label: "Exhaust Condensate Return", type: "number", unit: "Ton" },
       { id: "steamFuelRatio", label: "Steam Fuel Ratio", type: "number", unit: "%" },
       { id: "powerHouseSteamConsumption", label: "Power House Steam Consumption", type: "number", unit: "Ton" },
       { id: "boilingHouseSteamConsumption", label: "Boiling House Steam Consumption", type: "number", unit: "Ton" }
@@ -301,7 +301,7 @@ export const analysisConfig: GroupConfig[] = [
       { id: "bagasseMoisture", label: "Bagasse: Moisture%", type: "number", unit: "%" },
       { id: "bagassePol", label: "Bagasse: Pol%", type: "number", unit: "%" },
 
-      { id: "filterCakeMoisture", label: "Filter Cake: Moisture%", type: "number", unit: "%"},
+      { id: "filterCakeMoisture", label: "Filter Cake: Moisture%", type: "number", unit: "%" },
       { id: "filterCakePol", label: "Filter Cake: Pol%", type: "number", unit: "%" },
       { id: "aMassecuiteBrix", label: "A - Massecuite ", type: "number", unit: "%", subLabel: "Brix" },
       { id: "aMassecuitePol", label: "A - Massecuite", type: "number", unit: "%", subLabel: "Pol" },
@@ -325,7 +325,7 @@ export const analysisConfig: GroupConfig[] = [
       { id: "bHeavyMolassesPol", label: "B - Heavy Molasses", type: "number", unit: "%", subLabel: "Pol" },
       { id: "b1HeavyMolassesBrix", label: "B1 - Heavy Molasses ", type: "number", unit: "%", subLabel: "Brix" },
       { id: "b1HeavyMolassesPol", label: "B1 - Heavy Molasses", type: "number", unit: "%", subLabel: "Pol" },
-       { id: "c1HeavyMolassesBrix", label: "C1 - Heavy Molasses ", type: "number", unit: "%", subLabel: "Brix" },
+      { id: "c1HeavyMolassesBrix", label: "C1 - Heavy Molasses ", type: "number", unit: "%", subLabel: "Brix" },
       { id: "c1HeavyMolassesPol", label: "C1 - Heavy Molasses", type: "number", unit: "%", subLabel: "Pol" },
       { id: "cLightMolassesBrix", label: "C - Light Molasses ", type: "number", unit: "%", subLabel: "Brix" },
       { id: "cLightMolassesPol", label: "C - Light Molasses", type: "number", unit: "%", subLabel: "Pol" },
@@ -347,7 +347,7 @@ export const analysisConfig: GroupConfig[] = [
       { id: "r1MassecuitePol", label: "Refined/R1 - Massecuite", type: "number", unit: "%", subLabel: "Pol" },
       { id: "r1MolassesBrix", label: "Refined/R1 - Molasses ", type: "number", unit: "%", subLabel: "Brix" },
       { id: "r1MolassesPol", label: "Refined/R1 - Molasses", type: "number", unit: "%", subLabel: "Pol" },
-       { id: "r2MassecuiteBrix", label: "R2 - Massecuite ", type: "number", unit: "%", subLabel: "Brix" },
+      { id: "r2MassecuiteBrix", label: "R2 - Massecuite ", type: "number", unit: "%", subLabel: "Brix" },
       { id: "r2MassecuitePol", label: "R2 - Massecuite", type: "number", unit: "%", subLabel: "Pol" },
       { id: "r2MolassesBrix", label: "R2 - Molasses ", type: "number", unit: "%", subLabel: "Brix" },
       { id: "r2MolassesPol", label: "R2 - Molasses", type: "number", unit: "%", subLabel: "Pol" },
@@ -355,7 +355,7 @@ export const analysisConfig: GroupConfig[] = [
       { id: "r3MassecuitePol", label: "R3 - Massecuite", type: "number", unit: "%", subLabel: "Pol" },
       { id: "r3MolassesBrix", label: "R3 - Molasses ", type: "number", unit: "%", subLabel: "Brix" },
       { id: "r3MolassesPol", label: "R3 - Molasses", type: "number", unit: "%", subLabel: "Pol" },
-      
+
     ]
   },
   {

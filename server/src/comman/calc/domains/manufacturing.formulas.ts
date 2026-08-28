@@ -2,14 +2,14 @@ import { FormulaDefinition } from '../types';
 
 export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   // --- Raw Data Pass-Throughs (Quantities) ---
-  caneCrushed: { type: 'ADDITIVE', calculate: (data) => Number(data.caneCrushed) || 0 },
-  grossMixedJuice: { type: 'ADDITIVE', calculate: (data) => Number(data.grossMixedJuice) || 0 },
-  filterCakeProduction: { type: 'ADDITIVE', calculate: (data) => Number(data.filterCakeProduction) || 0 },
-  aMassecuite: { type: 'ADDITIVE', calculate: (data) => Number(data.aMassecuite) || 0 },
+  caneCrushed: { label: "Cane Crushed", type: 'ADDITIVE', calculate: (data) => Number(data.caneCrushed) || 0 },
+  grossMixedJuice: { label: "Gross Mixed Juice", type: 'ADDITIVE', calculate: (data) => Number(data.grossMixedJuice) || 0 },
+  filterCakeProduction: { label: "Filter Cake Production", type: 'ADDITIVE', calculate: (data) => Number(data.filterCakeProduction) || 0 },
+  aMassecuite: { label: "A Massecuite", type: 'ADDITIVE', calculate: (data) => Number(data.aMassecuite) || 0 },
   
-  grossMixedJuiceRawData: { type: 'ADDITIVE', calculate: (data) => Number(data.grossMixedJuiceRawData) || 0 },
+  grossMixedJuiceRawData: { label: "Gross Mixed Juice Raw Data", type: 'ADDITIVE', calculate: (data) => Number(data.grossMixedJuiceRawData) || 0 },
   imbibitionWaterCalc: {
-    type: 'ADDITIVE',
+    label: "Imbibition Water Calc", type: 'ADDITIVE',
     calculate: (data) => {
       const rawData = Number(data.imbibitionWaterRawData) || 0;
       const spGravity = Number(data.imbibitionWaterSpecificGavity) || 0;
@@ -18,7 +18,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   imbibitionPercentCane: {
-    type: 'DERIVED',
+    label: "Imbibition Percent Cane", type: 'DERIVED',
     calculate: (data) => {
       const water = Number(data.imbibitionWaterCalc) || 0;
       const cane = Number(data.caneCrushed) || 0;
@@ -28,7 +28,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   grossMixedJuiceCalc: {
-    type: 'ADDITIVE',
+    label: "Gross Mixed Juice Calc", type: 'ADDITIVE',
     calculate: (data) => {
       const rawData = Number(data.grossMixedJuiceRawData) || 0;
       const spGravity = Number(data.mixedJuiceSpecificGravity) || 0;
@@ -37,7 +37,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   DirtCalc: {
-    type: 'ADDITIVE',
+    label: "Dirt Calc", type: 'ADDITIVE',
     calculate: (data) => {
       const gross = Number(data.grossMixedJuiceCalc) || 0;
       const dirt = Number(data.dirtPercent) || 0;
@@ -46,7 +46,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   NetMixedJuiceCalc: {
-    type: 'ADDITIVE',
+    label: "Net Mixed Juice Calc", type: 'ADDITIVE',
     calculate: (data) => {
       const gross = Number(data.grossMixedJuiceCalc) || 0;
       const dirt = Number(data.DirtCalc) || 0;
@@ -55,7 +55,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   NetMixedJuicePercentCane: {
-    type: 'DERIVED',
+    label: "Net Mixed Juice Percent Cane", type: 'DERIVED',
     calculate: (data) => {
       const net = Number(data.NetMixedJuiceCalc) || 0;
       const cane = Number(data.caneCrushed) || 0;
@@ -65,7 +65,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   BagasseCalc: {
-    type: 'ADDITIVE',
+    label: "Bagasse Calc", type: 'ADDITIVE',
     calculate: (data) => {
       const cane = Number(data.caneCrushed) || 0;
       const water = Number(data.imbibitionWaterCalc) || 0;
@@ -75,7 +75,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   BagassePercentCane: {
-    type: 'DERIVED',
+    label: "Bagasse Percent Cane", type: 'DERIVED',
     calculate: (data) => {
       const bagasse = Number(data.BagasseCalc) || 0;
       const cane = Number(data.caneCrushed) || 0;
@@ -85,7 +85,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   PolinBagasseCalc: {
-    type: 'ADDITIVE',
+    label: "Polin Bagasse Calc", type: 'ADDITIVE',
     calculate: (data) => {
       const bagasse = Number(data.BagasseCalc) || 0;
       const pol = Number(data.bagassePol) || 0;
@@ -94,7 +94,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   PolinBagassePercent: {
-    type: 'DERIVED',
+    label: "Polin Bagasse Percent", type: 'DERIVED',
     calculate: (data) => {
       const polInBagasse = Number(data.PolinBagasseCalc) || 0;
       const cane = Number(data.caneCrushed) || 0;
@@ -104,7 +104,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   MoistureinBagasseCalc: {
-    type: 'ADDITIVE',
+    label: "Moisturein Bagasse Calc", type: 'ADDITIVE',
     calculate: (data) => {
       const bagasse = Number(data.BagasseCalc) || 0;
       const moisture = Number(data.bagasseMoisture) || 0;
@@ -113,7 +113,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   BrixPercentBagasse: {
-    type: 'DERIVED',
+    label: "Brix Percent Bagasse", type: 'DERIVED',
     calculate: (data) => {
       const pol = Number(data.bagassePol) || 0;
       const lmBrix = Number(data.lastMillJuiceBrix) || 0;
@@ -125,7 +125,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   BrixinBagasse: {
-    type: 'ADDITIVE',
+    label: "Brixin Bagasse", type: 'ADDITIVE',
     calculate: (data) => {
       const bagasse = Number(data.BagasseCalc) || 0;
       const brixPct = Number(data.BrixPercentBagasse) || 0;
@@ -134,7 +134,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   FiberPercentBagasse: {
-    type: 'DERIVED',
+    label: "Fiber Percent Bagasse", type: 'DERIVED',
     calculate: (data) => {
       const brixPct = Number(data.BrixPercentBagasse) || 0;
       const moisture = Number(data.bagasseMoisture) || 0;
@@ -143,7 +143,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   FiberinBagasse: {
-    type: 'ADDITIVE',
+    label: "Fiberin Bagasse", type: 'ADDITIVE',
     calculate: (data) => {
       const bagasse = Number(data.BagasseCalc) || 0;
       const fiberPct = Number(data.FiberPercentBagasse) || 0;
@@ -152,7 +152,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   FiberPercentCane: {
-    type: 'DERIVED',
+    label: "Fiber Percent Cane", type: 'DERIVED',
     calculate: (data) => {
       const fiber = Number(data.FiberinBagasse) || 0;
       const cane = Number(data.caneCrushed) || 0;
@@ -162,7 +162,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   BrixinMixedJuiceCalc: {
-    type: 'ADDITIVE',
+    label: "Brixin Mixed Juice Calc", type: 'ADDITIVE',
     calculate: (data) => {
       const netJuice = Number(data.NetMixedJuiceCalc) || 0;
       const brix = Number(data.mixedJuiceBrix) || 0;
@@ -171,7 +171,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   BrixinMixedJuice: {
-    type: 'DERIVED',
+    label: "Brixin Mixed Juice", type: 'DERIVED',
     calculate: (data) => {
       const brixJuice = Number(data.BrixinMixedJuiceCalc) || 0;
       const cane = Number(data.caneCrushed) || 0;
@@ -181,7 +181,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   PolinMixedJuiceCalc: {
-    type: 'ADDITIVE',
+    label: "Polin Mixed Juice Calc", type: 'ADDITIVE',
     calculate: (data) => {
       const netJuice = Number(data.NetMixedJuiceCalc) || 0;
       const pol = Number(data.mixedJuicePol) || 0;
@@ -190,7 +190,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   PolinMixedJuice: {
-    type: 'DERIVED',
+    label: "Polin Mixed Juice", type: 'DERIVED',
     calculate: (data) => {
       const polJuice = Number(data.PolinMixedJuiceCalc) || 0;
       const cane = Number(data.caneCrushed) || 0;
@@ -200,7 +200,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   FilterCakePrecentCane: {
-    type: 'DERIVED',
+    label: "Filter Cake Precent Cane", type: 'DERIVED',
     calculate: (data) => {
       const cake = Number(data.filterCakeProduction) || 0;
       const cane = Number(data.caneCrushed) || 0;
@@ -210,7 +210,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   PolinFilterCakeCalc: {
-    type: 'ADDITIVE',
+    label: "Polin Filter Cake Calc", type: 'ADDITIVE',
     calculate: (data) => {
       const pol = Number(data.filterCakePol) || 0;
       const cake = Number(data.filterCakeProduction) || 0;
@@ -219,7 +219,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   PolinFilterCake: {
-    type: 'DERIVED',
+    label: "Polin Filter Cake", type: 'DERIVED',
     calculate: (data) => {
       const polCake = Number(data.PolinFilterCakeCalc) || 0;
       const cane = Number(data.caneCrushed) || 0;
@@ -229,7 +229,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   PolinClearJuiceCalc: {
-    type: 'ADDITIVE',
+    label: "Polin Clear Juice Calc", type: 'ADDITIVE',
     calculate: (data) => {
       const polMixed = Number(data.PolinMixedJuiceCalc) || 0;
       const polCake = Number(data.PolinFilterCakeCalc) || 0;
@@ -238,7 +238,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   PolinClearJuice: {
-    type: 'DERIVED',
+    label: "Polin Clear Juice", type: 'DERIVED',
     calculate: (data) => {
       const polClear = Number(data.PolinClearJuiceCalc) || 0;
       const cane = Number(data.caneCrushed) || 0;
@@ -248,7 +248,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   ClearJuiceQuantity: {
-    type: 'ADDITIVE',
+    label: "Clear Juice Quantity", type: 'ADDITIVE',
     calculate: (data) => {
       const polClear = Number(data.PolinClearJuiceCalc) || 0;
       const pol = Number(data.clearJuicePol) || 0;
@@ -258,7 +258,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   BrixinClearJuiceCalc: {
-    type: 'ADDITIVE',
+    label: "Brixin Clear Juice Calc", type: 'ADDITIVE',
     calculate: (data) => {
       const qty = Number(data.ClearJuiceQuantity) || 0;
       const brix = Number(data.clearJuiceBrix) || 0;
@@ -267,7 +267,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   BrixinClearJuicePercentCane: {
-    type: 'DERIVED',
+    label: "Brixin Clear Juice Percent Cane", type: 'DERIVED',
     calculate: (data) => {
       const brixClear = Number(data.BrixinClearJuiceCalc) || 0;
       const cane = Number(data.caneCrushed) || 0;
@@ -277,7 +277,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   NonSugarinClearJuice: {
-    type: 'ADDITIVE',
+    label: "Non Sugarin Clear Juice", type: 'ADDITIVE',
     calculate: (data) => {
       const brixClear = Number(data.BrixinClearJuiceCalc) || 0;
       const polClear = Number(data.PolinClearJuiceCalc) || 0;
@@ -286,7 +286,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   NonSugarinFinalMolasses: {
-    type: 'DERIVED',
+    label: "Non Sugarin Final Molasses", type: 'DERIVED',
     calculate: (data) => {
       const brix = Number(data.finalMolassesBrix) || 0;
       const pol = Number(data.finalMolassesPol) || 0;
@@ -295,7 +295,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   EstimatedFinalMolassesCalc: {
-    type: 'ADDITIVE',
+    label: "Estimated Final Molasses Calc", type: 'ADDITIVE',
     calculate: (data) => {
       const nsClear = Number(data.NonSugarinClearJuice) || 0;
       const nsMolasses = Number(data.NonSugarinFinalMolasses) || 0;
@@ -305,7 +305,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   EstimatedFinalMolasses: {
-    type: 'DERIVED',
+    label: "Estimated Final Molasses", type: 'DERIVED',
     calculate: (data) => {
       const estMolasses = Number(data.EstimatedFinalMolassesCalc) || 0;
       const cane = Number(data.caneCrushed) || 0;
@@ -315,7 +315,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   BrixinFinalMolassesCalc: {
-    type: 'ADDITIVE',
+    label: "Brixin Final Molasses Calc", type: 'ADDITIVE',
     calculate: (data) => {
       const estMolasses = Number(data.EstimatedFinalMolassesCalc) || 0;
       const brix = Number(data.finalMolassesBrix) || 0;
@@ -324,7 +324,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   PolinFinalMolassesCalc: {
-    type: 'ADDITIVE',
+    label: "Polin Final Molasses Calc", type: 'ADDITIVE',
     calculate: (data) => {
       const estMolasses = Number(data.EstimatedFinalMolassesCalc) || 0;
       const pol = Number(data.finalMolassesPol) || 0;
@@ -333,7 +333,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   PolinFinalMolasses: {
-    type: 'DERIVED',
+    label: "Polin Final Molasses", type: 'DERIVED',
     calculate: (data) => {
       const polMolasses = Number(data.PolinFinalMolassesCalc) || 0;
       const cane = Number(data.caneCrushed) || 0;
@@ -343,7 +343,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   PolinCaneCalc: {
-    type: 'ADDITIVE',
+    label: "Polin Cane Calc", type: 'ADDITIVE',
     calculate: (data) => {
       const polMixed = Number(data.PolinMixedJuiceCalc) || 0;
       const polBagasse = Number(data.PolinBagasseCalc) || 0;
@@ -352,7 +352,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   PolinCane: {
-    type: 'DERIVED',
+    label: "Polin Cane", type: 'DERIVED',
     calculate: (data) => {
       const polCane = Number(data.PolinCaneCalc) || 0;
       const cane = Number(data.caneCrushed) || 0;
@@ -362,7 +362,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   UnknownLossesCalc: {
-    type: 'DERIVED', 
+    label: "Unknown Losses Calc", type: 'DERIVED', 
     calculate: (data) => {
       const losses = Number(data.unknownLosses) || 0;
       const cane = Number(data.caneCrushed) || 0;
@@ -371,7 +371,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   PolUndetermined: {
-    type: 'DERIVED',
+    label: "Pol Undetermined", type: 'DERIVED',
     calculate: (data) => {
       const lossesCalc = Number(data.UnknownLossesCalc) || 0;
       const cane = Number(data.caneCrushed) || 0;
@@ -381,7 +381,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   TotalSyrupCalc: {
-    type: 'ADDITIVE',
+    label: "Total Syrup Calc", type: 'ADDITIVE',
     calculate: (data) => {
       const qty = Number(data.ClearJuiceQuantity) || 0;
       const clearBrix = Number(data.clearJuiceBrix) || 0;
@@ -392,7 +392,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   TotalSyrupPerCane: {
-    type: 'DERIVED',
+    label: "Total Syrup Per Cane", type: 'DERIVED',
     calculate: (data) => {
       const syrup = Number(data.TotalSyrupCalc) || 0;
       const cane = Number(data.caneCrushed) || 0;
@@ -402,7 +402,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   DivertedSyrupPerCane: {
-    type: 'DERIVED',
+    label: "Diverted Syrup Per Cane", type: 'DERIVED',
     calculate: (data) => {
       const syrup = Number(data.divertedSyrup) || 0;
       const cane = Number(data.caneCrushed) || 0;
@@ -412,7 +412,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   BrixinDivertedSyrup: {
-    type: 'ADDITIVE',
+    label: "Brixin Diverted Syrup", type: 'ADDITIVE',
     calculate: (data) => {
       const cane = Number(data.caneCrushed) || 0;
       const pct = Number(data.DivertedSyrupPerCane) || 0;
@@ -422,7 +422,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   PolinDivertedSyrup: {
-    type: 'ADDITIVE',
+    label: "Polin Diverted Syrup", type: 'ADDITIVE',
     calculate: (data) => {
       const cane = Number(data.caneCrushed) || 0;
       const pct = Number(data.DivertedSyrupPerCane) || 0;
@@ -432,7 +432,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   NonSugarinDivertedSyrup: {
-    type: 'ADDITIVE',
+    label: "Non Sugarin Diverted Syrup", type: 'ADDITIVE',
     calculate: (data) => {
       const brix = Number(data.BrixinDivertedSyrup) || 0;
       const pol = Number(data.PolinDivertedSyrup) || 0;
@@ -441,7 +441,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   PolinDivertedSyrupPerCane: {
-    type: 'DERIVED',
+    label: "Polin Diverted Syrup Per Cane", type: 'DERIVED',
     calculate: (data) => {
       const pol = Number(data.PolinDivertedSyrup) || 0;
       const cane = Number(data.caneCrushed) || 0;
@@ -451,7 +451,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   TotalLossesCalc: {
-    type: 'DERIVED', 
+    label: "Total Losses Calc", type: 'DERIVED', 
     calculate: (data) => {
       const bagasse = Number(data.PolinBagasseCalc) || 0;
       const filter = Number(data.PolinFilterCakeCalc) || 0;
@@ -463,7 +463,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   TotalLosses: {
-    type: 'DERIVED',
+    label: "Total Losses", type: 'DERIVED',
     calculate: (data) => {
       const losses = Number(data.TotalLossesCalc) || 0;
       const cane = Number(data.caneCrushed) || 0;
@@ -473,7 +473,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   RecoveryCalc: {
-    type: 'ADDITIVE',
+    label: "Recovery Calc", type: 'ADDITIVE',
     calculate: (data) => {
       const polCane = Number(data.PolinCaneCalc) || 0;
       const losses = Number(data.TotalLossesCalc) || 0;
@@ -482,7 +482,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   Recovery: {
-    type: 'DERIVED',
+    label: "Recovery", type: 'DERIVED',
     calculate: (data) => {
       const rec = Number(data.RecoveryCalc) || 0;
       const cane = Number(data.caneCrushed) || 0;
@@ -492,7 +492,7 @@ export const manufacturingFormulas: Record<string, FormulaDefinition> = {
   },
 
   PolinSugar: {
-    type: 'DERIVED',
+    label: "Polin Sugar", type: 'DERIVED',
     calculate: (data) => {
       const rec = Number(data.Recovery) || 0;
       const polPct = Number(data.polPercentSugar) || 0;
