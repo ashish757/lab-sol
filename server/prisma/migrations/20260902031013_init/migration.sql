@@ -13,6 +13,7 @@ CREATE TABLE "daily_logs" (
     "created_at" TIMESTAMP(3) NOT NULL,
     "status" "LogStatus" NOT NULL DEFAULT 'UNLOCKED',
     "locked_at" TIMESTAMP(3),
+    "unlock_expires_at" TIMESTAMP(3),
     "dayType" "LogDayType" NOT NULL DEFAULT 'NORMAL',
     "metrics" JSONB NOT NULL,
     "unitId" TEXT NOT NULL,
